@@ -1,16 +1,16 @@
-
 ############################
 # Java / Maven / Gradle
 ############################
 target/
+build/
 *.class
-*.war
-*.ear
-*.jar
-*.nar
-*.zip
-*.tar.gz
-*.rar
+
+# Permit source EAR/WAR/JAR content (only ignore built artifacts)
+# Ignore generated archives in root or target, but allow content in modules
+# Do NOT ignore files inside EarContent, META-INF, or source modules
+/*.ear
+/*.war
+/*.jar
 
 ############################
 # Eclipse / IntelliJ / VSCode
@@ -20,6 +20,7 @@ target/
 .classpath
 .settings/
 .loadpath
+.metadata/
 
 # IntelliJ IDEA
 .idea/
@@ -27,8 +28,6 @@ target/
 *.ipr
 *.iws
 out/
-.metadata/
-
 
 # VSCode
 .vscode/
@@ -81,7 +80,6 @@ domain/tmp/
 
 # Gradle
 .gradle/
-build/
 gradle-app.setting
 
 ############################
