@@ -1,3 +1,4 @@
+
 ############################
 # Java / Maven / Gradle
 ############################
@@ -26,6 +27,8 @@ target/
 *.ipr
 *.iws
 out/
+.metadata/
+
 
 # VSCode
 .vscode/
