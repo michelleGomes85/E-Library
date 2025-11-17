@@ -1,0 +1,97 @@
+############################
+# Java / Maven / Gradle
+############################
+target/
+*.class
+*.war
+*.ear
+*.jar
+*.nar
+*.zip
+*.tar.gz
+*.rar
+
+############################
+# Eclipse / IntelliJ / VSCode
+############################
+# Eclipse
+.project
+.classpath
+.settings/
+.loadpath
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+
+# VSCode
+.vscode/
+
+############################
+# OS files
+############################
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Linux
+*~
+
+############################
+# Logs / Temp
+############################
+*.log
+logs/
+tmp/
+temp/
+
+############################
+# WildFly / JBoss / App Server
+############################
+standalone/data/
+standalone/log/
+standalone/tmp/
+standalone/deployments/*.failed
+standalone/deployments/*.isdeploying
+standalone/deployments/*.undeployed
+standalone/deployments/*.deployed
+standalone/configuration/standalone_xml_history/
+
+domain/data/
+domain/log/
+domain/tmp/
+
+############################
+# Build tools
+############################
+# Maven
+.mvn/wrapper/maven-wrapper.jar
+
+# Gradle
+.gradle/
+build/
+gradle-app.setting
+
+############################
+# Other
+############################
+*.swp
+*.bak
+*.backup
+*.orig
+*.rej
+
+# Credentials (if used)
+*.env
+.env.local
+secrets.properties
+
