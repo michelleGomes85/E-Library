@@ -1,5 +1,6 @@
 package br.elibrary.model;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -18,8 +19,10 @@ import jakarta.persistence.Table;
  */
 @Entity
 @Table(name = "books")
-public class Book {
+public class Book implements Serializable {
 	
+	private static final long serialVersionUID = 1L;
+
 	@Id
 	@SequenceGenerator(
 			name="book_id", 

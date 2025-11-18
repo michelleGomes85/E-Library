@@ -12,7 +12,7 @@ import jakarta.persistence.PersistenceContext;
 
 @Stateless
 @Remote(CopyService.class)
-public class CopyServiceSB implements CopyService {
+public class CopySB implements CopyService {
 	
     @PersistenceContext(unitName = "E-Library")
     private EntityManager em;

@@ -1,5 +1,7 @@
 package br.elibrary.model;
 
+import java.io.Serializable;
+
 import br.elibrary.model.enuns.CopyStatus;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -20,8 +22,10 @@ import jakarta.persistence.Table;
  */
 @Entity
 @Table(name = "copies")
-public class Copy {
+public class Copy implements Serializable {
 	
+	private static final long serialVersionUID = 1L;
+
 	@Id
 	@SequenceGenerator(
 			name="copy_id", 

@@ -1,5 +1,6 @@
 package br.elibrary.model;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 
 import br.elibrary.model.enuns.LoanStatus;
@@ -21,8 +22,10 @@ import jakarta.persistence.Table;
  */
 @Entity
 @Table(name = "loans")
-public class Loan {
+public class Loan implements Serializable {
 	
+	private static final long serialVersionUID = 1L;
+
 	@Id
 	@SequenceGenerator(
 			name="loan_id", 
