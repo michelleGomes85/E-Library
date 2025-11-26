@@ -1,5 +1,7 @@
 package br.elibrary.stateless;
 
+import org.mindrot.jbcrypt.BCrypt;
+
 import br.elibrary.model.User;
 import br.elibrary.model.service.UserService;
 import jakarta.ejb.Remote;
@@ -21,6 +23,9 @@ public class UserSB implements UserService {
 		if (findByRegistration(user.getRegistration()) != null) {
             throw new IllegalArgumentException("Matrícula já cadastrada: " + user.getRegistration());
         }
+		
+		String hashed = BCrypt.hashpw(user.getPasswordHash(), BCrypt.gensalt());
+        user.setPasswordHash(hashed);
 		
 		em.persist(user);
 		return user;

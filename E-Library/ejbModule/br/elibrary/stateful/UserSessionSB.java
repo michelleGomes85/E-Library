@@ -17,21 +17,25 @@ public class UserSessionSB implements UserSessionService {
     private User currentUser;
 
     @Override
-    public boolean login(String registration, String passwordHash) {
+    public boolean login(String registration, String passwordPlain) {
     	
-        User user = em.createQuery(
-            "SELECT u FROM User u WHERE u.registration = :reg AND u.passwordHash = :pwd", User.class)
-            .setParameter("reg", registration)
-            .setParameter("pwd", passwordHash)
-            .getResultStream()
-            .findFirst()
-            .orElse(null);
+    	User user = em.createQuery(
+                "SELECT u FROM User u WHERE u.registration = :reg", User.class)
+                .setParameter("reg", registration)
+                .getResultStream()
+                .findFirst()
+                .orElse(null);
 
-        if (user != null) {
-            this.currentUser = user;
+        if (user == null)
+            return false;
+      
+        boolean passwordOk = org.mindrot.jbcrypt.BCrypt.checkpw(passwordPlain, user.getPasswordHash());
+
+        if (passwordOk) {
+            currentUser = user;
             return true;
         }
-        
+
         return false;
     }
 

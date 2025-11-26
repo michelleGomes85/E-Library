@@ -5,73 +5,112 @@ import java.io.Serializable;
 import br.elibrary.model.User;
 import br.elibrary.model.service.UserSessionService;
 import jakarta.ejb.EJB;
+import jakarta.enterprise.context.RequestScoped;
 import jakarta.enterprise.context.SessionScoped;
 import jakarta.inject.Named;
 
-@Named
-@SessionScoped
+/**
+ * Managed Bean responsável pelo processo de login e logout do usuário.
+ *
+ * <p>
+ * Mantém o estado do usuário autenticado utilizando escopo de sessão,
+ * permitindo que o sistema saiba quem está logado durante toda a navegação.
+ * </p>
+ */
+@Named("loginBean")
+@RequestScoped
 public class LoginBean implements Serializable {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	@EJB
-	private UserSessionService userSession;
+    @EJB
+    private UserSessionService userSession;
 
-	private String registration;
-	private String password;
-	private String message;
-	private User loggedInUser;
+    /** Matrícula usada para autenticação. */
+    private String registration;
 
-	public String doLogin() {
-		String passwordHash = password;
+    /** Senha digitada no formulário. */
+    private String password;
 
-		if (userSession.login(registration, passwordHash)) {
-			loggedInUser = userSession.getLoggedInUser();
-			message = "Login realizado com sucesso!";
-			return "index?faces-redirect=true"; 
-		} else {
-			message = "Matrícula ou senha inválidos.";
-			return null;
-		}
-	}
+    /** Mensagem de erro ou sucesso exibida na interface. */
+    private String message;
 
-	public String doLogout() {
-		userSession.logout();
-		loggedInUser = null;
-		message = "Você saiu do sistema.";
-		
-		return "login?faces-redirect=true";
-	}
+    /** Usuário logado na sessão atual. */
+    private User loggedInUser;
 
-	public String getRegistration() {
-		return registration;
-	}
+    /**
+     * Tenta autenticar o usuário no sistema.
+     *
+     * <p>
+     * Caso o login seja bem-sucedido, o usuário é carregado e mantido na sessão.
+     * Caso contrário, apenas exibe uma mensagem de erro.
+     * </p>
+     *
+     * @return navegação da página (com redirect) ou null em caso de falha
+     */
+    public String doLogin() {
 
-	public void setRegistration(String registration) {
-		this.registration = registration;
-	}
+        if (userSession.login(registration, password)) {
+            loggedInUser = userSession.getLoggedInUser();
+            message = "Login realizado com sucesso!";
+            return "index?faces-redirect=true";
+        } else {
+            message = "Matrícula ou senha inválidos.";
+            return null;
+        }
+    }
 
-	public String getPassword() {
-		return password;
-	}
+    /**
+     * Realiza logout do sistema, limpando dados da sessão.
+     *
+     * @return página de login com redirect
+     */
+    public String doLogout() {
+        userSession.logout();
+        loggedInUser = null;
+        message = "Você saiu do sistema.";
 
-	public void setPassword(String password) {
-		this.password = password;
-	}
+        return "login?faces-redirect=true";
+    }
 
-	public String getMessage() {
-		return message;
-	}
+    // ==============================
+    // Getters e Setters
+    // ==============================
 
-	public void setMessage(String message) {
-		this.message = message;
-	}
+    public String getRegistration() {
+        return registration;
+    }
 
-	public User getLoggedInUser() {
-		return loggedInUser;
-	}
+    public void setRegistration(String registration) {
+        this.registration = registration;
+    }
 
-	public boolean isLoggedIn() {
-		return loggedInUser != null;
-	}
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public User getLoggedInUser() {
+        return loggedInUser;
+    }
+
+    /**
+     * Indica se há um usuário autenticado na sessão.
+     *
+     * @return true se o usuário está logado
+     */
+    public boolean isLoggedIn() {
+        return loggedInUser != null;
+    }
 }
