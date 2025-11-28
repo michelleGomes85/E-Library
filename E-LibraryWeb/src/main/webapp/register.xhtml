@@ -1,50 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
-	xmlns:h="http://xmlns.jcp.org/jsf/html"
-	xmlns:f="http://xmlns.jcp.org/jsf/core">
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
 <h:head>
-	<title>Cadastro — E-Library</title>
-	<meta charset="UTF-8" />
+    <title>Cadastro — E-Library</title>
+    <meta charset="UTF-8" />
+    <h:outputStylesheet name="css/custom.css" />
 </h:head>
+
 <h:body>
-	<h2>Cadastro de Usuário</h2>
+    <div class="page-container">
+        <div class="form-card">
+            <h1 class="form-title">Cadastro de Usuário</h1>
 
-	<!-- Mensagem de feedback -->
-	<h:outputText value="#{registerBean.message}"
-		rendered="#{not empty registerBean.message}" />
-	<br />
-	<br />
+            <p:messages id="globalMessages" globalOnly="true" autoUpdate="true" />
 
-	<h:form>
-    Nome: <h:inputText value="#{registerBean.newUser.name}"
-			required="true" />
-		<br />
-		<br />
-    Matrícula: <h:inputText value="#{registerBean.newUser.registration}"
-			required="true" />
-		<br />
-		<br />
-    E-mail: <h:inputText value="#{registerBean.newUser.email}"
-			required="true" />
-		<br />
-		<br />
-    Senha: <h:inputSecret value="#{registerBean.newUser.passwordHash}"
-			required="true" />
-		<br />
-		<br />
-    
-    Tipo:
-    <h:selectOneMenu value="#{registerBean.newUser.type}"
-			required="true">
-			<f:selectItems value="#{registerBean.userTypes}" />
-		</h:selectOneMenu>
-		<br />
-		<br />
+            <h:form id="registerForm">
 
-		<h:commandButton value="Cadastrar" action="#{registerBean.doRegister}" />
-	</h:form>
+                <!-- Nome -->
+                <div class="field-group">
+                    <div class="field">
+                        <label for="name" class="field-label">Nome:</label>
+                        <div class="field-input">
+                            <p:inputText id="name"
+                                         value="#{registerBean.newUser.name}"
+                                         required="true"
+                                         placeholder="Nome completo"
+                                         autocomplete="name" />
+                            <p:message for="name" display="icon" />
+                        </div>
+                    </div>
+                </div>
 
-	<br />
-	<h:link value="← Já tenho conta. Voltar para login." outcome="login" />
+                <!-- Matrícula -->
+                <div class="field-group">
+                    <div class="field">
+                        <label for="registration" class="field-label">Matrícula:</label>
+                        <div class="field-input">
+                            <p:inputText id="registration"
+                                         value="#{registerBean.newUser.registration}"
+                                         required="true"
+                                         placeholder="Ex: 20241001"
+                                         autocomplete="username" />
+                            <p:message for="registration" display="icon" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- E-mail -->
+                <div class="field-group">
+                    <div class="field">
+                        <label for="email" class="field-label">E-mail:</label>
+                        <div class="field-input">
+                            <p:inputText id="email"
+                                         value="#{registerBean.newUser.email}"
+                                         required="true"
+                                         placeholder="seu@email.com"
+                                         type="email" />
+                            <p:message for="email" display="icon" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Senha -->
+                <div class="field-group">
+                    <div class="field">
+                        <label for="password" class="field-label">Senha:</label>
+                        <div class="field-input">
+                            <p:password id="password"
+                                        value="#{registerBean.newUser.passwordHash}"
+                                        required="true"
+                                        placeholder="Mín. 6 caracteres"
+                                        feedback="true"
+                                        autocomplete="new-password" />
+                            <p:message for="password" display="icon" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tipo (Role) -->
+                <div class="field-group">
+                    <div class="field">
+                        <label for="type" class="field-label">Tipo:</label>
+                        <div class="field-input">
+                            <p:selectOneMenu id="type"
+                                             value="#{registerBean.newUser.type}"
+                                             required="true"
+                                             filter="true"
+                                             filterMatchMode="contains">
+                                <f:selectItems value="#{registerBean.userTypes}" />
+                            </p:selectOneMenu>
+                            <p:message for="type" display="icon" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botão de cadastro -->
+                <div class="field-group">
+                    <div class="actions">
+                        <p:commandButton value="Cadastrar"
+                                         action="#{registerBean.doRegister}"
+                                         icon="pi pi-user-plus"
+                                         styleClass="btn-primary"
+                                         update="@form"
+                                         ajax="true" />
+                    </div>
+                </div>
+
+                <!-- Link de retorno -->
+                <div class="field-group">
+                    <div class="link-action">
+                        <p:link value="← Já tenho conta. Voltar para login."
+                                outcome="login"
+                                styleClass="link-secondary" />
+                    </div>
+                </div>
+
+            </h:form>
+        </div>
+    </div>
 </h:body>
 </html>

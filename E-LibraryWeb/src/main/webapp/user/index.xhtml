@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+<h:head>
+    <title>E-Library - Dashboard</title>
+</h:head>
+
+<h:body>
+
+    <f:event type="preRenderView" listener="#{dashboardBean.refresh}" />
+
+    <p:growl id="globalMessages" showDetail="true" autoUpdate="true" life="3000" />
+
+    <div class="page-container">
+
+        <div class="header">
+            <div class="header-content">
+                <h1 class="page-title">E-Library - Dashboard</h1>
+                <p class="user-info">
+                    Bem-vindo, <strong>#{sessionBean.loggedUser.name}</strong>!
+                </p>
+            </div>
+            <div class="header-actions">
+                <h:form id="logoutForm" prependId="false">
+                    <p:commandButton value="Sair"
+                                     action="#{loginBean.doLogout}"
+                                     styleClass="btn-logout"
+                                     ajax="true"
+                                     update=":globalMessages" />
+                </h:form>
+            </div>
+        </div>
+
+        <h:panelGroup id="summaryPanel" layout="block" styleClass="summary-box">
+            <h3>Situação do Acervo</h3>
+            <div class="summary-stats">
+                <div class="stat-item">
+                    <span class="stat-label">Livros cadastrados</span>
+                    <span class="stat-value">#{dashboardBean.totalBooks}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Cópias totais</span>
+                    <span class="stat-value">#{dashboardBean.totalCopies}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Cópias disponíveis</span>
+                    <span class="stat-value"
+                          style="color: #{dashboardBean.availableCopies gt 0 ? '#28a745' : '#dc3545'}">
+                        #{dashboardBean.availableCopies}
+                    </span>
+                </div>
+            </div>
+        </h:panelGroup>
+
+        <h2>Catálogo</h2>
+        <h:panelGroup id="catalogPanel" layout="block" styleClass="catalog-section">
+            <ui:repeat value="#{dashboardBean.booksWithAvailableCount}" var="row">
+                <div class="book-card">
+                    <div class="book-title">#{row[0].title}</div>
+                    <div class="book-meta">
+                        Autor: #{row[0].author} |
+                        Total: #{row[1]} cópia(s) •
+                        Disponíveis: #{row[2]}
+                    </div>
+
+                    <h:panelGroup rendered="#{row[2] gt 0}" layout="block" styleClass="book-actions">
+                        <span class="book-status status-available">Disponível</span>
+                        <h:form prependId="false">
+                            <p:commandButton value="Emprestar"
+                                             action="#{dashboardBean.borrow(row[0])}"
+                                             update=":summaryPanel :catalogPanel :loansPanel :globalMessages"
+                                             styleClass="btn-action p-button-sm p-button-success" />
+                        </h:form>
+                    </h:panelGroup>
+
+                    <h:panelGroup rendered="#{row[2] eq 0}" layout="block" styleClass="book-actions">
+                        <span class="book-status status-unavailable">Indisponível</span>
+                        <h:form prependId="false">
+                            <p:commandButton value="Emprestar"
+                                             disabled="true"
+                                             styleClass="btn-action p-button-sm p-button-secondary" />
+                        </h:form>
+                    </h:panelGroup>
+                </div>
+            </ui:repeat>
+        </h:panelGroup>
+
+        <h2>Meus Empréstimos Ativos (<span id="loan-count">#{dashboardBean.activeLoans.size()}</span>)</h2>
+        <h:panelGroup id="loansPanel" layout="block" styleClass="loans-section">
+            <ui:fragment rendered="#{empty dashboardBean.activeLoans}">
+                <div class="no-loans">
+                    <i>Nenhum empréstimo ativo no momento.</i>
+                </div>
+            </ui:fragment>
+
+            <ui:repeat value="#{dashboardBean.activeLoans}" var="loan">
+                <div class="book-card loan-card">
+                    <div class="book-title">#{loan.copy.book.title}</div>
+                    <div class="book-meta">
+                        Exemplar: <strong>#{loan.copy.internalCode}</strong> |
+                        Emprestado em: #{loan.issueDate} |
+                        Devolução prevista:
+                        <span class="due-date #{loan.overdue ? 'overdue' : ''}">
+                            #{loan.dueDate}
+                        </span>
+                    </div>
+
+                    <h:form prependId="false">
+                        <p:commandButton value="Devolver"
+                                         action="#{dashboardBean.returnCopy(loan)}"
+                                         update=":summaryPanel :catalogPanel :loansPanel :globalMessages"
+                                         styleClass="btn-action p-button-sm p-button-warning" />
+                    </h:form>
+                </div>
+            </ui:repeat>
+        </h:panelGroup>
+
+    </div>
+
+</h:body>
+</html>

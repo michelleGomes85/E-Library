@@ -3,7 +3,11 @@ package br.elibrary.stateless;
 import java.util.List;
 
 import br.elibrary.model.Book;
+import br.elibrary.model.Copy;
+import br.elibrary.model.enuns.CopyStatus;
 import br.elibrary.model.service.BookService;
+import br.elibrary.model.service.CatalogStatusService;
+import jakarta.ejb.EJB;
 import jakarta.ejb.Remote;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
@@ -16,10 +20,14 @@ public class BookSB implements BookService {
 	
     @PersistenceContext(unitName = "E-Library")
     private EntityManager em;
+    
+    @EJB
+    private CatalogStatusService catalogStatusSB;
 
 	@Override
 	public Book create(Book book) {
 		em.persist(book);
+		catalogStatusSB.onBookCreated();
 		return book;
 	}
 
@@ -52,5 +60,34 @@ public class BookSB implements BookService {
         query.setParameter("title", "%" + title + "%");
         
         return query.getResultList();
+    }
+    
+    public List<Object[]> findBooksWithCopyStats() {
+    	
+        String jpql = """
+            SELECT b,
+                   COUNT(c) AS totalCopies,
+                   SUM(CASE WHEN c.status = :available THEN 1 ELSE 0 END) AS availableCopies
+            FROM Book b
+            LEFT JOIN b.copies c
+            GROUP BY b.id
+            ORDER BY b.title
+            """;
+
+        return em.createQuery(jpql, Object[].class)
+                 .setParameter("available", CopyStatus.AVAILABLE)
+                 .getResultList();
+    }
+    
+    @Override
+    public Copy findFirstAvailableCopy(Long bookId) {
+        return em.createQuery(
+            "SELECT c FROM Copy c WHERE c.book.id = :bookId AND c.status = :status", Copy.class)
+            .setParameter("bookId", bookId)
+            .setParameter("status", CopyStatus.AVAILABLE)
+            .setMaxResults(1)
+            .getResultStream()
+            .findFirst()
+            .orElse(null);
     }
 }

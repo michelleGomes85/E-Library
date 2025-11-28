@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
+import br.elibrary.model.enuns.Rules;
 import br.elibrary.model.enuns.UserType;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -17,9 +18,6 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 
-/**
- * Classe Usuários
- */
 @Entity
 @Table(name = "users")
 public class User implements Serializable {
@@ -27,31 +25,32 @@ public class User implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@SequenceGenerator(
-			name="user_id", 
-			sequenceName="user_seq",
-			allocationSize=1)
-	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="user_id")
-    private Long id;
-	
-	@Column(nullable = false)
-    private String name;
-	
-	@Column(nullable = false)
-    private String registration; 
-	
-	@Column(nullable = false)
-    private String email;
-	
-	@Column(nullable = false)
-    private String passwordHash;
+	@SequenceGenerator(name = "user_id", sequenceName = "user_seq", allocationSize = 1)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_id")
+	private Long id;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private UserType type;
+	@Column(nullable = false)
+	private String name;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private Set<Loan> loans = new HashSet<>();
+	@Column(nullable = false)
+	private String registration;
+
+	@Column(nullable = false)
+	private String email;
+
+	@Column(nullable = false)
+	private String passwordHash;
+
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false)
+	private UserType type;
+
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false)
+	private Rules rules;
+
+	@OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
+	private Set<Loan> loans = new HashSet<>();
 
 	public Long getId() {
 		return id;
@@ -99,6 +98,14 @@ public class User implements Serializable {
 
 	public void setType(UserType type) {
 		this.type = type;
+	}
+
+	public Rules getRules() {
+		return rules;
+	}
+
+	public void setRules(Rules rules) {
+		this.rules = rules;
 	}
 
 	public Set<Loan> getLoans() {

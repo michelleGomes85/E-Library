@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<title>E-Library — Admin</title>
+	<meta charset="UTF-8" />
+	<h:outputStylesheet name="css/admin-dashboard.css" />
+</h:head>
+
+<h:body>
+	<div class="page-container">
+		<div class="header">
+			<div class="header-content">
+				<h1 class="page-title">Painel do Administrador</h1>
+				<p class="user-info">
+					Bem-vindo, <strong>#{sessionBean.loggedUser.name}</strong>!
+				</p>
+			</div>
+
+			<!-- Botão de logout no cabeçalho -->
+			<div class="header-actions">
+				<h:form id="logoutForm" styleClass="inline-form">
+					<p:commandButton value="Sair" action="#{loginBean.doLogout}"
+						icon="pi pi-sign-out" styleClass="btn-logout" ajax="true"
+						update="@form" title="Encerrar sessão" />
+				</h:form>
+			</div>
+		</div>
+
+		<div class="card-grid">
+
+			<!-- Card: Gerenciar Usuários -->
+			<div class="card">
+				<div class="card-content">
+					<h2 class="card-title">Gerenciar Usuários</h2>
+					<p class="card-description">Crie, edite, consulte e exclua
+						usuários do sistema.</p>
+				</div>
+
+				<div class="card-actions">
+					<p:button value="Acessar" outcome="/admin/user"
+						styleClass="btn-secondary" />
+				</div>
+			</div>
+
+			<!-- Card: Gerenciar Livros -->
+			<div class="card">
+
+				<div class="card-content">
+					<h2 class="card-title">Gerenciar Livros</h2>
+					<p class="card-description">Crie, edite, consulte e exclua
+						livros do catálogo.</p>
+				</div>
+
+				<div class="card-actions">
+					<p:button value="Acessar" outcome="/admin/book"
+						styleClass="btn-secondary" />
+				</div>
+			</div>
+
+			<!-- Card: Gerenciar Exemplares -->
+			<div class="card">
+				<div class="card-content">
+					<h2 class="card-title">Gerenciar Exemplares</h2>
+					<p class="card-description">Adicione, localize e remova
+						exemplares físicos de livros cadastrados.</p>
+				</div>
+
+				<div class="card-actions">
+					<p:button value="Acessar" outcome="/admin/copy"
+						styleClass="btn-secondary" />
+				</div>
+			</div>
+
+
+
+
+		</div>
+
+
+	</div>
+</h:body>
+</html>

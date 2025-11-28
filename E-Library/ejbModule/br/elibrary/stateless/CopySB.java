@@ -4,7 +4,9 @@ import java.util.List;
 
 import br.elibrary.model.Copy;
 import br.elibrary.model.enuns.CopyStatus;
+import br.elibrary.model.service.CatalogStatusService;
 import br.elibrary.model.service.CopyService;
+import jakarta.ejb.EJB;
 import jakarta.ejb.Remote;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
@@ -16,10 +18,14 @@ public class CopySB implements CopyService {
 	
     @PersistenceContext(unitName = "E-Library")
     private EntityManager em;
+    
+    @EJB
+    private CatalogStatusService catalogStatusSB;
 
 	@Override
 	public Copy create(Copy copy) {
 		em.persist(copy);
+		catalogStatusSB.onCopyCreated();
 		return copy;
 	}
 
@@ -31,7 +37,32 @@ public class CopySB implements CopyService {
 
 	@Override
 	public void delete(Copy copy) {
-		em.remove(em.merge(copy));
+		
+	    Copy managed = em.merge(copy);
+	    CopyStatus status = managed.getStatus();
+	    em.remove(managed);
+	    
+	    if (status == CopyStatus.AVAILABLE)
+	        catalogStatusSB.onCopyStatusChanged(CopyStatus.AVAILABLE, null);
+	    else
+	        catalogStatusSB.onCopyStatusChanged(status, null);
+	    
+	    catalogStatusSB.onCopyDeleted();
+	}
+	
+	@Override
+	public void deleteById(Long id) {
+		
+	    Copy copy = em.find(Copy.class, id);
+	    
+	    if (copy != null) {
+	        CopyStatus status = copy.getStatus();
+	        em.remove(copy);
+	        if (status == CopyStatus.AVAILABLE)
+	            catalogStatusSB.onCopyStatusChanged(CopyStatus.AVAILABLE, null);
+	        
+	        catalogStatusSB.onCopyDeleted();
+	    }
 	}
 
 	@Override
@@ -60,10 +91,14 @@ public class CopySB implements CopyService {
     }
     
     @Override
-    public List<Copy> findByInternalCode(String internalCode) {
-        return em.createQuery("SELECT c FROM Copy c WHERE c.internalCode = :code", Copy.class)
-                  .setParameter("code", internalCode)
-                  .getResultList();
+    public List<Copy> findAvailableCopiesByBookId(Long bookId) {
+    	
+        return em.createQuery("""
+            SELECT c FROM Copy c
+            WHERE c.book.id = :bookId
+              AND c.status = br.elibrary.model.CopyStatus.AVAILABLE
+            """, Copy.class)
+            .setParameter("bookId", bookId)
+            .getResultList();
     }
-	
 }

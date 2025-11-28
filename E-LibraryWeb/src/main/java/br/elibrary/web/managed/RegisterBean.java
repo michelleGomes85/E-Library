@@ -48,13 +48,14 @@ public class RegisterBean {
      * captura exceções específicas e genéricas para informar mensagens adequadas.
      * </p>
      */
-    public void doRegister() {
+    public String doRegister() {
         try {
         
             newUser.setPasswordHash(newUser.getPasswordHash());
 
             userSB.create(newUser);
             message = "Usuário cadastrado com sucesso! Você já pode fazer login.";
+            
 
         } catch (IllegalArgumentException e) {
             message = e.getMessage();
@@ -62,6 +63,8 @@ public class RegisterBean {
         } catch (Exception e) {
             message = "Erro ao cadastrar usuário. Tente novamente.";
         }
+        
+        return null;
     }
 
     // ==============================
@@ -86,6 +89,6 @@ public class RegisterBean {
      * @return array de strings com os tipos de usuário
      */
     public String[] getUserTypes() {
-        return new String[] { "STUDENT", "TEACHER", "ADMIN" };
+        return new String[] { "STUDENT", "TEACHER" };
     }
 }

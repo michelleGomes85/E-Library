@@ -1,0 +1,213 @@
+@charset "UTF-8";
+
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+body {
+	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+	background: #000;
+	color: #e2e8f0;
+	min-height: 100vh;
+	padding: 1.5rem;
+	padding-top: 0;
+}
+
+body .ui-button {
+	background: #00335b;
+	border: 1px solid #00335b;
+}
+
+body .ui-button:hover {
+	background: #2563eb;
+	border: 1px solid #2563eb;
+}
+
+body .ui-toolbar, body .ui-datatable .ui-datatable-header, body .ui-paginator,
+	body .ui-datatable .ui-datatable-data>tr, body .ui-datatable thead th {
+	background: #000;
+	color: #e0e7ff;
+}
+
+body .ui-toolbar {
+	border: none;
+	padding: 30px 20px;
+}
+
+body .ui-datatable thead th, body .ui-datatable .ui-datatable-header,
+	body .ui-datatable .ui-datatable-data>tr>td {
+	border: 1px solid #24282d;
+	border-left: none;
+	border-right: none;
+}
+
+body .ui-datatable thead th.ui-state-hover {
+	background: #000 !important;
+	color: #2664ec;
+}
+
+body .ui-paginator {
+	border-color: #24282d;
+}
+
+.page-container {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-direction: column;
+}
+
+body .ui-inputfield {
+	background: #e0e7ff
+}
+
+body .ui-datatable .ui-paginator {
+	padding-bottom: 50px;
+}
+
+body .ui-button.ui-button-icon-only {
+	margin-right: 15px;
+}
+
+body .btn-danger {
+	background: #620c0c;
+	border-color: #620c0c;
+}
+
+.header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding-top: 4rem;
+	padding-bottom: 2.5rem;
+	flex-wrap: wrap;
+	gap: 1rem;
+	flex-direction: column;
+	text-align: center;
+	border-bottom: 1px solid #3d444db3;
+	background: linear-gradient(to bottom, #0f172a, #000);
+}
+
+.header-content {
+	flex: 1;
+	min-width: 0;
+}
+
+.page-title {
+	font-size: 2.2rem;
+	font-weight: 700;
+	color: #f1f5f9;
+	margin-bottom: 0.3rem;
+}
+
+.page-description {
+	font-size: 1.2rem;
+	color: #94a3b8; 
+	margin-bottom: 0.8rem;
+	line-height: 1.8;
+}
+
+.user-info {
+	font-size: 1rem;
+	color: #64748b; 
+}
+
+.header-actions {
+	flex-shrink: 0;
+	display: flex;
+	align-items: center;
+	margin-top: 10px;
+}
+
+.inline-form {
+	display: flex;
+	gap: 0.75rem;
+	align-items: center;
+}
+
+.btn-outline {
+	padding: 0.5rem 1rem;
+	font-weight: 600;
+	font-size: 0.95rem;
+	background: transparent;
+	color: #94a3b8;
+	border: 1px solid #475569;
+	border-radius: 6px;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	gap: 0.4rem;
+	transition: all 0.2s ease;
+}
+
+.btn-outline:hover {
+	background: rgba(96, 165, 250, 0.1);
+	border-color: #60a5fa;
+	color: #60a5fa;
+}
+
+.btn-logout {
+	padding: 0.5rem 1rem;
+	font-weight: 600;
+	font-size: 0.95rem;
+	background: transparent;
+	color: #fca5a5;
+	border: 1px solid #475569;
+	border-radius: 6px;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	gap: 0.4rem;
+	transition: all 0.2s ease;
+}
+
+.btn-logout:hover {
+	background: rgba(220, 38, 38, 0.1);
+	border-color: #ef4444;
+	color: #fecaca;
+}
+
+.btn-logout .pi {
+	font-size: 0.9rem;
+}
+
+body .ui-dialog .ui-dialog-titlebar,
+body .ui-dialog .ui-dialog-content,
+body .ui-dialog .ui-dialog-footer {
+	background: #000;
+	color: #fff;
+}
+
+.ui-widget-header .ui-inputfield, .ui-widget-content .ui-inputfield,
+body .ui-selectonemenu {
+	width: 100%;
+	margin: 0.5rem 0;
+}
+
+body .ui-dialog {
+	border: 1px solid #fff;
+}
+
+body .ui-dialog .ui-dialog-content {
+	padding: .3rem 2.5rem 1rem 2rem;
+}
+
+@media ( max-width : 768px) {
+	.header {
+		flex-direction: column;
+		text-align: center;
+	}
+	.header-content {
+		text-align: center;
+	}
+	.header-actions {
+		width: 100%;
+		justify-content: center;
+	}
+	.inline-form {
+		flex-wrap: wrap;
+		justify-content: center;
+	}
+}

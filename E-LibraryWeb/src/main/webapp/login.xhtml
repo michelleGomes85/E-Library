@@ -1,31 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
-	xmlns:h="http://xmlns.jcp.org/jsf/html">
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
 <h:head>
 	<title>Login — E-Library</title>
 	<meta charset="UTF-8" />
+	<h:outputStylesheet name="css/custom.css" />
 </h:head>
+
 <h:body>
-	<h2>Login</h2>
+	<div class="page-container">
+		<div class="form-card">
+			<h1 class="form-title">Login</h1>
 
-	<h:outputText value="#{loginBean.message}"
-		rendered="#{not empty loginBean.message}" />
+			<p:messages id="globalMessages" globalOnly="true" autoUpdate="true" />
 
-	<br />
-	<br />
+			<h:form id="loginForm">
 
-	<h:form>
-    Matrícula: <h:inputText value="#{loginBean.registration}"
-			required="true" />
-		<br />
-		<br />
-    Senha: <h:inputSecret value="#{loginBean.password}" required="true" />
-		<br />
-		<br />
-		<h:commandButton value="Entrar" action="#{loginBean.doLogin}" />
-	</h:form>
+				<!-- Matrícula -->
+				<div class="field-group">
+					<div class="field">
+						<label for="registration" class="field-label">Matrícula:</label>
+						<div class="field-input">
+							<p:inputText id="registration" value="#{loginBean.registration}"
+								required="true" placeholder="Digite sua matrícula"
+								autocomplete="username" />
+							<p:message for="registration" display="icon" />
+						</div>
+					</div>
+				</div>
 
-	<br />
-	<h:link value="Não tem conta? Cadastre-se aqui." outcome="register" />
+				<!-- Senha -->
+				<div class="field-group">
+					<div class="field">
+						<label for="password" class="field-label">Senha:</label>
+						<div class="field-input">
+							<p:password id="password" value="#{loginBean.password}"
+								required="true" placeholder="Digite sua senha" feedback="false"
+								autocomplete="current-password" />
+							<p:message for="password" display="icon" />
+						</div>
+					</div>
+				</div>
+
+				<!-- Botão de login -->
+				<div class="field-group">
+					<div class="actions">
+						<p:commandButton value="Entrar" action="#{loginBean.doLogin}"
+							icon="pi pi-sign-in" styleClass="btn-primary" ajax="false" />
+
+					</div>
+				</div>
+
+				<!-- Link de cadastro -->
+				<div class="field-group">
+					<div class="link-action">
+						<p:link value="Não tem conta? Cadastre-se aqui."
+							outcome="register" styleClass="link-primary" />
+					</div>
+				</div>
+
+			</h:form>
+		</div>
+	</div>
 </h:body>
 </html>

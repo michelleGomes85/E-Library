@@ -13,6 +13,8 @@ public interface CopyService {
     
     void delete(Copy copy);
     
+    void deleteById(Long id);
+    
     Copy findById(Long id);
     
     List<Copy> findAll();
@@ -21,5 +23,5 @@ public interface CopyService {
     
     List<Copy> findByStatus(CopyStatus status);
     
-    List<Copy> findByInternalCode(String internalCode);
+    List<Copy> findAvailableCopiesByBookId(Long bookId);
 }
