@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 import br.elibrary.model.User;
 import br.elibrary.model.enuns.Rules;
-import br.elibrary.model.service.UserSessionService;
+import br.elibrary.service.UserSessionService;
 import jakarta.ejb.EJB;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.faces.application.FacesMessage;

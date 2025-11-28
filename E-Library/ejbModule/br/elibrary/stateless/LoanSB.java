@@ -6,7 +6,7 @@ import br.elibrary.model.Copy;
 import br.elibrary.model.Loan;
 import br.elibrary.model.enuns.CopyStatus;
 import br.elibrary.model.enuns.LoanStatus;
-import br.elibrary.model.service.LoanService;
+import br.elibrary.service.LoanService;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;

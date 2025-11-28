@@ -14,7 +14,7 @@ import jakarta.inject.Named;
 import org.primefaces.PrimeFaces;
 
 import br.elibrary.model.Book;
-import br.elibrary.model.service.BookService;
+import br.elibrary.service.BookService;
 
 @Named
 @ViewScoped

@@ -2,7 +2,7 @@ package br.elibrary.web.managed;
 
 import br.elibrary.model.User;
 import br.elibrary.model.enuns.UserType;
-import br.elibrary.model.service.UserService;
+import br.elibrary.service.UserService;
 import jakarta.ejb.EJB;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Named;

@@ -1,4 +1,4 @@
-package br.elibrary.model.service;
+package br.elibrary.service;
 
 import br.elibrary.model.enuns.CopyStatus;
 

@@ -3,7 +3,7 @@ package br.elibrary.web.managed;
 import java.io.Serializable;
 
 import br.elibrary.model.User;
-import br.elibrary.model.service.UserSessionService;
+import br.elibrary.service.UserSessionService;
 import jakarta.enterprise.context.SessionScoped;
 import jakarta.inject.Named;
 

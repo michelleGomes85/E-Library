@@ -1,7 +1,7 @@
 package br.elibrary.web.converter;
 
 import br.elibrary.model.Book;
-import br.elibrary.model.service.BookService;
+import br.elibrary.service.BookService;
 import jakarta.ejb.EJB;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.faces.component.UIComponent;

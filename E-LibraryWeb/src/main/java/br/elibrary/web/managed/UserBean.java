@@ -10,7 +10,7 @@ import org.primefaces.PrimeFaces;
 import br.elibrary.model.User;
 import br.elibrary.model.enuns.Rules;
 import br.elibrary.model.enuns.UserType;
-import br.elibrary.model.service.UserService;
+import br.elibrary.service.UserService;
 import jakarta.annotation.PostConstruct;
 import jakarta.ejb.EJB;
 import jakarta.faces.application.FacesMessage;

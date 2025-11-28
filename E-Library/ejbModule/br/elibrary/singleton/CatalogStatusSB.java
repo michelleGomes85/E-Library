@@ -3,7 +3,7 @@ package br.elibrary.singleton;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import br.elibrary.model.enuns.CopyStatus;
-import br.elibrary.model.service.CatalogStatusService;
+import br.elibrary.service.CatalogStatusService;
 import jakarta.annotation.PostConstruct;
 import jakarta.ejb.ConcurrencyManagement;
 import jakarta.ejb.ConcurrencyManagementType;

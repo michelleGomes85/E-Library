@@ -16,8 +16,8 @@ import org.primefaces.PrimeFaces;
 import br.elibrary.model.Book;
 import br.elibrary.model.Copy;
 import br.elibrary.model.enuns.CopyStatus;
-import br.elibrary.model.service.BookService;
-import br.elibrary.model.service.CopyService;
+import br.elibrary.service.BookService;
+import br.elibrary.service.CopyService;
 
 @Named
 @ViewScoped

@@ -4,8 +4,8 @@ import java.util.List;
 
 import br.elibrary.model.Copy;
 import br.elibrary.model.enuns.CopyStatus;
-import br.elibrary.model.service.CatalogStatusService;
-import br.elibrary.model.service.CopyService;
+import br.elibrary.service.CatalogStatusService;
+import br.elibrary.service.CopyService;
 import jakarta.ejb.EJB;
 import jakarta.ejb.Remote;
 import jakarta.ejb.Stateless;

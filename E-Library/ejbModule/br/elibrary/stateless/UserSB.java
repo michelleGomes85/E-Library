@@ -6,7 +6,7 @@ import org.mindrot.jbcrypt.BCrypt;
 
 import br.elibrary.model.User;
 import br.elibrary.model.enuns.Rules;
-import br.elibrary.model.service.UserService;
+import br.elibrary.service.UserService;
 import jakarta.ejb.Remote;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
