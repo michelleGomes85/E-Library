@@ -18,5 +18,9 @@ public interface CatalogStatusService {
     
     void onBookCreated();
     
-    void onCopyDeleted();
+    void onCopyDeleted();                    
+    
+    void onCopyDeleted(CopyStatus status);  
+    
+    void onBookDeleted(int totalCopies, int availableCopies);
 }

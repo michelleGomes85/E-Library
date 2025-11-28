@@ -52,12 +52,8 @@ public class CatalogStatusSB implements CatalogStatusService {
     @Override
     @Lock(LockType.WRITE)
     public void refreshCache() {
-        Long bookCount = em.createQuery("SELECT COUNT(b) FROM Book b", Long.class)
-                           .getSingleResult();
-
-        Long copyCount = em.createQuery("SELECT COUNT(c) FROM Copy c", Long.class)
-                           .getSingleResult();
-
+        Long bookCount = em.createQuery("SELECT COUNT(b) FROM Book b", Long.class).getSingleResult();
+        Long copyCount = em.createQuery("SELECT COUNT(c) FROM Copy c", Long.class).getSingleResult();
         Long availableCount = em.createQuery(
                 "SELECT COUNT(c) FROM Copy c WHERE c.status = :status", Long.class)
                 .setParameter("status", CopyStatus.AVAILABLE)
@@ -68,15 +64,16 @@ public class CatalogStatusSB implements CatalogStatusService {
         availableCopies.set(availableCount.intValue());
     }
 
+    @Override
     @Lock(LockType.WRITE)
     public void onCopyCreated() {
         totalCopies.incrementAndGet();
         availableCopies.incrementAndGet();
     }
 
+    @Override
     @Lock(LockType.WRITE)
     public void onCopyStatusChanged(CopyStatus oldStatus, CopyStatus newStatus) {
-    	
         if (oldStatus == CopyStatus.AVAILABLE && newStatus != CopyStatus.AVAILABLE) {
             availableCopies.decrementAndGet();
         } else if (oldStatus != CopyStatus.AVAILABLE && newStatus == CopyStatus.AVAILABLE) {
@@ -84,13 +81,32 @@ public class CatalogStatusSB implements CatalogStatusService {
         }
     }
 
+    @Override
     @Lock(LockType.WRITE)
     public void onBookCreated() {
         totalBooks.incrementAndGet();
     }
-    
+
+    @Override
     @Lock(LockType.WRITE)
     public void onCopyDeleted() {
         totalCopies.decrementAndGet();
+    }
+
+    @Override
+    @Lock(LockType.WRITE)
+    public void onCopyDeleted(CopyStatus status) {
+        totalCopies.decrementAndGet();
+        if (status == CopyStatus.AVAILABLE) {
+            availableCopies.decrementAndGet();
+        }
+    }
+    
+    @Override
+    @Lock(LockType.WRITE)
+    public void onBookDeleted(int totalCopies, int availableCopies) {
+        totalBooks.decrementAndGet();
+        this.totalCopies.addAndGet(-totalCopies);
+        this.availableCopies.addAndGet(-availableCopies);
     }
 }

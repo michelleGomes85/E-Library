@@ -37,31 +37,21 @@ public class CopySB implements CopyService {
 
 	@Override
 	public void delete(Copy copy) {
-		
 	    Copy managed = em.merge(copy);
 	    CopyStatus status = managed.getStatus();
 	    em.remove(managed);
 	    
-	    if (status == CopyStatus.AVAILABLE)
-	        catalogStatusSB.onCopyStatusChanged(CopyStatus.AVAILABLE, null);
-	    else
-	        catalogStatusSB.onCopyStatusChanged(status, null);
-	    
-	    catalogStatusSB.onCopyDeleted();
+	    catalogStatusSB.onCopyDeleted(status);
 	}
 	
 	@Override
 	public void deleteById(Long id) {
-		
 	    Copy copy = em.find(Copy.class, id);
-	    
 	    if (copy != null) {
 	        CopyStatus status = copy.getStatus();
 	        em.remove(copy);
-	        if (status == CopyStatus.AVAILABLE)
-	            catalogStatusSB.onCopyStatusChanged(CopyStatus.AVAILABLE, null);
 	        
-	        catalogStatusSB.onCopyDeleted();
+	        catalogStatusSB.onCopyDeleted(status);
 	    }
 	}
 
@@ -92,13 +82,13 @@ public class CopySB implements CopyService {
     
     @Override
     public List<Copy> findAvailableCopiesByBookId(Long bookId) {
-    	
         return em.createQuery("""
             SELECT c FROM Copy c
             WHERE c.book.id = :bookId
-              AND c.status = br.elibrary.model.CopyStatus.AVAILABLE
+              AND c.status = :available
             """, Copy.class)
             .setParameter("bookId", bookId)
+            .setParameter("available", CopyStatus.AVAILABLE) 
             .getResultList();
     }
 }

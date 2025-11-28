@@ -2,6 +2,7 @@ package br.elibrary.stateless;
 
 import java.util.List;
 
+import br.elibrary.model.Book;
 import br.elibrary.model.Copy;
 import br.elibrary.model.Loan;
 import br.elibrary.model.enuns.CopyStatus;
@@ -19,6 +20,9 @@ public class LoanSB implements LoanService {
 
     @Override
     public List<Copy> findBorrowedCopiesByUser(Long userId) {
+        if (userId == null) {
+            return List.of();
+        }
         String jpql = """
             SELECT l.copy
             FROM Loan l
@@ -28,21 +32,24 @@ public class LoanSB implements LoanService {
         
         return em.createQuery(jpql, Copy.class)
                  .setParameter("userId", userId)
-                 .setParameter("activeStatus", LoanStatus.ACTIVE) // mais seguro que depender do status em Copy
+                 .setParameter("activeStatus", LoanStatus.ACTIVE)
                  .getResultList();
     }
 
     @Override
-    public List<Object[]> findBooksWithNoAvailableCopies() {
+    public List<Book> findBooksWithNoAvailableCopies() {
         String jpql = """
-            SELECT b, COUNT(c) 
+            SELECT b
             FROM Book b
-            LEFT JOIN b.copies c ON c.status = :available
-            WHERE c IS NULL
-            GROUP BY b.id
+            WHERE (
+                SELECT COUNT(c)
+                FROM Copy c
+                WHERE c.book = b AND c.status = :available
+            ) = 0
+            ORDER BY b.title
             """;
         
-        return em.createQuery(jpql, Object[].class)
+        return em.createQuery(jpql, Book.class)
                  .setParameter("available", CopyStatus.AVAILABLE)
                  .getResultList();
     }
