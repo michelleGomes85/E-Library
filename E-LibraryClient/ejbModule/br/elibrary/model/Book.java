@@ -1,7 +1,9 @@
 package br.elibrary.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -53,7 +55,8 @@ public class Book implements Serializable {
 	    joinColumns = @JoinColumn(name = "book_id"),
 	    inverseJoinColumns = @JoinColumn(name = "category_id")
 	)
-	private Set<Category> categories = new HashSet<>();
+	
+	private List<Category> categories = new ArrayList<>();
 
 	public Long getId() {
 		return id;
@@ -111,11 +114,11 @@ public class Book implements Serializable {
 		this.copies = copies;
 	}
 
-	public Set<Category> getCategories() {
+	public List<Category> getCategories() {
 		return categories;
 	}
 
-	public void setCategories(Set<Category> categories) {
+	public void setCategories(List<Category> categories) {
 		this.categories = categories;
 	}
 

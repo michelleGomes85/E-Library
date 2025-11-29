@@ -164,8 +164,49 @@ public class UserBean implements Serializable {
 	public List<Rules> getRulesList() {
 		return Arrays.asList(Rules.values());
 	}
+	
+	public void registerPublic() {
+	    try {
+	    	
+	        if (user.getName() == null || user.getName().isBlank())
+	            throw new IllegalArgumentException("Nome é obrigatório.");
+	        
+	        if (user.getRegistration() == null || user.getRegistration().isBlank())
+	            throw new IllegalArgumentException("Matrícula é obrigatória.");
+	        
+	        if (user.getEmail() == null || user.getEmail().isBlank())
+	            throw new IllegalArgumentException("E-mail é obrigatório.");
+	        
+	        if (user.getType() == null)
+	            throw new IllegalArgumentException("Selecione o tipo de usuário.");
 
-	// getters e setters
+	        user.setRules(Rules.COMMON_USER);
+
+	        if (password == null || password.trim().isEmpty())
+	            throw new IllegalArgumentException("A senha é obrigatória.");
+	        
+	        if (!password.equals(passwordConfirm))
+	            throw new IllegalArgumentException("As senhas não coincidem.");
+	        
+	        if (password.length() < 6)
+	            throw new IllegalArgumentException("A senha deve ter pelo menos 6 caracteres.");
+
+	        user.setPasswordHash(password);
+
+	        userService.create(user);
+
+	        addMessage(FacesMessage.SEVERITY_INFO, "Sucesso", "Cadastro realizado com sucesso! Agora você pode fazer login.");
+	        
+	        user = new User();
+	        password = "";
+	        passwordConfirm = "";
+
+	    } catch (IllegalArgumentException e) {
+	        addMessage(FacesMessage.SEVERITY_WARN, "Atenção", e.getMessage());
+	    } catch (Exception e) {
+	        addMessage(FacesMessage.SEVERITY_ERROR, "Erro", "Não foi possível concluir o cadastro. Tente novamente.");
+	    }
+	}
 
 	public User getUser() {
 		return user;

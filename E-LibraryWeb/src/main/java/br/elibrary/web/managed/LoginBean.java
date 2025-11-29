@@ -2,6 +2,8 @@ package br.elibrary.web.managed;
 
 import java.io.Serializable;
 
+import org.primefaces.PrimeFaces;
+
 import br.elibrary.model.User;
 import br.elibrary.model.enuns.Rules;
 import br.elibrary.service.UserSessionService;
@@ -27,37 +29,39 @@ public class LoginBean implements Serializable {
     private String registration;
     private String password;
 
-    public String doLogin() {
-
-        boolean ok;
-
+    public void doLogin() {
         try {
-            ok = userSession.login(registration, password);
+            boolean ok = userSession.login(registration, password);
+
+            if (!ok) {
+                addMessage(FacesMessage.SEVERITY_ERROR, "Erro de autenticação", "Matrícula ou senha inválidos.");
+                return;
+            }
+
+            User user = userSession.getLoggedInUser();
+            sessionBean.setLoggedUser(user);
+            sessionBean.setUserStateful(userSession);
+
+            FacesContext.getCurrentInstance()
+                    .getExternalContext()
+                    .getSessionMap()
+                    .put("loggedUser", user);
+
+            String target = (user.getRules() == Rules.ADMIN) ? "admin/index.xhtml"
+                    : "user/index.xhtml";
+
+            PrimeFaces.current().executeScript("window.location.href='" + target + "'");
+
         } catch (Exception e) {
-            addError("Erro no servidor ao tentar fazer login.");
-            return null;
+            e.printStackTrace();
+            addMessage(FacesMessage.SEVERITY_ERROR, "Erro interno", 
+                    "Não foi possível processar o login. Tente novamente mais tarde.");
         }
+    }
 
-        if (!ok) {
-            addError("Matrícula ou senha inválidos.");
-            return null;
-        }
-
-        User user = userSession.getLoggedInUser();
-
-        sessionBean.setLoggedUser(user);
-        sessionBean.setUserStateful(userSession);
-
+    private void addMessage(FacesMessage.Severity severity, String summary, String detail) {
         FacesContext.getCurrentInstance()
-                .getExternalContext()
-                .getSessionMap()
-                .put("loggedUser", user);
-
-        if (user.getRules() == Rules.ADMIN) {
-            return "/admin/index?faces-redirect=true";
-        } else {
-            return "/user/index?faces-redirect=true";
-        }
+                .addMessage(null, new FacesMessage(severity, summary, detail));
     }
 
     public String doLogout() {
@@ -76,11 +80,6 @@ public class LoginBean implements Serializable {
                 .invalidateSession();
 
         return "/login?faces-redirect=true";
-    }
-
-    private void addError(String msg) {
-        FacesContext.getCurrentInstance()
-                .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, msg, null));
     }
 
     public String getRegistration() {

@@ -23,12 +23,10 @@
 
 		<div class="header-actions">
 			<h:form id="navForm" styleClass="inline-form">
-				<!-- Botão Voltar -->
 				<p:button value="← Voltar" outcome="/admin/index.html"
 					title="Retornar ao Painel do Administrador"
 					styleClass="btn-outline" />
 
-				<!-- Botão Logout -->
 				<p:commandButton value="Sair" action="#{loginBean.doLogout}"
 					icon="pi pi-sign-out" styleClass="btn-logout" ajax="true"
 					update="@form" title="Encerrar sessão" />
@@ -91,9 +89,10 @@
 
 				<p:column headerText="Ações" exportable="false" style="width:120px;">
 					<p:commandButton icon="pi pi-pencil" title="Editar"
-						styleClass="btn-secondary btn-sm" action="#{bookBean.edit(book)}"
-						oncomplete="PF('manageBookDialog').show()"
-						update=":dialogs:bookDialog" />
+						styleClass="btn-secondary btn-sm"
+						actionListener="#{bookBean.edit(book)}" process="@this"
+						update=":dialogs:bookDialog"
+						oncomplete="if (args &amp;&amp; !args.validationFailed) PF('manageBookDialog').show();" />
 
 					<p:commandButton icon="pi pi-trash" title="Excluir"
 						styleClass="btn-danger btn-sm"
@@ -103,7 +102,6 @@
 				</p:column>
 			</p:dataTable>
 		</h:form>
-
 
 		<!-- FORMULÁRIO PARA CRIAÇÃO/EDIÇÃO -->
 		<h:form id="dialogs">
@@ -164,6 +162,26 @@
 									<f:validateLongRange minimum="1000" maximum="2030" />
 								</p:inputText>
 								<p:message for="year" display="icon" />
+							</div>
+						</div>
+					</div>
+
+					<div class="field-group">
+						<div class="field">
+							<label class="field-label">Categorias *</label>
+							<div class="field-input">
+								<p:selectCheckboxMenu id="categories"
+									value="#{bookBean.book.categories}" label="Categorias"
+									filter="true" filterMatchMode="contains" var="cat"
+									itemLabel="#{cat.name}" itemValue="#{cat}" required="true"
+									requiredMessage="Selecione pelo menos uma categoria">
+
+									<f:selectItems value="#{bookBean.availableCategories}" var="c"
+										itemLabel="#{c.name}" itemValue="#{c}" />
+								</p:selectCheckboxMenu>
+
+								<p:message for="categories" display="icon" />
+
 							</div>
 						</div>
 					</div>

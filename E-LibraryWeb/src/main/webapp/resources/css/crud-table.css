@@ -181,7 +181,8 @@ body .ui-dialog .ui-dialog-footer {
 }
 
 .ui-widget-header .ui-inputfield, .ui-widget-content .ui-inputfield,
-body .ui-selectonemenu {
+body .ui-selectonemenu,
+body .ui-selectcheckboxmenu {
 	width: 100%;
 	margin: 0.5rem 0;
 }
@@ -192,6 +193,10 @@ body .ui-dialog {
 
 body .ui-dialog .ui-dialog-content {
 	padding: .3rem 2.5rem 1rem 2rem;
+}
+
+.ui-datatable .ui-sortable-column {
+	width: 300px;
 }
 
 @media ( max-width : 768px) {

@@ -5,6 +5,7 @@
 		<class>br.elibrary.model.User</class>
 		<class>br.elibrary.model.Copy</class>
 		<class>br.elibrary.model.Book</class>
+		<class>br.elibrary.model.Category</class>
 		<class>br.elibrary.model.Loan</class>
 		<properties>
 			<property name="jakarta.persistence.schema-generation.database.action" value="update"/>

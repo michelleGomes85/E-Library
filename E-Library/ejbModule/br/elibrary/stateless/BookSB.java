@@ -1,8 +1,10 @@
 package br.elibrary.stateless;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import br.elibrary.model.Book;
+import br.elibrary.model.Category;
 import br.elibrary.model.Copy;
 import br.elibrary.model.enuns.CopyStatus;
 import br.elibrary.service.BookService;
@@ -33,8 +35,20 @@ public class BookSB implements BookService {
 
 	@Override
 	public Book update(Book book) {
-		em.merge(book);
-		return book;
+
+	    if (book.getCategories() != null) {
+	    	
+	        List<Category> managedCategories = new ArrayList<>();
+
+	        for (Category c : book.getCategories()) {
+	            Category managed = em.find(Category.class, c.getId());
+	            managedCategories.add(managed);
+	        }
+
+	        book.setCategories(managedCategories);
+	    }
+
+	    return em.merge(book); 
 	}
 
 	@Override
@@ -55,7 +69,12 @@ public class BookSB implements BookService {
 
 	@Override
 	public Book findById(Long id) {
-		return em.find(Book.class, id);
+	    return em.createQuery(
+	        "SELECT b FROM Book b " +
+	        "LEFT JOIN FETCH b.categories " +
+	        "WHERE b.id = :id", Book.class)
+	        .setParameter("id", id)
+	        .getSingleResult();
 	}
 
 	@Override

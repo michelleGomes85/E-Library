@@ -16,46 +16,42 @@
 		<div class="form-card">
 			<h1 class="form-title">Login</h1>
 
-			<p:messages id="globalMessages" globalOnly="true" autoUpdate="true" />
+			<p:growl id="growl" globalOnly="true" autoUpdate="true" showDetail="true" />
 
 			<h:form id="loginForm">
 
-				<!-- Matrícula -->
-				<div class="field-group">
+				<div class="field-group-login">
 					<div class="field">
 						<label for="registration" class="field-label">Matrícula:</label>
 						<div class="field-input">
 							<p:inputText id="registration" value="#{loginBean.registration}"
 								required="true" placeholder="Digite sua matrícula"
 								autocomplete="username" />
-							<p:message for="registration" display="icon" />
 						</div>
 					</div>
 				</div>
 
-				<!-- Senha -->
-				<div class="field-group">
+				<div class="field-group-login">
 					<div class="field">
 						<label for="password" class="field-label">Senha:</label>
 						<div class="field-input">
 							<p:password id="password" value="#{loginBean.password}"
 								required="true" placeholder="Digite sua senha" feedback="false"
 								autocomplete="current-password" />
-							<p:message for="password" display="icon" />
 						</div>
 					</div>
 				</div>
 
-				<!-- Botão de login -->
 				<div class="field-group">
 					<div class="actions">
-						<p:commandButton value="Entrar" action="#{loginBean.doLogin}"
-							icon="pi pi-sign-in" styleClass="btn-primary" ajax="false" />
-
+						<p:commandButton value="Entrar" 
+							action="#{loginBean.doLogin}" 
+							update="growl" 
+							icon="pi pi-sign-in" 
+							styleClass="btn-primary" />
 					</div>
 				</div>
 
-				<!-- Link de cadastro -->
 				<div class="field-group">
 					<div class="link-action">
 						<p:link value="Não tem conta? Cadastre-se aqui."
