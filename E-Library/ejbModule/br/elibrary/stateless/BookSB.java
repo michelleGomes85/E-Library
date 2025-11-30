@@ -36,26 +36,26 @@ public class BookSB implements BookService {
 	@Override
 	public Book update(Book book) {
 
-	    if (book.getCategories() != null) {
-	    	
-	        List<Category> managedCategories = new ArrayList<>();
+		if (book.getCategories() != null) {
 
-	        for (Category c : book.getCategories()) {
-	            Category managed = em.find(Category.class, c.getId());
-	            managedCategories.add(managed);
-	        }
+			List<Category> managedCategories = new ArrayList<>();
 
-	        book.setCategories(managedCategories);
-	    }
+			for (Category c : book.getCategories()) {
+				Category managed = em.find(Category.class, c.getId());
+				managedCategories.add(managed);
+			}
 
-	    return em.merge(book); 
+			book.setCategories(managedCategories);
+		}
+
+		return em.merge(book);
 	}
 
 	@Override
 	public void delete(Book book) {
 
 		Book managed = em.find(Book.class, book.getId());
-		
+
 		if (managed == null)
 			return;
 
@@ -69,17 +69,15 @@ public class BookSB implements BookService {
 
 	@Override
 	public Book findById(Long id) {
-	    return em.createQuery(
-	        "SELECT b FROM Book b " +
-	        "LEFT JOIN FETCH b.categories " +
-	        "WHERE b.id = :id", Book.class)
-	        .setParameter("id", id)
-	        .getSingleResult();
+		return em
+				.createQuery("SELECT b FROM Book b " + "LEFT JOIN FETCH b.categories " + "WHERE b.id = :id", Book.class)
+				.setParameter("id", id).getSingleResult();
 	}
 
 	@Override
 	public List<Book> findAll() {
-		return em.createQuery("SELECT b FROM Book b ORDER BY b.title", Book.class).getResultList();
+		return em.createQuery("SELECT DISTINCT b FROM Book b " + "LEFT JOIN FETCH b.categories " + "ORDER BY b.title",
+				Book.class).getResultList();
 	}
 
 	@Override
@@ -93,15 +91,14 @@ public class BookSB implements BookService {
 	}
 
 	public List<Object[]> findBooksWithCopyStats() {
-
 		String jpql = """
 				SELECT b,
 				       COUNT(c) AS totalCopies,
 				       SUM(CASE WHEN c.status = :available THEN 1 ELSE 0 END) AS availableCopies
 				FROM Book b
 				LEFT JOIN b.copies c
-				GROUP BY b.id
-				ORDER BY b.title
+				GROUP BY b.id, b.title
+				ORDER BY b.title ASC
 				""";
 
 		return em.createQuery(jpql, Object[].class).setParameter("available", CopyStatus.AVAILABLE).getResultList();

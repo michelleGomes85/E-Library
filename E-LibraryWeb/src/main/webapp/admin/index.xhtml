@@ -21,13 +21,15 @@
 				</p>
 			</div>
 
-			<!-- Botão de logout no cabeçalho -->
 			<div class="header-actions">
 				<h:form id="logoutForm" styleClass="inline-form">
 					<p:commandButton value="Sair" action="#{loginBean.doLogout}"
 						icon="pi pi-sign-out" styleClass="btn-logout" ajax="true"
 						update="@form" title="Encerrar sessão" />
 				</h:form>
+				
+				<p:button value="Modo Usuário Comum" outcome="/user/index.html"
+					icon="pi pi-user" title="Ir para o modo de usuário comum" styleClass="btn-outline" />
 			</div>
 		</div>
 

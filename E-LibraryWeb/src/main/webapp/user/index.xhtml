@@ -1,125 +1,270 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:h="http://xmlns.jcp.org/jsf/html"
-      xmlns:f="http://xmlns.jcp.org/jsf/core"
-      xmlns:p="http://primefaces.org/ui"
-      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
 
 <h:head>
-    <title>E-Library - Dashboard</title>
+	<title>E-Library - Dashboard</title>
+	<h:outputStylesheet name="css/admin-dashboard.css" />
+	<h:outputStylesheet name="css/client-dashboard.css" />
 </h:head>
 
 <h:body>
 
-    <f:event type="preRenderView" listener="#{dashboardBean.refresh}" />
+	<f:event type="preRenderView" listener="#{dashboardBean.refresh}" />
 
-    <p:growl id="globalMessages" showDetail="true" autoUpdate="true" life="3000" />
+	<p:growl id="globalMessages" showDetail="true" autoUpdate="true"
+		life="3000" />
 
-    <div class="page-container">
+	<div class="page-container">
 
-        <div class="header">
-            <div class="header-content">
-                <h1 class="page-title">E-Library - Dashboard</h1>
-                <p class="user-info">
-                    Bem-vindo, <strong>#{sessionBean.loggedUser.name}</strong>!
-                </p>
-            </div>
-            <div class="header-actions">
-                <h:form id="logoutForm" prependId="false">
-                    <p:commandButton value="Sair"
-                                     action="#{loginBean.doLogout}"
-                                     styleClass="btn-logout"
-                                     ajax="true"
-                                     update=":globalMessages" />
-                </h:form>
-            </div>
-        </div>
+		<!-- Header -->
+		<div class="header">
+			<div class="header-content">
+				<h1 class="page-title">Painel do Cliente</h1>
+				<p class="user-info">
+					Bem-vindo, <strong>#{sessionBean.loggedUser.name}</strong>!
+				</p>
+			</div>
 
-        <h:panelGroup id="summaryPanel" layout="block" styleClass="summary-box">
-            <h3>Situação do Acervo</h3>
-            <div class="summary-stats">
-                <div class="stat-item">
-                    <span class="stat-label">Livros cadastrados</span>
-                    <span class="stat-value">#{dashboardBean.totalBooks}</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label">Cópias totais</span>
-                    <span class="stat-value">#{dashboardBean.totalCopies}</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label">Cópias disponíveis</span>
-                    <span class="stat-value"
-                          style="color: #{dashboardBean.availableCopies gt 0 ? '#28a745' : '#dc3545'}">
-                        #{dashboardBean.availableCopies}
-                    </span>
-                </div>
-            </div>
-        </h:panelGroup>
+			<div class="header-actions">
+				<h:form id="logoutForm" styleClass="inline-form">
+					<p:commandButton value="Sair" action="#{loginBean.doLogout}"
+						icon="pi pi-sign-out" styleClass="btn-logout" update="@form"
+						ajax="true" />
+				</h:form>
 
-        <h2>Catálogo</h2>
-        <h:panelGroup id="catalogPanel" layout="block" styleClass="catalog-section">
-            <ui:repeat value="#{dashboardBean.booksWithAvailableCount}" var="row">
-                <div class="book-card">
-                    <div class="book-title">#{row[0].title}</div>
-                    <div class="book-meta">
-                        Autor: #{row[0].author} |
-                        Total: #{row[1]} cópia(s) •
-                        Disponíveis: #{row[2]}
-                    </div>
+				<h:panelGroup rendered="#{sessionBean.loggedUser.rules == 'ADMIN'}">
+					<p:button value="Modo Administrador" outcome="/admin/index.html"
+						icon="pi pi-user-edit" title="Ir para o modo de administração"
+						styleClass="btn-outline" />
+				</h:panelGroup>
+			</div>
+		</div>
 
-                    <h:panelGroup rendered="#{row[2] gt 0}" layout="block" styleClass="book-actions">
-                        <span class="book-status status-available">Disponível</span>
-                        <h:form prependId="false">
-                            <p:commandButton value="Emprestar"
-                                             action="#{dashboardBean.borrow(row[0])}"
-                                             update=":summaryPanel :catalogPanel :loansPanel :globalMessages"
-                                             styleClass="btn-action p-button-sm p-button-success" />
-                        </h:form>
-                    </h:panelGroup>
+		<!-- Ícone / Badge de Empréstimos -->
+		<h:form id="badgeForm">
+			<div class="loans-card">
+				<p:commandLink onclick="PF('loansDialog').show(); return false;"
+					styleClass="loan-icon-link"
+					title="Clique para ver seus empréstimos ativos">
+					<i class="pi pi-bookmark"
+						style="font-size: 1.3rem; color: #3a86ff;"></i>
+				</p:commandLink>
 
-                    <h:panelGroup rendered="#{row[2] eq 0}" layout="block" styleClass="book-actions">
-                        <span class="book-status status-unavailable">Indisponível</span>
-                        <h:form prependId="false">
-                            <p:commandButton value="Emprestar"
-                                             disabled="true"
-                                             styleClass="btn-action p-button-sm p-button-secondary" />
-                        </h:form>
-                    </h:panelGroup>
-                </div>
-            </ui:repeat>
-        </h:panelGroup>
+				<h:panelGroup id="badgeContainer" layout="block"
+					styleClass="badge-wrapper">
+					<h:panelGroup>
+						<span class="badge-circle">#{dashboardBean.activeLoans.size()}</span>
+					</h:panelGroup>
+				</h:panelGroup>
+			</div>
+		</h:form>
 
-        <h2>Meus Empréstimos Ativos (<span id="loan-count">#{dashboardBean.activeLoans.size()}</span>)</h2>
-        <h:panelGroup id="loansPanel" layout="block" styleClass="loans-section">
-            <ui:fragment rendered="#{empty dashboardBean.activeLoans}">
-                <div class="no-loans">
-                    <i>Nenhum empréstimo ativo no momento.</i>
-                </div>
-            </ui:fragment>
+		<!-- Resumo -->
+		<h:panelGroup id="summaryPanel" layout="block"
+			styleClass="summary-box">
+			<h3>Visão Geral da Biblioteca</h3>
+			<div class="description">
+				<p>
+					Explore os <span>livros disponíveis</span> e clique no ícone
+					correspondente para <span>solicitar um empréstimo</span>.
+				</p>
+				<p>
+					Para <span>visualizar seus empréstimos ativos</span>, utilize o
+					ícone <span>ao lado</span>.
+				</p>
+			</div>
+			<div class="summary-stats">
+				<div class="stat-item">
+					<span class="stat-label">Livros cadastrados</span> <span
+						class="stat-value">#{dashboardBean.totalBooks}</span>
+				</div>
+				<div class="stat-item">
+					<span class="stat-label">Cópias totais</span> <span
+						class="stat-value">#{dashboardBean.totalCopies}</span>
+				</div>
+				<div class="stat-item">
+					<span class="stat-label">Cópias disponíveis</span> <span
+						class="stat-value"
+						style="color: #{dashboardBean.availableCopies gt 0 ? '#28a745' : '#dc3545'}">
+						#{dashboardBean.availableCopies} </span>
+				</div>
+			</div>
+		</h:panelGroup>
 
-            <ui:repeat value="#{dashboardBean.activeLoans}" var="loan">
-                <div class="book-card loan-card">
-                    <div class="book-title">#{loan.copy.book.title}</div>
-                    <div class="book-meta">
-                        Exemplar: <strong>#{loan.copy.internalCode}</strong> |
-                        Emprestado em: #{loan.issueDate} |
-                        Devolução prevista:
-                        <span class="due-date #{loan.overdue ? 'overdue' : ''}">
-                            #{loan.dueDate}
-                        </span>
-                    </div>
 
-                    <h:form prependId="false">
-                        <p:commandButton value="Devolver"
-                                         action="#{dashboardBean.returnCopy(loan)}"
-                                         update=":summaryPanel :catalogPanel :loansPanel :globalMessages"
-                                         styleClass="btn-action p-button-sm p-button-warning" />
-                    </h:form>
-                </div>
-            </ui:repeat>
-        </h:panelGroup>
+		<!-- Catálogo -->
+		<h:panelGroup id="catalogPanel" layout="block"
+			styleClass="catalog-section">
 
-    </div>
+			<p:carousel id="carrossel"
+				value="#{dashboardBean.booksWithAvailableCount}" var="row"
+				numVisible="3" circular="false" styleClass="book-carousel"
+				widgetVar="bookCarousel" binding="#{carousel}">
 
+				<h:panelGroup id="wrapper" layout="block" styleClass="product-card">
+
+					<div class="product-content">
+
+						<h3 class="product-title">#{row[0].title}</h3>
+
+						<div class="product-author">
+							<i class="pi pi-user"></i> #{row[0].author}
+						</div>
+
+						<h:panelGroup id="bookStatsID" styleClass="bookStats"
+							layout="block">
+
+							<div class="product-stats">
+								<span class="stat-badge total"> <i class="pi pi-copy"></i>
+									#{row[1]}
+								</span> <span class="stat-badge available"> <i
+									class="pi pi-check-circle"></i> #{row[2]}
+								</span>
+							</div>
+
+							<h:panelGroup>
+								<h:panelGroup rendered="#{row[2] gt 0}">
+									<span class="status-badge available"> <i
+										class="pi pi-check"></i> Disponível
+									</span>
+								</h:panelGroup>
+
+								<h:panelGroup rendered="#{row[2] eq 0}">
+									<span class="status-badge unavailable"> <i
+										class="pi pi-times"></i> Indisponível
+									</span>
+								</h:panelGroup>
+							</h:panelGroup>
+
+						</h:panelGroup>
+
+						<div class="product-actions">
+
+							<p:commandButton icon="pi pi-info-circle" title="Detalhes"
+								styleClass="action-btn details p-button-sm" process="@this"
+								update=":detailPanel"
+								action="#{dashboardBean.selectBook(row[0], row[1], row[2])}"
+								oncomplete="PF('bookDetailDialog').show();" />
+
+							<p:commandButton icon="pi pi-book" title="Emprestar"
+								process="@this :catalogPanel"
+								update="
+						        :summaryPanel
+						        :loansDialogContent
+						        :badgeForm:badgeContainer
+						        :globalMessages
+						        :carrossel"
+								styleClass="action-btn borrow p-button-sm">
+							</p:commandButton>
+						</div>
+					</div>
+				</h:panelGroup>
+
+			</p:carousel>
+		</h:panelGroup>
+
+
+	</div>
+
+	<!-- Dialog: Detalhes do Livro -->
+	<p:dialog styleClass="details-modal" widgetVar="bookDetailDialog"
+		header="Detalhes do Livro" modal="true" width="500" resizable="false"
+		closeOnEscape="true" appendTo="@(body)">
+
+		<h:panelGroup id="detailPanel">
+
+			<div class="book-detail-container">
+				<div class="detail-row">
+					<span class="detail-label">Título:</span> <span
+						class="detail-value">#{dashboardBean.selectedBook.title}</span>
+				</div>
+				<div class="detail-row">
+					<span class="detail-label">ISBN:</span> <span
+						class="detail-value mono">#{dashboardBean.selectedBook.isbn}</span>
+				</div>
+				<div class="detail-row">
+					<span class="detail-label">Autor:</span> <span class="detail-value">#{dashboardBean.selectedBook.author}</span>
+				</div>
+				<div class="detail-row">
+					<span class="detail-label">Editora:</span> <span
+						class="detail-value">#{dashboardBean.selectedBook.publisher}</span>
+				</div>
+				<div class="detail-row">
+					<span class="detail-label">Ano:</span> <span class="detail-value">#{dashboardBean.selectedBook.year}</span>
+				</div>
+				<div class="detail-row">
+					<span class="detail-label">Total de Cópias:</span> <span
+						class="detail-value copies total">#{dashboardBean.detailTotal}</span>
+				</div>
+				<div class="detail-row">
+					<span class="detail-label">Disponíveis:</span> <span
+						class="detail-value copies available">#{dashboardBean.detailAvailable}</span>
+				</div>
+				<div class="detail-row categories-row">
+					<span class="detail-label">Categorias:</span>
+					<div class="categories-list">
+						<ui:repeat value="#{dashboardBean.bookCategories}" var="c">
+							<span class="category-badge">#{c}</span>
+						</ui:repeat>
+						<h:panelGroup rendered="#{empty dashboardBean.bookCategories}">
+							<span class="category-placeholder">—</span>
+						</h:panelGroup>
+					</div>
+				</div>
+			</div>
+		</h:panelGroup>
+
+		<f:facet name="footer">
+			<p:commandButton value="Fechar" type="button"
+				onclick="PF('bookDetailDialog').hide();" />
+		</f:facet>
+	</p:dialog>
+
+	<!-- Dialog: Meus Empréstimos -->
+	<p:dialog styleClass="loans" widgetVar="loansDialog"
+		header="Meus Empréstimos" modal="true" width="600" resizable="false"
+		closeOnEscape="true" appendTo="@(body)">
+
+		<h:panelGroup id="loansDialogContent">
+
+			<p:dataTable value="#{dashboardBean.activeLoans}" var="loan"
+				emptyMessage="Nenhum empréstimo ativo.">
+
+				<p:column headerText="Livro" width="40%">
+					<h:outputText value="#{loan.copy.book.title}" />
+				</p:column>
+
+				<p:column headerText="Data do Empréstimo" width="25%">
+					<h:outputText value="#{loan.borrowDate}">
+					</h:outputText>
+				</p:column>
+
+				<p:column headerText="Prazo (dias)" width="20%">
+					<h:outputText value="#{loan.daysRemaining} dias restantes"
+						style="color: #{loan.daysRemaining lt 3 ? 'red' : 'inherit'}" />
+				</p:column>
+
+				<p:column headerText="Ações" width="15%" style="text-align: center;">
+					<p:commandButton icon="pi pi-undo" title="Devolver"
+						action="#{dashboardBean.returnCopy(loan)}"
+						update=":summaryPanel :catalogPanel :loansDialogContent :badgeForm:badgeContainer :globalMessages"
+						process="@this"
+						styleClass="p-button-sm p-button-warning return-book" />
+				</p:column>
+
+			</p:dataTable>
+		</h:panelGroup>
+		<f:facet name="footer">
+			<p:commandButton value="Fechar" type="button"
+				styleClass="p-button-secondary" onclick="PF('loansDialog').hide();" />
+		</f:facet>
+	</p:dialog>
+
+	<h:outputScript name="js/carousel-utils.js" />
 </h:body>
+
 </html>

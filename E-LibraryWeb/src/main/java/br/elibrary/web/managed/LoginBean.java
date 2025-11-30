@@ -24,7 +24,7 @@ public class LoginBean implements Serializable {
     private UserSessionService userSession;
 
     @Inject
-    private SessionBean sessionBean;
+    private UserSessionBean sessionBean;
 
     private String registration;
     private String password;

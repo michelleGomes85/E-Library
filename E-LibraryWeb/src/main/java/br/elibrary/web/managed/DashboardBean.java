@@ -30,10 +30,16 @@ public class DashboardBean implements Serializable {
     private CatalogStatusService catalogStatusSB;
 
     @Inject
-    private SessionBean sessionBean;
+    private UserSessionBean sessionBean;
 
     private List<Object[]> booksWithAvailableCount;
     private List<Loan> activeLoans;
+    
+    private Book selectedBook;
+    
+    private int detailTotal;
+    
+    private int detailAvailable;
 
     @PostConstruct
     public void init() {
@@ -60,8 +66,8 @@ public class DashboardBean implements Serializable {
         boolean success = getUserSession().borrowCopy(availableCopy.getId());
 
         if (success) {
-            addMessage(FacesMessage.SEVERITY_INFO, "Sucesso", "Livro emprestado!");
-            refresh();
+        	//refresh();
+            addMessage(FacesMessage.SEVERITY_INFO, "Sucesso", String.format("Aproveito o livro: %s, e explore outros titulos ", availableCopy.getBook().getTitle()));
         } else {
             addMessage(FacesMessage.SEVERITY_ERROR, "Erro", "Falha ao emprestar.");
         }
@@ -71,12 +77,35 @@ public class DashboardBean implements Serializable {
         boolean success = getUserSession().returnCopy(loan.getCopy().getId());
 
         if (success) {
+        	refresh();
             addMessage(FacesMessage.SEVERITY_INFO, "Sucesso", "Livro devolvido!");
-            refresh();
         } else {
             addMessage(FacesMessage.SEVERITY_ERROR, "Erro", "Falha ao devolver.");
         }
     }
+    
+    public void selectBook(Book book, int total, int available) {
+    	
+        this.selectedBook = bookService.findById(book.getId());
+        
+        this.detailTotal = total;
+        
+        this.detailAvailable = available;
+    }
+    
+    public List<String> getBookCategories() {
+    	
+        if (selectedBook == null || selectedBook.getCategories() == null) {
+            return List.of();
+        }
+        
+        return selectedBook.getCategories()
+                           .stream()
+                           .map(c -> c.getName())
+                           .sorted()
+                           .toList();
+    }
+
 
     public List<Object[]> getBooksWithAvailableCount() {
         return booksWithAvailableCount;
@@ -101,4 +130,28 @@ public class DashboardBean implements Serializable {
     private void addMessage(FacesMessage.Severity severity, String summary, String detail) {
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, summary, detail));
     }
+
+	public Book getSelectedBook() {
+		return selectedBook;
+	}
+
+	public void setSelectedBook(Book selectedBook) {
+		this.selectedBook = selectedBook;
+	}
+
+	public int getDetailTotal() {
+		return detailTotal;
+	}
+
+	public void setDetailTotal(int detailTotal) {
+		this.detailTotal = detailTotal;
+	}
+
+	public int getDetailAvailable() {
+		return detailAvailable;
+	}
+
+	public void setDetailAvailable(int detailAvailable) {
+		this.detailAvailable = detailAvailable;
+	}
 }

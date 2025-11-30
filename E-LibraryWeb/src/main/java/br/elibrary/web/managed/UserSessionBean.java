@@ -9,7 +9,7 @@ import jakarta.inject.Named;
 
 @Named("sessionBean")
 @SessionScoped
-public class SessionBean implements Serializable {
+public class UserSessionBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

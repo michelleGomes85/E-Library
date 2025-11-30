@@ -7,11 +7,12 @@
 }
 
 body {
-	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-	background: linear-gradient(135deg, #0f172a, #000);
+	font-family: Poppins, sans-serif !important;
+	background: #000;
 	color: #e2e8f0;
 	min-height: 100vh;
 	padding: 1.5rem;
+	border-top: 5px solid #00335b;
 }
 
 .page-container {
@@ -37,8 +38,83 @@ body {
 .user-info {
 	font-size: 1.1rem;
 	color: #94a3b8;
+	margin-top: 1.5rem;
 }
 
+.btn-secondary {
+	width: 100%;
+	padding: 0.75rem 1rem;
+	font-weight: 600;
+	font-size: 1rem;
+	background: transparent;
+	color: #60a5fa;
+	border: 2px solid #334155;
+	border-radius: 8px;
+	cursor: pointer;
+	transition: all 0.25s ease;
+}
+
+.btn-secondary:hover {
+	background: rgba(96, 165, 250, 0.1);
+	border-color: #60a5fa;
+}
+
+.btn-secondary .ui-button-icon-right {
+	margin-left: 0.5rem;
+	font-size: 0.9rem;
+}
+
+.logout-section {
+	text-align: center;
+	margin-top: 1.5rem;
+}
+
+.btn-danger {
+	padding: 0.7rem 1.5rem;
+	font-weight: 600;
+	font-size: 1.05rem;
+	background: #ef4444;
+	color: white;
+	border: none;
+	border-radius: 8px;
+	cursor: pointer;
+	transition: background 0.25s, transform 0.15s;
+}
+
+.btn-danger:hover {
+	background: #dc2626;
+	transform: scale(1.03);
+}
+
+.btn-danger:active {
+	transform: scale(1);
+}
+
+.btn-secondary:focus-visible,
+.btn-danger:focus-visible {
+	outline: 2px solid #60a5fa;
+	outline-offset: 2px;
+}
+
+body .ui-button {
+	background: #00335b;
+	border: 1px solid #00335b;
+}
+
+body .ui-button:hover {
+	background: #2563eb;
+	border: 1px solid #2563eb;
+}
+
+.header-actions {
+	margin-top: 20px;
+	display: flex;
+	justify-content: center;
+	gap: 2rem;
+	margin-top: 2rem;
+}
+
+/*Cards*/
 .card-grid {
 	display: grid;
 	justify-content: center;
@@ -116,55 +192,6 @@ body {
 	padding: 0 2rem 2rem;
 }
 
-.btn-secondary {
-	width: 100%;
-	padding: 0.75rem 1rem;
-	font-weight: 600;
-	font-size: 1rem;
-	background: transparent;
-	color: #60a5fa;
-	border: 2px solid #334155;
-	border-radius: 8px;
-	cursor: pointer;
-	transition: all 0.25s ease;
-}
-
-.btn-secondary:hover {
-	background: rgba(96, 165, 250, 0.1);
-	border-color: #60a5fa;
-}
-
-.btn-secondary .ui-button-icon-right {
-	margin-left: 0.5rem;
-	font-size: 0.9rem;
-}
-
-.logout-section {
-	text-align: center;
-	margin-top: 1.5rem;
-}
-
-.btn-danger {
-	padding: 0.7rem 1.5rem;
-	font-weight: 600;
-	font-size: 1.05rem;
-	background: #ef4444;
-	color: white;
-	border: none;
-	border-radius: 8px;
-	cursor: pointer;
-	transition: background 0.25s, transform 0.15s;
-}
-
-.btn-danger:hover {
-	background: #dc2626;
-	transform: scale(1.03);
-}
-
-.btn-danger:active {
-	transform: scale(1);
-}
-
 @media (max-width: 700px) {
 	.card-grid {
 		grid-template-columns: 1fr;
@@ -176,24 +203,4 @@ body {
 		grid-column: 1;
 		width: 320px;
 	}
-}
-
-.btn-secondary:focus-visible,
-.btn-danger:focus-visible {
-	outline: 2px solid #60a5fa;
-	outline-offset: 2px;
-}
-
-body .ui-button {
-	background: #00335b;
-	border: 1px solid #00335b;
-}
-
-body .ui-button:hover {
-	background: #2563eb;
-	border: 1px solid #2563eb;
-}
-
-.header-actions {
-	margin-top: 20px;
 }

@@ -19,7 +19,7 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "loans")
 public class Loan implements Serializable {
-	
+
 	private static final long serialVersionUID = 1L;
 
 	@Id
@@ -35,12 +35,16 @@ public class Loan implements Serializable {
 	@JoinColumn(name = "copy_id", nullable = false)
 	private Copy copy;
 
-	@Column(nullable = false)
+	// Data do empréstimo
+	@Column(name = "issue_date", nullable = false)
 	private LocalDate issueDate;
 
-	@Column(nullable = false)
+	// Data limite para devolução
+	@Column(name = "due_date", nullable = false)
 	private LocalDate dueDate;
 
+	// Data da devolução
+	@Column(name = "return_date")
 	private LocalDate returnDate;
 
 	@Enumerated(EnumType.STRING)
@@ -101,6 +105,16 @@ public class Loan implements Serializable {
 
 	public void setStatus(LoanStatus status) {
 		this.status = status;
+	}
+
+	public LocalDate getBorrowDate() {
+		return issueDate;
+	}
+
+	public long getDaysRemaining() {
+		if (dueDate == null)
+			return 0;
+		return LocalDate.now().until(dueDate).getDays();
 	}
 
 	public boolean isOverdue() {
