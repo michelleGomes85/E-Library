@@ -12,12 +12,14 @@ import br.elibrary.service.CatalogStatusService;
 import br.elibrary.service.LoanService;
 import br.elibrary.service.UserSessionService;
 import jakarta.ejb.EJB;
+import jakarta.ejb.Remote;
 import jakarta.ejb.Remove;
 import jakarta.ejb.Stateful;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 
 @Stateful
+@Remote(UserSessionService.class)
 public class UserSessionSB implements UserSessionService {
 
     @PersistenceContext(unitName = "E-Library")

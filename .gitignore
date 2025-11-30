@@ -9,4 +9,13 @@
 .loadpath
 .metadata/
 
+# Ignorar arquivos compilados
+*.class
+
+# Ignorar diretórios de build/target
+E-Library/build/
+E-LibraryWeb/target/
+
+# Ignorar arquivos JAR gerados
+*.jar
 

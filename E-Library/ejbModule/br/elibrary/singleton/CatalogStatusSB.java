@@ -9,6 +9,7 @@ import jakarta.ejb.ConcurrencyManagement;
 import jakarta.ejb.ConcurrencyManagementType;
 import jakarta.ejb.Lock;
 import jakarta.ejb.LockType;
+import jakarta.ejb.Remote;
 import jakarta.ejb.Singleton;
 import jakarta.ejb.Startup;
 import jakarta.persistence.EntityManager;
@@ -17,6 +18,7 @@ import jakarta.persistence.PersistenceContext;
 @Singleton
 @Startup
 @ConcurrencyManagement(ConcurrencyManagementType.CONTAINER)
+@Remote(CatalogStatusService.class)
 public class CatalogStatusSB implements CatalogStatusService {
 
     @PersistenceContext
