@@ -100,20 +100,68 @@ O backend utiliza três tipos de Session Beans, conforme exigido pelo enunciado:
 ### 🔐 Autenticação e Controle de Acesso
 
 #### ✅ Managed Beans
+
 - **`UserSessionBean`** (`@SessionScoped`): mantém o estado da sessão do usuário (instância de `User` e referência ao `UserSessionService` Stateful).
+
 - **`LoginBean`** (`@RequestScoped`):
   - `doLogin()`: autentica via `UserSessionService.login()`, armazena usuário na sessão e redireciona para `admin/index.xhtml` ou `user/index.xhtml` com base em `Rules`.
+  
   - `doLogout()`: chama `logout()` no Stateful Bean, limpa sessão e redireciona para `/login`.
 
 #### ✅ Filtros de Segurança (Servlet Filters)
+
 - **`AuthFilter`** (`@WebFilter({"/user/*", "/admin/*"})`):
   - Bloqueia acesso não autenticado → redireciona para `login.xhtml`.
+  
 - **`AdminFilter`** (`@WebFilter("/admin/*")`):
   - Permite acesso apenas a usuários com `Rules.ADMIN` → caso contrário, redireciona para `access-denied.xhtml`.
 
 #### ✅ Integração com EJB Stateful
 - O `LoginBean` injeta `@EJB UserSessionService` (proxy para `UserSessionSB`).
+
 - Após login, o `UserSessionBean` mantém a referência ao Stateful Bean — permitindo que outros beans (ex: `BorrowBean`) chamem `borrowCopy()` diretamente, preservando o estado da sessão.
 
-> ✅ **Conformidade**: Atende integralmente o item 5 do enunciado: login, dashboard por perfil, navegação segura, injeção de EJBs.
+### 🛠️ CRUD de Administração (Role: `ADMIN`)
+
+#### ✅ Managed Beans (`@ViewScoped`)
+- **`BookBean`**: CRUD completo de livros com validações (título, autor, ano, categorias). Suporte a edição com pré-carregamento de relações (`categories`).
+- **`CopyBean`**: CRUD de exemplares com seleção de livro associado (`<p:selectOneMenu>` de livros) e validação de código interno.
+- **`CategoryBean`**: CRUD de categorias
+- **`UserBean`**: CRUD de usuários com tratamento seguro de senha (confirmação, tamanho mínimo, hashing no EJB). Inclui método `registerPublic()` para auto-cadastro (para usuário comum).
+
+#### ✅ Funcionalidades Comuns
+- Diálogos modais com PrimeFaces (`<p:dialog widgetVar="manageBookDialog">`).
+- Validação no lado do cliente (JSF) e servidor (Managed Bean).
+- Atualização automática da lista após operações (`loadBooks()`, `loadCopies()`, etc.).
+- Mensagens de feedback com ícones e detalhes.
+- Confirmação de exclusão com `selectedX`.
+
+#### 🔐 Controle de Acesso
+- As páginas de administração (`/admin/book.xhtml`, `/admin/copy.xhtml`, etc.) são protegidas pelo `AdminFilter`.
+
+### 📊 Dashboard do Usuário Comum
+
+#### ✅ Funcionalidades
+
+- **Visão geral do catálogo**: exibe `totalBooks`, `totalCopies`, `availableCopies` (direto do `CatalogStatusSB`).
+- **Lista de empréstimos ativos**: obtida via `UserSessionSB.getActiveLoans()`
+- **Busca integrada**: por título/autor, e filtro para "livros em espera" (0 cópias disponíveis).
+
+- **Ações diretas no catálogo**:
+  - `Detalhes`: exibe ISBN, editora, ano, categorias.
+  - `Emprestar`: reserva a primeira cópia disponível via `UserSessionSB.borrowCopy()`.
+  - `Devolver`: atualiza status do exemplar e do empréstimo.
+
+#### ✅ Tecnologias Utilizadas
+- `<p:carousel>` para exibição responsiva de livros.
+- `<p:dialog>` com `appendTo="@(body)"` para modais robustos.
+- Atualizações parciais (`update="..."`) para manter estado do carrossel e badge.
+- CSS Personalizado
+
+#### 🔐 Controle de Acesso
+- Botão "Modo Administrador" só visível se `rules == 'ADMIN'`.
+- Logout com redirecionamento seguro (`/login?faces-redirect=true`).
+
+
+
 
