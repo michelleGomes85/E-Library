@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.primefaces.PrimeFaces;
 
-import br.elibrary.model.Category;
+import br.elibrary.dto.CategoryDTO;
 import br.elibrary.service.CategoryService;
 import jakarta.annotation.PostConstruct;
 import jakarta.ejb.EJB;
@@ -24,11 +24,11 @@ public class CategoryBean implements Serializable {
 	@EJB
 	private CategoryService categoryService;
 
-	private Category category = new Category();
+	private CategoryDTO category = new CategoryDTO();
 
-	private Category selectedCategory;
+	private CategoryDTO selectedCategory;
 
-	private List<Category> categories;
+	private List<CategoryDTO> categories;
 
 	private boolean editMode = false;
 
@@ -42,17 +42,17 @@ public class CategoryBean implements Serializable {
 	}
 
 	public void openNew() {
-		category = new Category();
+		category = new CategoryDTO();
 		editMode = false;
 	}
 
-	public void edit(Category cat) {
-		this.category = cat;
-		this.editMode = true;
+	public void edit(CategoryDTO category) {
+		this.category = categoryService.findById(category.getId());
+        this.editMode = true;
 	}
 
-	public void confirmDelete(Category cat) {
-		this.selectedCategory = cat;
+	public void confirmDelete(CategoryDTO category) {
+		this.selectedCategory = category;
 	}
 
 	public void save() {
@@ -100,40 +100,42 @@ public class CategoryBean implements Serializable {
 	}
 
 	private boolean validateCategory() {
+		
 		boolean valid = true;
+		
 		if (category.getName() == null || category.getName().trim().isEmpty()) {
 			addFieldError("name", "Nome da categoria é obrigatório.");
 			valid = false;
 		}
+		
 		return valid;
 	}
 
 	private void addFieldError(String clientId, String message) {
-		FacesContext.getCurrentInstance().addMessage("dialogs:" + clientId,
-				new FacesMessage(FacesMessage.SEVERITY_ERROR, "", message));
+		FacesContext.getCurrentInstance().addMessage("dialogs:" + clientId, new FacesMessage(FacesMessage.SEVERITY_ERROR, "", message));
 	}
 
 	private void addMessage(FacesMessage.Severity severity, String summary, String detail) {
 		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, summary, detail));
 	}
 
-	public Category getCategory() {
+	public CategoryDTO getCategory() {
 		return category;
 	}
 
-	public void setCategory(Category category) {
+	public void setCategory(CategoryDTO category) {
 		this.category = category;
 	}
 
-	public Category getSelectedCategory() {
+	public CategoryDTO getSelectedCategory() {
 		return selectedCategory;
 	}
 
-	public void setSelectedCategory(Category selectedCategory) {
+	public void setSelectedCategory(CategoryDTO selectedCategory) {
 		this.selectedCategory = selectedCategory;
 	}
 
-	public List<Category> getCategories() {
+	public List<CategoryDTO> getCategories() {
 		return categories != null ? categories : new ArrayList<>();
 	}
 

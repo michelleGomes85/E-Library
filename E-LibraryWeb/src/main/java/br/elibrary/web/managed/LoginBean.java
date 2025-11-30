@@ -2,9 +2,7 @@ package br.elibrary.web.managed;
 
 import java.io.Serializable;
 
-import org.primefaces.PrimeFaces;
-
-import br.elibrary.model.User;
+import br.elibrary.dto.UserDTO;
 import br.elibrary.model.enuns.Rules;
 import br.elibrary.service.UserSessionService;
 import jakarta.ejb.EJB;
@@ -38,7 +36,7 @@ public class LoginBean implements Serializable {
                 return;
             }
 
-            User user = userSession.getLoggedInUser();
+            UserDTO user = userSession.getLoggedInUser();
             sessionBean.setLoggedUser(user);
             sessionBean.setUserStateful(userSession);
 

@@ -2,17 +2,19 @@ package br.elibrary.service;
 
 import java.util.List;
 
-import br.elibrary.model.Category;
+import br.elibrary.dto.CategoryDTO;
 
 public interface CategoryService {
 	
-	Category create(Category category);
+	CategoryDTO create(CategoryDTO category);
 
-	Category update(Category category);
+	CategoryDTO update(CategoryDTO category);
 
-	void delete(Category category);
+	void delete(CategoryDTO category);
+	
+	void deleteById(Long id);
 
-	Category findById(Long id);
+	CategoryDTO findById(Long id);
 
-	List<Category> findAll();
+	List<CategoryDTO> findAll();
 }

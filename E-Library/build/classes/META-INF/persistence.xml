@@ -2,11 +2,6 @@
 <persistence version="3.0" xmlns="https://jakarta.ee/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence https://jakarta.ee/xml/ns/persistence/persistence_3_0.xsd">
 	<persistence-unit name="E-Library" transaction-type="JTA">
 		<jta-data-source>E-LibraryDS</jta-data-source>
-		<class>br.elibrary.model.User</class>
-		<class>br.elibrary.model.Category</class>
-		<class>br.elibrary.model.Book</class>
-		<class>br.elibrary.model.Copy</class>
-		<class>br.elibrary.model.Loan</class>
 		<properties>
 			<property name="jakarta.persistence.schema-generation.database.action" value="update"/>
 		</properties>

@@ -17,9 +17,10 @@ public class LoanSB implements LoanService {
 
     @PersistenceContext(unitName = "E-Library")
     private EntityManager em;
-
+    
     @Override
     public List<Copy> findBorrowedCopiesByUser(Long userId) {
+    	
         if (userId == null) {
             return List.of();
         }
@@ -29,13 +30,12 @@ public class LoanSB implements LoanService {
             WHERE l.user.id = :userId
               AND l.status = :activeStatus
             """;
-        
         return em.createQuery(jpql, Copy.class)
                  .setParameter("userId", userId)
                  .setParameter("activeStatus", LoanStatus.ACTIVE)
                  .getResultList();
     }
-
+    
     @Override
     public List<Book> findBooksWithNoAvailableCopies() {
         String jpql = """
@@ -50,15 +50,17 @@ public class LoanSB implements LoanService {
             """;
         
         return em.createQuery(jpql, Book.class)
-                 .setParameter("available", CopyStatus.AVAILABLE)
+        		  .setParameter("available", CopyStatus.AVAILABLE)
                  .getResultList();
     }
     
     @Override
     public List<Loan> findActiveLoansByUser(Long userId) {
-        if (userId == null) {
+        
+    	if (userId == null) {
             return List.of();
         }
+        
         return em.createQuery(
             "SELECT l FROM Loan l WHERE l.user.id = :userId AND l.status = :status", Loan.class)
             .setParameter("userId", userId)
@@ -68,6 +70,7 @@ public class LoanSB implements LoanService {
     
     @Override
     public Loan findActiveLoanByCopyId(Long copyId) {
+    	
         if (copyId == null)
             return null;
         

@@ -2,26 +2,26 @@ package br.elibrary.service;
 
 import java.util.List;
 
-import br.elibrary.model.Book;
-import br.elibrary.model.Copy;
+import br.elibrary.dto.BookDTO;
+import br.elibrary.dto.CopyDTO;
 
 public interface BookService {
 
-	Book create(Book book);
+	BookDTO create(BookDTO book);
 
-	Book update(Book book);
+	BookDTO update(BookDTO book);
 
-	void delete(Book book);
+	void delete(BookDTO book);
 
-	Book findById(Long id);
+	BookDTO findById(Long id);
 
-	List<Book> findAll();
+	List<BookDTO> findAll();
 
 	List<Object[]> findByTitleOrAuthorWithStats(String query);
 
 	List<Object[]> findBooksWithCopyStats();
 
-	Copy findFirstAvailableCopy(Long bookId);
-	
+	CopyDTO findFirstAvailableCopy(Long bookId);	
+
 	List<Object[]> findUnavailableBooksWithStats();
 }

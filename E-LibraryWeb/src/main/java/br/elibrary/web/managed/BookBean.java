@@ -6,8 +6,8 @@ import java.util.List;
 
 import org.primefaces.PrimeFaces;
 
-import br.elibrary.model.Book;
-import br.elibrary.model.Category;
+import br.elibrary.dto.BookDTO;
+import br.elibrary.dto.CategoryDTO;
 import br.elibrary.service.BookService;
 import br.elibrary.service.CategoryService;
 import jakarta.annotation.PostConstruct;
@@ -29,11 +29,11 @@ public class BookBean implements Serializable {
 	@EJB
 	private CategoryService categoryService;
 
-	private Book book = new Book();
-	private Book selectedBook;
-	private List<Book> books;
-	private List<Book> filteredBooks;
-	private List<Category> availableCategories;
+	private BookDTO book = new BookDTO();
+	private BookDTO selectedBook;
+	private List<BookDTO> books;
+	private List<BookDTO> filteredBooks;
+	private List<CategoryDTO> availableCategories;
 	private boolean editMode = false;
 
 	@PostConstruct
@@ -51,19 +51,16 @@ public class BookBean implements Serializable {
 	}
 
 	public void openNew() {
-		book = new Book();
+		book = new BookDTO();
 		editMode = false;
 	}
 
-	public void edit(Book book) {
+	public void edit(BookDTO book) {
 		this.book = bookService.findById(book.getId());
-
-		this.book.setCategories(new ArrayList<>(this.book.getCategories()));
-
 		this.editMode = true;
 	}
 
-	public void confirmDelete(Book book) {
+	public void confirmDelete(BookDTO book) {
 		this.selectedBook = book;
 	}
 
@@ -89,8 +86,7 @@ public class BookBean implements Serializable {
 
 		} catch (Exception e) {
 			e.printStackTrace();
-			addMessage(FacesMessage.SEVERITY_ERROR, "Erro",
-					"Erro ao salvar livro. Verifique os dados e tente novamente.");
+			addMessage(FacesMessage.SEVERITY_ERROR, "Erro", "Erro ao salvar livro. Verifique os dados e tente novamente.");
 		}
 	}
 
@@ -112,7 +108,8 @@ public class BookBean implements Serializable {
 		}
 	}
 
-	private boolean validateBook(Book book) {
+	private boolean validateBook(BookDTO book) {
+		
 		boolean valid = true;
 
 		if (book.getTitle() == null || book.getTitle().trim().isEmpty()) {
@@ -137,7 +134,7 @@ public class BookBean implements Serializable {
 			valid = false;
 		}
 
-		if (book.getCategories() == null || book.getCategories().isEmpty()) {
+		if (book.getCategoryIds() == null || book.getCategoryIds().isEmpty()) {
 			addFieldError("categories", "Selecione pelo menos uma categoria.");
 			valid = false;
 		}
@@ -146,39 +143,38 @@ public class BookBean implements Serializable {
 	}
 
 	private void addFieldError(String clientId, String message) {
-		FacesContext.getCurrentInstance().addMessage("dialogs:" + clientId,
-				new FacesMessage(FacesMessage.SEVERITY_ERROR, "", message));
+		FacesContext.getCurrentInstance().addMessage("dialogs:" + clientId, new FacesMessage(FacesMessage.SEVERITY_ERROR, "", message));
 	}
 
 	private void addMessage(FacesMessage.Severity severity, String summary, String detail) {
 		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, summary, detail));
 	}
 
-	public Book getBook() {
+	public BookDTO getBook() {
 		return book;
 	}
 
-	public void setBook(Book book) {
+	public void setBook(BookDTO book) {
 		this.book = book;
 	}
 
-	public Book getSelectedBook() {
+	public BookDTO getSelectedBook() {
 		return selectedBook;
 	}
 
-	public void setSelectedBook(Book selectedBook) {
+	public void setSelectedBook(BookDTO selectedBook) {
 		this.selectedBook = selectedBook;
 	}
 
-	public List<Book> getBooks() {
+	public List<BookDTO> getBooks() {
 		return books != null ? books : new ArrayList<>();
 	}
 
-	public List<Book> getFilteredBooks() {
+	public List<BookDTO> getFilteredBooks() {
 		return filteredBooks;
 	}
 
-	public void setFilteredBooks(List<Book> filteredBooks) {
+	public void setFilteredBooks(List<BookDTO> filteredBooks) {
 		this.filteredBooks = filteredBooks;
 	}
 
@@ -190,7 +186,7 @@ public class BookBean implements Serializable {
 		this.editMode = editMode;
 	}
 
-	public List<Category> getAvailableCategories() {
+	public List<CategoryDTO> getAvailableCategories() {
 		return availableCategories != null ? availableCategories : new ArrayList<>();
 	}
 }

@@ -23,22 +23,22 @@
 
 		<div class="header-actions">
 			<h:form id="navForm" styleClass="inline-form">
-				<!-- Botão Voltar -->
+
 				<p:button value="← Voltar" outcome="/admin/index.html"
 					title="Retornar ao Painel do Administrador"
 					styleClass="btn-outline" />
 
-				<!-- Botão Logout -->
 				<p:commandButton value="Sair" action="#{loginBean.doLogout}"
 					icon="pi pi-sign-out" styleClass="btn-logout" ajax="true"
 					update="@form" title="Encerrar sessão" />
 			</h:form>
 		</div>
 	</div>
+
 	<div class="page-container">
 
-		<!-- FORM PRINCIPAL (tabela e toolbar) -->
 		<h:form id="copyForm">
+
 			<p:growl id="messages" showDetail="true" autoUpdate="true" />
 
 			<!-- Toolbar -->
@@ -69,9 +69,9 @@
 					<h:outputText value="#{copy.internalCode}" />
 				</p:column>
 
-				<p:column headerText="Livro" sortBy="#{copy.book.title}"
-					filterBy="#{copy.book.title}" filterMatchMode="contains">
-					<h:outputText value="#{copy.book.title} (#{copy.book.isbn})" />
+				<p:column headerText="Livro" sortBy="#{copy.bookTitle}"
+					filterBy="#{copy.bookTitle}" filterMatchMode="contains">
+					<h:outputText value="#{copy.bookTitle} (#{copy.bookIsbn})" />
 				</p:column>
 
 				<p:column headerText="Status" sortBy="#{copy.status}"
@@ -80,6 +80,7 @@
 				</p:column>
 
 				<p:column headerText="Ações" exportable="false" style="width:120px;">
+				
 					<p:commandButton icon="pi pi-pencil" title="Editar"
 						styleClass="btn-secondary btn-sm" action="#{copyBean.edit(copy)}"
 						oncomplete="PF('manageCopyDialog').show()"
@@ -119,13 +120,16 @@
 						<div class="field">
 							<label class="field-label">Livro *</label>
 							<div class="field-input">
-								<p:selectOneMenu id="book" value="#{copyBean.copy.book}"
-									required="true" converter="#{bookConverter}" filter="true"
-									filterMatchMode="contains">
-									<f:selectItem itemLabel="-- Selecione --"
+								<p:selectOneMenu id="book" value="#{copyBean.copy.bookId}"
+									required="true" filter="true" filterMatchMode="contains">
+
+									<f:selectItem itemLabel="-- Selecione um livro --"
 										noSelectionOption="true" />
+
 									<f:selectItems value="#{copyBean.books}" var="book"
-										itemLabel="#{book.title} (#{book.isbn})" itemValue="#{book}" />
+										itemLabel="#{book.title} (ISBN: #{book.isbn})"
+										itemValue="#{book.id}" />
+
 								</p:selectOneMenu>
 								<p:message for="book" display="icon" />
 							</div>

@@ -24,6 +24,7 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "books")
 public class Book implements Serializable {
+	
 	private static final long serialVersionUID = 1L;
 
 	@Id
@@ -31,7 +32,7 @@ public class Book implements Serializable {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "book_id")
 	private Long id;
 
-	@Column(unique = true)
+	@Column(unique = true, nullable = false)
 	private String isbn;
 
 	@Column(nullable = false)
@@ -55,7 +56,6 @@ public class Book implements Serializable {
 	    joinColumns = @JoinColumn(name = "book_id"),
 	    inverseJoinColumns = @JoinColumn(name = "category_id")
 	)
-	
 	private List<Category> categories = new ArrayList<>();
 
 	public Long getId() {

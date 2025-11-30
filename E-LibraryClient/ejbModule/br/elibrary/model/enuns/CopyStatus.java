@@ -1,6 +1,7 @@
 package br.elibrary.model.enuns;
 
 public enum CopyStatus {
+	
 	AVAILABLE("DISPONIVEL"), BORROWED("EMPRESTADO"), RESERVED("RESERVADO");
 
 	private final String label;
@@ -15,5 +16,9 @@ public enum CopyStatus {
 	
 	public String toString() {
         return label;
+    }
+	
+    public boolean isAvailable() {
+        return this == AVAILABLE;
     }
 }

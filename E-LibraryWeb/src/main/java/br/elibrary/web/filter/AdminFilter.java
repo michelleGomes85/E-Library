@@ -2,7 +2,7 @@ package br.elibrary.web.filter;
 
 import java.io.IOException;
 
-import br.elibrary.model.User;
+import br.elibrary.dto.UserDTO;
 import br.elibrary.model.enuns.Rules;
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
@@ -22,7 +22,7 @@ public class AdminFilter implements Filter {
         HttpServletRequest request = (HttpServletRequest) requestArg;
         HttpServletResponse response = (HttpServletResponse) responseArg;
 
-        User user = (User) request.getSession().getAttribute("loggedUser");
+        UserDTO user = (UserDTO) request.getSession().getAttribute("loggedUser");
 
         if (user == null || user.getRules() != Rules.ADMIN) {
             response.sendRedirect(request.getContextPath() + "/access-denied.xhtml");

@@ -1,13 +1,15 @@
 package br.elibrary.stateless;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
+import br.elibrary.dto.CategoryDTO;
+import br.elibrary.mapper.CategoryMapper;
 import br.elibrary.model.Category;
 import br.elibrary.service.CategoryService;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.TypedQuery;
 
 @Stateless
 public class CategorySB implements CategoryService {
@@ -16,32 +18,60 @@ public class CategorySB implements CategoryService {
 	private EntityManager em;
 
 	@Override
-	public Category create(Category category) {
-		em.persist(category);
-		return category;
+	public CategoryDTO create(CategoryDTO dto) {
+
+		if (dto == null || dto.getName() == null || dto.getName().trim().isEmpty())
+			throw new IllegalArgumentException("Nome da categoria é obrigatório.");
+
+		Category entity = CategoryMapper.toEntity(dto);
+
+		em.persist(entity);
+
+		return CategoryMapper.toDTO(entity);
 	}
 
 	@Override
-	public Category update(Category category) {
-		return em.merge(category);
+	public CategoryDTO update(CategoryDTO dto) {
+
+		if (dto == null || dto.getId() == null)
+			throw new IllegalArgumentException("ID da categoria é obrigatório para atualização.");
+
+		Category existing = em.find(Category.class, dto.getId());
+		if (existing == null)
+			throw new IllegalArgumentException("Categoria não encontrada.");
+
+		existing.setName(dto.getName());
+
+		return CategoryMapper.toDTO(existing);
 	}
 
 	@Override
-	public void delete(Category category) {
-		if (!em.contains(category)) {
-			category = em.merge(category);
+	public void delete(CategoryDTO dto) {
+		if (dto != null && dto.getId() != null) {
+			deleteById(dto.getId());
 		}
-		em.remove(category);
 	}
 
 	@Override
-	public Category findById(Long id) {
-		return em.find(Category.class, id);
+	public void deleteById(Long id) {
+		Category category = em.find(Category.class, id);
+		if (category != null)
+			em.remove(category);
 	}
 
 	@Override
-	public List<Category> findAll() {
-		TypedQuery<Category> query = em.createQuery("SELECT c FROM Category c ORDER BY c.name", Category.class);
-		return query.getResultList();
+	public CategoryDTO findById(Long id) {
+		Category category = em.find(Category.class, id);
+		return CategoryMapper.toDTO(category);
+	}
+
+	@Override
+	public List<CategoryDTO> findAll() {
+
+		List<Category> categories = 
+				em.createQuery("SELECT c FROM Category c ORDER BY c.name", Category.class)
+				.getResultList();
+
+		return categories.stream().map(CategoryMapper::toDTO).collect(Collectors.toList());
 	}
 }

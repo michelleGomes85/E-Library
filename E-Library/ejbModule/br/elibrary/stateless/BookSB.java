@@ -1,8 +1,13 @@
 package br.elibrary.stateless;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
+import br.elibrary.dto.BookDTO;
+import br.elibrary.dto.CopyDTO;
+import br.elibrary.mapper.BookMapper;
+import br.elibrary.mapper.CopyMapper;
 import br.elibrary.model.Book;
 import br.elibrary.model.Category;
 import br.elibrary.model.Copy;
@@ -19,128 +24,175 @@ import jakarta.persistence.PersistenceContext;
 @Remote(BookService.class)
 public class BookSB implements BookService {
 
-    @PersistenceContext(unitName = "E-Library")
-    private EntityManager em;
+	@PersistenceContext(unitName = "E-Library")
+	private EntityManager em;
 
-    @EJB
-    private CatalogStatusService catalogStatusSB;
+	@EJB
+	private CatalogStatusService catalogStatusSB;
 
-    @Override
-    public Book create(Book book) {
-        em.persist(book);
-        catalogStatusSB.onBookCreated();
-        return book;
-    }
+	@Override
+	public BookDTO create(BookDTO dto) {
+		
+		if (dto == null) 
+			return null;
 
-    @Override
-    public Book update(Book book) {
-        if (book.getCategories() != null) {
-            List<Category> managedCategories = new ArrayList<>();
-            for (Category c : book.getCategories()) {
-                Category managed = em.find(Category.class, c.getId());
-                managedCategories.add(managed);
-            }
-            book.setCategories(managedCategories);
-        }
-        return em.merge(book);
-    }
+		Book entity = BookMapper.toEntity(dto, em);
+		em.persist(entity);
 
-    @Override
-    public void delete(Book book) {
-        Book managed = em.find(Book.class, book.getId());
-        if (managed == null) return;
+		catalogStatusSB.onBookCreated();
+		
+		return BookMapper.toDTO(entity);
+	}
 
-        long totalCopies = managed.getCopies().size();
-        long availableCopies = managed.getCopies().stream()
-            .filter(c -> c.getStatus() == CopyStatus.AVAILABLE).count();
+	@Override
+	public BookDTO update(BookDTO dto) {
+		
+	    if (dto == null || dto.getId() == null)
+	        throw new IllegalArgumentException("ID do livro é obrigatório para atualização");
 
-        em.remove(managed);
-        catalogStatusSB.onBookDeleted((int) totalCopies, (int) availableCopies);
-    }
+	    Book existing = em.find(Book.class, dto.getId());
+	    if (existing == null)
+	        throw new IllegalArgumentException("Livro não encontrado");
 
-    @Override
-    public Book findById(Long id) {
-        return em.createQuery("""
-            SELECT b FROM Book b 
-            LEFT JOIN FETCH b.categories 
-            WHERE b.id = :id
-            """, Book.class)
-            .setParameter("id", id)
-            .getSingleResult();
-    }
+	    existing.setIsbn(dto.getIsbn());
+	    existing.setTitle(dto.getTitle());
+	    existing.setAuthor(dto.getAuthor());
+	    existing.setPublisher(dto.getPublisher());
+	    existing.setYear(dto.getYear());
 
-    @Override
-    public List<Book> findAll() {
-        return em.createQuery("""
-            SELECT DISTINCT b FROM Book b 
-            LEFT JOIN FETCH b.categories 
-            ORDER BY b.title
-            """, Book.class)
-            .getResultList();
-    }
+	    existing.getCategories().clear();
 
-    @Override
-    public List<Object[]> findByTitleOrAuthorWithStats(String query) {
-        
-    	String q = "%" + query.toLowerCase() + "%";
-        
-        return em.createQuery("""
-            SELECT b,
-                   COUNT(c) AS totalCopies,
-                   SUM(CASE WHEN c.status = :available THEN 1 ELSE 0 END) AS availableCopies
-            FROM Book b
-            LEFT JOIN b.copies c
-            WHERE LOWER(b.title) LIKE :q OR LOWER(b.author) LIKE :q
-            GROUP BY b.id, b.title
-            ORDER BY b.title ASC
-            """, Object[].class)
-            .setParameter("q", q)
-            .setParameter("available", CopyStatus.AVAILABLE)
-            .getResultList();
-    }
+	    if (dto.getCategoryIds() != null && !dto.getCategoryIds().isEmpty()) {
+	    	
+	        var managedCategories = dto.getCategoryIds().stream()
+	            .filter(Objects::nonNull)
+	            .map(id -> em.getReference(Category.class, id))
+	            .collect(Collectors.toList());
+	        existing.getCategories().addAll(managedCategories);
+	    }
 
-    @Override
-    public List<Object[]> findUnavailableBooksWithStats() {
-        return em.createQuery("""
-            SELECT b, 
-                   COUNT(c) AS totalCopies,
-                   0L AS availableCopies
-            FROM Book b
-            INNER JOIN b.copies c
-            GROUP BY b.id, b.title
-            HAVING SUM(CASE WHEN c.status = :available THEN 1 ELSE 0 END) = 0
-            ORDER BY b.title
-            """, Object[].class)
-            .setParameter("available", CopyStatus.AVAILABLE)
-            .getResultList();
-    }
+	    return BookMapper.toDTO(existing);
+	}
 
-    @Override
-    public List<Object[]> findBooksWithCopyStats() {
-        return em.createQuery("""
-            SELECT b,
-                   COUNT(c) AS totalCopies,
-                   SUM(CASE WHEN c.status = :available THEN 1 ELSE 0 END) AS availableCopies
-            FROM Book b
-            LEFT JOIN b.copies c
-            GROUP BY b.id, b.title
-            ORDER BY b.title ASC
-            """, Object[].class)
-            .setParameter("available", CopyStatus.AVAILABLE)
-            .getResultList();
-    }
+	@Override
+	public void delete(BookDTO book) {
 
-    @Override
-    public Copy findFirstAvailableCopy(Long bookId) {
-        return em.createQuery("""
-            SELECT c FROM Copy c 
-            WHERE c.book.id = :bookId AND c.status = :status
-            """, Copy.class)
-            .setParameter("bookId", bookId)
-            .setParameter("status", CopyStatus.AVAILABLE)
-            .setMaxResults(1)
-            .getResultStream()
-            .findFirst()
-            .orElse(null);
-    }
+		Book managed = em.find(Book.class, book.getId());
+		if (managed == null)
+			return;
+
+		long totalCopies = managed.getCopies().size();
+		long availableCopies = managed.getCopies().stream().filter(c -> c.getStatus() == CopyStatus.AVAILABLE).count();
+
+		em.remove(managed);
+		catalogStatusSB.onBookDeleted((int) totalCopies, (int) availableCopies);
+	}
+
+	@Override
+	public BookDTO findById(Long id) {
+		Book book = em.createQuery("""
+				SELECT b FROM Book b
+				LEFT JOIN FETCH b.categories
+				WHERE b.id = :id
+				""", Book.class).setParameter("id", id).getSingleResult();
+		
+		return BookMapper.toDTO(book);
+	}
+
+	@Override
+	public List<BookDTO> findAll() {
+		List<Book> books = em.createQuery("""
+				SELECT DISTINCT b FROM Book b
+				LEFT JOIN FETCH b.categories
+				ORDER BY b.title
+				""", Book.class)
+				.getResultList();
+		
+		return books.stream()
+				.map(BookMapper::toDTO)
+				.collect(Collectors.toList());
+	}
+
+	@Override
+	public List<Object[]> findByTitleOrAuthorWithStats(String query) {
+
+		String q = "%" + query.toLowerCase() + "%";
+
+		List<Object[]> results =  em.createQuery("""
+				SELECT b,
+				       COUNT(c) AS totalCopies,
+				       SUM(CASE WHEN c.status = :available THEN 1 ELSE 0 END) AS availableCopies
+				FROM Book b
+				LEFT JOIN b.copies c
+				WHERE LOWER(b.title) LIKE :q OR LOWER(b.author) LIKE :q
+				GROUP BY b.id, b.title
+				ORDER BY b.title ASC
+				""", Object[].class).setParameter("q", q).setParameter("available", CopyStatus.AVAILABLE)
+				.getResultList();
+		
+	    return results.stream()
+	            .map(row -> new Object[]{
+	                BookMapper.toDTO((Book) row[0]),
+	                row[1], 
+	                row[2]  
+	            })
+	            
+	            .collect(Collectors.toList());
+	}
+
+	@Override
+	public List<Object[]> findUnavailableBooksWithStats() {
+		
+		List<Object[]> results = em.createQuery("""
+				SELECT b,
+				       COUNT(c) AS totalCopies,
+				       0L AS availableCopies
+				FROM Book b
+				INNER JOIN b.copies c
+				GROUP BY b.id, b.title
+				HAVING SUM(CASE WHEN c.status = :available THEN 1 ELSE 0 END) = 0
+				ORDER BY b.title
+				""", Object[].class).setParameter("available", CopyStatus.AVAILABLE).getResultList();
+		
+	    return results.stream()
+	            .map(row -> new Object[]{
+	                BookMapper.toDTO((Book) row[0]),
+	                row[1],
+	                row[2]
+	            })
+	            .collect(Collectors.toList());
+	}
+
+	@Override
+	public List<Object[]> findBooksWithCopyStats() {
+		List<Object[]> results = em.createQuery("""
+				SELECT b,
+				       COUNT(c) AS totalCopies,
+				       SUM(CASE WHEN c.status = :available THEN 1 ELSE 0 END) AS availableCopies
+				FROM Book b
+				LEFT JOIN b.copies c
+				GROUP BY b.id, b.title
+				ORDER BY b.title ASC
+				""", Object[].class).setParameter("available", CopyStatus.AVAILABLE).getResultList();
+		
+	    return results.stream()
+	            .map(row -> new Object[]{
+	                BookMapper.toDTO((Book) row[0]),
+	                row[1],
+	                row[2]
+	            })
+	            .collect(Collectors.toList());
+	}
+
+	@Override
+	public CopyDTO findFirstAvailableCopy(Long bookId) {
+		
+		Copy copy = em.createQuery("""
+				SELECT c FROM Copy c
+				WHERE c.book.id = :bookId AND c.status = :status
+				""", Copy.class).setParameter("bookId", bookId).setParameter("status", CopyStatus.AVAILABLE)
+				.setMaxResults(1).getResultStream().findFirst().orElse(null);
+		
+		return CopyMapper.toDTO(copy);
+	}
 }

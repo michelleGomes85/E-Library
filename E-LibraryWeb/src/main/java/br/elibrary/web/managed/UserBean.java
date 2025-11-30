@@ -7,7 +7,7 @@ import java.util.List;
 
 import org.primefaces.PrimeFaces;
 
-import br.elibrary.model.User;
+import br.elibrary.dto.UserDTO;
 import br.elibrary.model.enuns.Rules;
 import br.elibrary.model.enuns.UserType;
 import br.elibrary.service.UserService;
@@ -27,11 +27,11 @@ public class UserBean implements Serializable {
 	@EJB
 	private UserService userService;
 
-	private User user = new User();
-	private User selectedUser;
+	private UserDTO user = new UserDTO();
+	private UserDTO selectedUser;
 
-	private List<User> users;
-	private List<User> filteredUsers;
+	private List<UserDTO> users;
+	private List<UserDTO> filteredUsers;
 
 	private String password;
 	private String passwordConfirm;
@@ -47,111 +47,65 @@ public class UserBean implements Serializable {
 		users = userService.findAll();
 	}
 
-	public void openNew() {
-		user = new User();
-		editMode = false;
-	}
+    public void openNew() {
+        user = new UserDTO();
+        password = "";
+        passwordConfirm = "";
+        editMode = false;
+    }
 
-	public void edit(User u) {
-		this.user = u;
-		this.editMode = true;
-	}
+    public void edit(UserDTO u) {
+    	
+        this.user = userService.findById(u.getId());
+        password = "";
+        passwordConfirm = "";
+        editMode = true;
+    }
 
-	public void confirmDelete(User u) {
+	public void confirmDelete(UserDTO u) {
 		this.selectedUser = u;
 	}
 
 	public void save() {
-	    try {
-	        validate(user);
+        try {
+            user.setPassword(password);
 
-	        if (!editMode) {
-	        	
-	            if (password == null || password.trim().isEmpty()) {
-	                throw new IllegalArgumentException("A senha é obrigatória para novo usuário.");
-	            }
-	            
-	            if (!password.equals(passwordConfirm)) {
-	                throw new IllegalArgumentException("As senhas não coincidem.");
-	            }
-	            
-	            if (password.length() < 6) {
-	                throw new IllegalArgumentException("A senha deve ter pelo menos 6 caracteres.");
-	            }
-	            
-	            user.setPasswordHash(password); 
-	        } else {
-	        	
-	            if (password != null && !password.trim().isEmpty()) {
-	                if (!password.equals(passwordConfirm)) {
-	                    throw new IllegalArgumentException("As senhas não coincidem.");
-	                }
-	                
-	                if (password.length() < 6) {
-	                    throw new IllegalArgumentException("A senha deve ter pelo menos 6 caracteres.");
-	                }
-	                user.setPasswordHash(password);
-	            }
-	        }
+            if (editMode) {
+                user = userService.update(user);
+                addMessage(FacesMessage.SEVERITY_INFO, "Sucesso", "Usuário atualizado com sucesso!");
+            } else {
+                user = userService.create(user);
+                addMessage(FacesMessage.SEVERITY_INFO, "Sucesso", "Usuário cadastrado com sucesso!");
+            }
 
-	        if (editMode) {
-	            userService.update(user);
-	            addMessage(FacesMessage.SEVERITY_INFO, "Sucesso", "Usuário atualizado com sucesso!");
-	        } else {
-	            userService.create(user);
-	            addMessage(FacesMessage.SEVERITY_INFO, "Sucesso", "Usuário cadastrado com sucesso!");
-	        }
+            loadUsers();
+            PrimeFaces.current().executeScript("PF('manageUserDialog').hide();");
 
-	        loadUsers();
+        } catch (Exception e) {
+            addMessage(FacesMessage.SEVERITY_ERROR, "Erro", e.getMessage());
+        } finally {
+            password = "";
+            passwordConfirm = "";
+        }
+    }
 
-	        password = "";
-	        passwordConfirm = "";
-
-	        PrimeFaces.current().executeScript("PF('manageUserDialog').hide();");
-
-	    } catch (IllegalArgumentException e) {
-	        addMessage(FacesMessage.SEVERITY_WARN, "Atenção", e.getMessage());
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        addMessage(FacesMessage.SEVERITY_ERROR, "Erro", "Não foi possível salvar o usuário. Verifique os dados e tente novamente.");
-	    }
-	}
-
-	public void delete() {
-		try {
-			if (selectedUser == null || selectedUser.getId() == null) {
-				addMessage(FacesMessage.SEVERITY_ERROR, "Erro", "Nenhum usuário selecionado.");
-				return;
-			}
-
-			userService.delete(selectedUser);
-			addMessage(FacesMessage.SEVERITY_INFO, "Sucesso", "Usuário excluído!");
-
-			loadUsers();
-
-			PrimeFaces.current().executeScript("PF('deleteUserDialog').hide();");
-
-		} catch (Exception e) {
-			addMessage(FacesMessage.SEVERITY_ERROR, "Erro", e.getMessage());
-		}
-	}
-
-	private void validate(User u) {
-		if (u.getName() == null || u.getName().isBlank())
-			throw new IllegalArgumentException("Nome é obrigatório.");
-
-		if (u.getEmail() == null || u.getEmail().isBlank())
-			throw new IllegalArgumentException("Email é obrigatório.");
-
-		if (u.getRegistration() == null || u.getRegistration().isBlank())
-			throw new IllegalArgumentException("Matrícula é obrigatória.");
-
-		if (u.getType() == null)
-			throw new IllegalArgumentException("Tipo é obrigatório.");
-
-		if (u.getRules() == null)
-			throw new IllegalArgumentException("Regra é obrigatória.");
-	}
+    public void delete() {
+        try {
+        	
+            if (selectedUser == null || selectedUser.getId() == null) {
+                addMessage(FacesMessage.SEVERITY_ERROR, "Erro", "Nenhum usuário selecionado.");
+                return;
+            }
+            
+            userService.delete(selectedUser);
+            addMessage(FacesMessage.SEVERITY_INFO, "Sucesso", "Usuário excluído!");
+            loadUsers();
+            
+            PrimeFaces.current().executeScript("PF('deleteUserDialog').hide();");
+        } catch (Exception e) {
+            addMessage(FacesMessage.SEVERITY_ERROR, "Erro", e.getMessage());
+        }
+    }
 
 	private void addMessage(FacesMessage.Severity s, String summary, String detail) {
 		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(s, summary, detail));
@@ -164,75 +118,32 @@ public class UserBean implements Serializable {
 	public List<Rules> getRulesList() {
 		return Arrays.asList(Rules.values());
 	}
-	
-	public void registerPublic() {
-	    try {
-	    	
-	        if (user.getName() == null || user.getName().isBlank())
-	            throw new IllegalArgumentException("Nome é obrigatório.");
-	        
-	        if (user.getRegistration() == null || user.getRegistration().isBlank())
-	            throw new IllegalArgumentException("Matrícula é obrigatória.");
-	        
-	        if (user.getEmail() == null || user.getEmail().isBlank())
-	            throw new IllegalArgumentException("E-mail é obrigatório.");
-	        
-	        if (user.getType() == null)
-	            throw new IllegalArgumentException("Selecione o tipo de usuário.");
 
-	        user.setRules(Rules.COMMON_USER);
-
-	        if (password == null || password.trim().isEmpty())
-	            throw new IllegalArgumentException("A senha é obrigatória.");
-	        
-	        if (!password.equals(passwordConfirm))
-	            throw new IllegalArgumentException("As senhas não coincidem.");
-	        
-	        if (password.length() < 6)
-	            throw new IllegalArgumentException("A senha deve ter pelo menos 6 caracteres.");
-
-	        user.setPasswordHash(password);
-
-	        userService.create(user);
-
-	        addMessage(FacesMessage.SEVERITY_INFO, "Sucesso", "Cadastro realizado com sucesso! Agora você pode fazer login.");
-	        
-	        user = new User();
-	        password = "";
-	        passwordConfirm = "";
-
-	    } catch (IllegalArgumentException e) {
-	        addMessage(FacesMessage.SEVERITY_WARN, "Atenção", e.getMessage());
-	    } catch (Exception e) {
-	        addMessage(FacesMessage.SEVERITY_ERROR, "Erro", "Não foi possível concluir o cadastro. Tente novamente.");
-	    }
-	}
-
-	public User getUser() {
+	public UserDTO getUser() {
 		return user;
 	}
 
-	public void setUser(User user) {
+	public void setUser(UserDTO user) {
 		this.user = user;
 	}
 
-	public User getSelectedUser() {
+	public UserDTO getSelectedUser() {
 		return selectedUser;
 	}
 
-	public void setSelectedUser(User selectedUser) {
+	public void setSelectedUser(UserDTO selectedUser) {
 		this.selectedUser = selectedUser;
 	}
 
-	public List<User> getUsers() {
+	public List<UserDTO> getUsers() {
 		return users != null ? users : new ArrayList<>();
 	}
 
-	public List<User> getFilteredUsers() {
+	public List<UserDTO> getFilteredUsers() {
 		return filteredUsers;
 	}
 
-	public void setFilteredUsers(List<User> filteredUsers) {
+	public void setFilteredUsers(List<UserDTO> filteredUsers) {
 		this.filteredUsers = filteredUsers;
 	}
 
@@ -254,5 +165,27 @@ public class UserBean implements Serializable {
 
 	public void setPassword(String password) {
 		this.password = password;
+	}
+	
+	public void registerPublic() {
+	    try {
+	        user.setRules(Rules.COMMON_USER);
+	        user.setPassword(password);
+
+	        userService.create(user);
+
+	        addMessage(FacesMessage.SEVERITY_INFO, "Sucesso", "Cadastro realizado com sucesso! Agora você pode fazer login.");
+	        
+	        user = new UserDTO();
+	        password = "";
+	        passwordConfirm = "";
+
+	    } catch (IllegalArgumentException e) {
+	    	System.out.println("Aqui - 1");
+	        addMessage(FacesMessage.SEVERITY_WARN, "Atenção", e.getMessage());
+	    } catch (Exception e) {
+	    	System.out.println("Aqui - 2");
+	        addMessage(FacesMessage.SEVERITY_ERROR, "Erro", e.getMessage());
+	    }
 	}
 }

@@ -2,7 +2,7 @@ package br.elibrary.web.managed;
 
 import java.io.Serializable;
 
-import br.elibrary.model.User;
+import br.elibrary.dto.UserDTO;
 import br.elibrary.service.UserSessionService;
 import jakarta.enterprise.context.SessionScoped;
 import jakarta.inject.Named;
@@ -13,14 +13,14 @@ public class UserSessionBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private User loggedUser;
+    private UserDTO loggedUser;
     private UserSessionService userStateful;
 
-    public User getLoggedUser() {
+    public UserDTO getLoggedUser() {
         return loggedUser;
     }
 
-    public void setLoggedUser(User user) {
+    public void setLoggedUser(UserDTO user) {
         this.loggedUser = user;
     }
 

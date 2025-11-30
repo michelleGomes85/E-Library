@@ -1,6 +1,6 @@
 package br.elibrary.web.converter;
 
-import br.elibrary.model.Book;
+import br.elibrary.dto.BookDTO;
 import br.elibrary.service.BookService;
 import jakarta.ejb.EJB;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -11,19 +11,21 @@ import jakarta.inject.Named;
 
 @Named("bookConverter") 
 @ApplicationScoped     
-public class BookConverter implements Converter<Book> {
+public class BookConverter implements Converter<BookDTO> {
 
     @EJB
     private BookService bookService;
 
     @Override
-    public Book getAsObject(FacesContext ctx, UIComponent comp, String id) {
+    public BookDTO getAsObject(FacesContext ctx, UIComponent comp, String id) {
+    	
         if (id == null || id.trim().isEmpty()) {
             return null;
         }
+        
         try {
             Long longId = Long.parseLong(id.trim());
-            Book book = bookService.findById(longId);
+            BookDTO book = bookService.findById(longId);
             return book;
         } catch (NumberFormatException e) {
             return null;
@@ -31,10 +33,10 @@ public class BookConverter implements Converter<Book> {
     }
 
     @Override
-    public String getAsString(FacesContext ctx, UIComponent comp, Book book) {
-        if (book == null || book.getId() == null) {
+    public String getAsString(FacesContext ctx, UIComponent comp, BookDTO book) {
+        if (book == null || book.getId() == null)
             return "";
-        }
+        
         return String.valueOf(book.getId());
     }
 }

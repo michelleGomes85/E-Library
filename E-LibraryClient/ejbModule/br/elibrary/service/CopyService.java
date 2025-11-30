@@ -2,26 +2,26 @@ package br.elibrary.service;
 
 import java.util.List;
 
-import br.elibrary.model.Copy;
+import br.elibrary.dto.CopyDTO;
 import br.elibrary.model.enuns.CopyStatus;
 
 public interface CopyService {
 	
-    Copy create(Copy copy);
+    CopyDTO create(CopyDTO copy);
     
-    Copy update(Copy copy);
+    CopyDTO update(CopyDTO copy);
     
-    void delete(Copy copy);
+    void delete(CopyDTO copy);
     
     void deleteById(Long id);
     
-    Copy findById(Long id);
+    CopyDTO findById(Long id);
     
-    List<Copy> findAll();
+    List<CopyDTO> findAll();
     
-    List<Copy> findByBookId(Long bookId);
+    List<CopyDTO> findByBookId(Long bookId);
     
-    List<Copy> findByStatus(CopyStatus status);
+    List<CopyDTO> findByStatus(CopyStatus status);
     
-    List<Copy> findAvailableCopiesByBookId(Long bookId);
+    List<CopyDTO> findAvailableCopiesByBookId(Long bookId);
 }

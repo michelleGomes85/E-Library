@@ -195,6 +195,7 @@
 						        :carrossel"
 						        action="#{dashboardBean.borrow(row[0])}"
 								styleClass="action-btn borrow p-button-sm">
+								
 							</p:commandButton>
 						</div>
 					</div>
@@ -271,7 +272,7 @@
 				emptyMessage="Nenhum empréstimo ativo.">
 
 				<p:column headerText="Livro" width="40%">
-					<h:outputText value="#{loan.copy.book.title}" />
+					<h:outputText value="#{loan.bookTitle}" />
 				</p:column>
 
 				<p:column headerText="Data do Empréstimo" width="25%">

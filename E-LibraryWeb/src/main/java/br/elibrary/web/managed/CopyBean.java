@@ -6,8 +6,8 @@ import java.util.List;
 
 import org.primefaces.PrimeFaces;
 
-import br.elibrary.model.Book;
-import br.elibrary.model.Copy;
+import br.elibrary.dto.BookDTO;
+import br.elibrary.dto.CopyDTO;
 import br.elibrary.model.enuns.CopyStatus;
 import br.elibrary.service.BookService;
 import br.elibrary.service.CopyService;
@@ -30,15 +30,15 @@ public class CopyBean implements Serializable {
     @EJB
     private BookService bookService;
 
-    private Copy copy = new Copy();
+    private CopyDTO copy = new CopyDTO();
     
-    private Copy selectedCopy;
+    private CopyDTO selectedCopy;
 
-    private List<Copy> copies;
+    private List<CopyDTO> copies;
     
-    private List<Copy> filteredCopies;
+    private List<CopyDTO> filteredCopies;
 
-    private List<Book> books;
+    private List<BookDTO> books;
 
     private boolean editMode = false;
 
@@ -57,16 +57,16 @@ public class CopyBean implements Serializable {
     }
 
     public void openNew() {
-        copy = new Copy();
+        copy = new CopyDTO();
         editMode = false;
     }
 
-    public void edit(Copy copy) {
-        this.copy = copy;
+    public void edit(CopyDTO copy) {
+    	this.copy = copyService.findById(copy.getId());
         this.editMode = true;
     }
 
-    public void confirmDelete(Copy copy) {
+    public void confirmDelete(CopyDTO copy) {
         this.selectedCopy = copy;
     }
 
@@ -97,7 +97,7 @@ public class CopyBean implements Serializable {
         }
     }
 
-    private boolean validateCopy(Copy copy) throws IllegalArgumentException {
+    private boolean validateCopy(CopyDTO copy) throws IllegalArgumentException {
 
     	boolean valid = true;
         if (copy.getInternalCode() == null || copy.getInternalCode().trim().isEmpty()) {
@@ -105,7 +105,7 @@ public class CopyBean implements Serializable {
             valid = false;
         }
         
-        if (copy.getBook() == null || copy.getBook().getId() == null) {
+        if (copy.getBookId() == null) {
             addFieldError("book", "Selecione um livro.");
             valid = false;
         }
@@ -114,12 +114,13 @@ public class CopyBean implements Serializable {
     }
     
 	private void addFieldError(String clientId, String message) {
-		FacesContext.getCurrentInstance().addMessage("dialogs:" + clientId,
-				new FacesMessage(FacesMessage.SEVERITY_ERROR, "", message));
+		FacesContext.getCurrentInstance().addMessage("dialogs:" + clientId, new FacesMessage(FacesMessage.SEVERITY_ERROR, "", message));
 	}
 
     public void delete() {
+    	
         try {
+        	
             if (selectedCopy == null || selectedCopy.getId() == null) {
                 addMessage(FacesMessage.SEVERITY_ERROR, "Erro", "Nenhum exemplar selecionado para exclusão.");
                 return;
@@ -139,43 +140,42 @@ public class CopyBean implements Serializable {
     }
 
     private void addMessage(FacesMessage.Severity severity, String summary, String detail) {
-        FacesContext.getCurrentInstance().addMessage(null, 
-                new FacesMessage(severity, summary, detail));
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, summary, detail));
     }
 
-    public Copy getCopy() {
+    public CopyDTO getCopy() {
         return copy;
     }
 
-    public void setCopy(Copy copy) {
+    public void setCopy(CopyDTO copy) {
         this.copy = copy;
     }
 
-    public Copy getSelectedCopy() {
+    public CopyDTO getSelectedCopy() {
         return selectedCopy;
     }
 
-    public void setSelectedCopy(Copy selectedCopy) {
+    public void setSelectedCopy(CopyDTO selectedCopy) {
         this.selectedCopy = selectedCopy;
     }
 
-    public List<Copy> getCopies() {
+    public List<CopyDTO> getCopies() {
         return copies != null ? copies : new ArrayList<>();
     }
 
-    public void setCopies(List<Copy> copies) {
+    public void setCopies(List<CopyDTO> copies) {
         this.copies = copies;
     }
 
-    public List<Copy> getFilteredCopies() {
+    public List<CopyDTO> getFilteredCopies() {
         return filteredCopies;
     }
 
-    public void setFilteredCopies(List<Copy> filteredCopies) {
+    public void setFilteredCopies(List<CopyDTO> filteredCopies) {
         this.filteredCopies = filteredCopies;
     }
 
-    public List<Book> getBooks() {
+    public List<BookDTO> getBooks() {
         return books != null ? books : new ArrayList<>();
     }
 

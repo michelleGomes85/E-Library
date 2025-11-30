@@ -2,7 +2,7 @@ package br.elibrary.web.filter;
 
 import java.io.IOException;
 
-import br.elibrary.model.User;
+import br.elibrary.dto.UserDTO;
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -22,7 +22,7 @@ public class AuthFilter implements Filter {
         HttpServletRequest request = (HttpServletRequest) requestArg;
         HttpServletResponse response = (HttpServletResponse) responseArg;
 
-        User user = (User) request.getSession().getAttribute("loggedUser");
+        UserDTO user = (UserDTO) request.getSession().getAttribute("loggedUser");
 
         if (user == null) {  
             response.sendRedirect(request.getContextPath() + "/login.xhtml");

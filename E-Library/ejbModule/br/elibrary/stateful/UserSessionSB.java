@@ -2,7 +2,14 @@ package br.elibrary.stateful;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import org.mindrot.jbcrypt.BCrypt;
+
+import br.elibrary.dto.LoanDTO;
+import br.elibrary.dto.UserDTO;
+import br.elibrary.mapper.LoanMapper;
+import br.elibrary.mapper.UserMapper;
 import br.elibrary.model.Copy;
 import br.elibrary.model.Loan;
 import br.elibrary.model.User;
@@ -22,116 +29,109 @@ import jakarta.persistence.PersistenceContext;
 @Remote(UserSessionService.class)
 public class UserSessionSB implements UserSessionService {
 
-    @PersistenceContext(unitName = "E-Library")
-    private EntityManager em;
+	@PersistenceContext(unitName = "E-Library")
+	private EntityManager em;
 
-    private User currentUser;
-    
-    @EJB
-    private CatalogStatusService catalogStatusSB;
-    
-    @EJB
-    private LoanService loanSB; 
+	private User currentUser;
 
-    @Override
-    public boolean login(String registration, String passwordPlain) {
-    	
-    	User user = em.createQuery(
-                "SELECT u FROM User u WHERE u.registration = :reg", User.class)
-                .setParameter("reg", registration)
-                .getResultStream()
-                .findFirst()
-                .orElse(null);
+	@EJB
+	private CatalogStatusService catalogStatusSB;
 
-        if (user == null)
-            return false;
-      
-        boolean passwordOk = org.mindrot.jbcrypt.BCrypt.checkpw(passwordPlain, user.getPasswordHash());
+	@EJB
+	private LoanService loanSB;
 
-        if (passwordOk) {
-            currentUser = user;
-            return true;
-        }
+	@Override
+	public boolean login(String registration, String passwordPlain) {
 
-        return false;
-    }
+		User user = em.createQuery("SELECT u FROM User u WHERE u.registration = :reg", User.class)
+				.setParameter("reg", registration).getResultStream().findFirst().orElse(null);
 
-    @Override
-    public User getLoggedInUser() {
-        return currentUser;
-    }
+		if (user == null)
+			return false;
 
-    @Override
-    @Remove
-    public void logout() {
-        this.currentUser = null;
-    }
-    
-    @Override
-    public boolean borrowCopy(Long copyId) {
+		boolean passwordOk = BCrypt.checkpw(passwordPlain, user.getPasswordHash());
 
-        if (currentUser == null)
-            throw new IllegalStateException("Usuário não autenticado.");
+		if (passwordOk) {
+			currentUser = user;
+			return true;
+		}
 
-        Copy copy = em.find(Copy.class, copyId);
+		return false;
+	}
 
-        if (copy == null || copy.getStatus() != CopyStatus.AVAILABLE)
-            return false;
+	@Override
+	public UserDTO getLoggedInUser() {
+		return currentUser != null ? UserMapper.toDTO(currentUser) : null;
+	}
 
-        Loan loan = new Loan();
-        loan.setUser(currentUser);
-        loan.setCopy(copy);
-        loan.setIssueDate(LocalDate.now());
-        loan.setDueDate(LocalDate.now().plusDays(14));
-        loan.setStatus(LoanStatus.ACTIVE);
-        loan.setReturnDate(null);
+	@Override
+	@Remove
+	public void logout() {
+		this.currentUser = null;
+	}
 
-        em.persist(loan);
+	@Override
+	public boolean borrowCopy(Long copyId) {
 
-        copy.setStatus(CopyStatus.BORROWED);
-        em.merge(copy);
+		if (currentUser == null)
+			throw new IllegalStateException("Usuário não autenticado.");
 
-        catalogStatusSB.onCopyStatusChanged(CopyStatus.AVAILABLE, CopyStatus.BORROWED);
+		Copy copy = em.find(Copy.class, copyId);
 
-        return true;
-    }
+		if (copy == null || copy.getStatus() != CopyStatus.AVAILABLE)
+			return false;
 
-    @Override
-    public boolean returnCopy(Long copyId) {
-        if (currentUser == null)
-            throw new IllegalStateException("Usuário não autenticado.");
+		Loan loan = new Loan();
+		loan.setUser(currentUser);
+		loan.setCopy(copy);
+		loan.setIssueDate(LocalDate.now());
+		loan.setDueDate(LocalDate.now().plusDays(14));
+		loan.setStatus(LoanStatus.ACTIVE);
+		loan.setReturnDate(null);
 
-        Copy copy = em.find(Copy.class, copyId);
+		em.persist(loan);
 
-        if (copy == null || copy.getStatus() != CopyStatus.BORROWED) {
-            return false;
-        }
+		copy.setStatus(CopyStatus.BORROWED);
 
-        Loan activeLoan = loanSB.findActiveLoanByCopyId(copyId);
+		catalogStatusSB.onCopyStatusChanged(CopyStatus.AVAILABLE, CopyStatus.BORROWED);
 
-        if (activeLoan == null) {
-            copy.setStatus(CopyStatus.AVAILABLE);
-            em.merge(copy);
-            return false;
-        }
+		return true;
+	}
 
-        activeLoan.setReturnDate(LocalDate.now());
-        activeLoan.setStatus(LoanStatus.RETURNED);
-        em.merge(activeLoan);
+	@Override
+	public boolean returnCopy(Long copyId) {
 
-        copy.setStatus(CopyStatus.AVAILABLE);
-        em.merge(copy);
+		if (currentUser == null)
+			throw new IllegalStateException("Usuário não autenticado.");
 
-        catalogStatusSB.onCopyStatusChanged(CopyStatus.BORROWED, CopyStatus.AVAILABLE);
-        return true;
-    }
+		Copy copy = em.find(Copy.class, copyId);
 
-    @Override
-    public List<Loan> getActiveLoans() {
-    	
-        if (currentUser == null)
-            return List.of();
-        
-        return loanSB.findActiveLoansByUser(currentUser.getId());
-    }
+		if (copy == null || copy.getStatus() != CopyStatus.BORROWED) {
+			return false;
+		}
+
+		Loan activeLoan = loanSB.findActiveLoanByCopyId(copyId);
+		if (activeLoan == null) {
+			copy.setStatus(CopyStatus.AVAILABLE);
+			return false;
+		}
+
+		activeLoan.setReturnDate(LocalDate.now());
+		activeLoan.setStatus(LoanStatus.RETURNED);
+		copy.setStatus(CopyStatus.AVAILABLE);
+
+		catalogStatusSB.onCopyStatusChanged(CopyStatus.BORROWED, CopyStatus.AVAILABLE);
+
+		return true;
+	}
+
+	@Override
+	public List<LoanDTO> getActiveLoans() {
+		
+		if (currentUser == null)
+			return List.of();
+
+		List<Loan> loans = loanSB.findActiveLoansByUser(currentUser.getId());
+		return loans.stream().map(LoanMapper::toDTO).collect(Collectors.toList());
+	}
 }

@@ -11,7 +11,9 @@
 </h:head>
 
 <h:body>
+
 	<div class="header">
+	
 		<div class="header-content">
 			<h1 class="page-title">Gerenciamento de Livros</h1>
 			<p class="page-description">Crie, edite, consulte e exclua livros
@@ -88,6 +90,7 @@
 				</p:column>
 
 				<p:column headerText="Ações" exportable="false" style="width:120px;">
+				
 					<p:commandButton icon="pi pi-pencil" title="Editar"
 						styleClass="btn-secondary btn-sm"
 						actionListener="#{bookBean.edit(book)}" process="@this"
@@ -99,12 +102,15 @@
 						action="#{bookBean.confirmDelete(book)}"
 						oncomplete="PF('deleteBookDialog').show()" process="@this"
 						update="@none" />
+						
 				</p:column>
 			</p:dataTable>
 		</h:form>
 
 		<!-- FORMULÁRIO PARA CRIAÇÃO/EDIÇÃO -->
+		
 		<h:form id="dialogs">
+		
 			<p:dialog id="bookDialog"
 				header="#{bookBean.editMode ? 'Editar Livro' : 'Novo Livro'}"
 				widgetVar="manageBookDialog" modal="true" resizable="false"
@@ -168,17 +174,25 @@
 
 					<div class="field-group">
 						<div class="field">
+						
 							<label class="field-label">Categorias *</label>
+							
 							<div class="field-input">
-								<p:selectCheckboxMenu id="categories"
-									value="#{bookBean.book.categories}" label="Categorias"
-									filter="true" filterMatchMode="contains" var="cat"
-									itemLabel="#{cat.name}" itemValue="#{cat}" required="true"
-									requiredMessage="Selecione pelo menos uma categoria">
-
-									<f:selectItems value="#{bookBean.availableCategories}" var="c"
-										itemLabel="#{c.name}" itemValue="#{c}" />
-								</p:selectCheckboxMenu>
+								<p:selectCheckboxMenu 
+					                id="categories"
+					                value="#{bookBean.book.categoryIds}" 
+					                label="Categorias"
+					                filter="true" 
+					                filterMatchMode="contains"
+					                required="true"
+					                requiredMessage="Selecione pelo menos uma categoria">
+					
+					                <f:selectItems 
+					                    value="#{bookBean.availableCategories}" 
+					                    var="c"
+					                    itemLabel="#{c.name}" 
+					                    itemValue="#{c.id}" />
+					            </p:selectCheckboxMenu>
 
 								<p:message for="categories" display="icon" />
 
