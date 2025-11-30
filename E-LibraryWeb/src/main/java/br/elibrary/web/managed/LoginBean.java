@@ -50,7 +50,7 @@ public class LoginBean implements Serializable {
             String target = (user.getRules() == Rules.ADMIN) ? "admin/index.xhtml"
                     : "user/index.xhtml";
 
-            PrimeFaces.current().executeScript("window.location.href='" + target + "'");
+            FacesContext.getCurrentInstance().getExternalContext().redirect(target);
 
         } catch (Exception e) {
             e.printStackTrace();

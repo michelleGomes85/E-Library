@@ -1,144 +1,119 @@
-# 📚 E-Library — Sistema de Gerenciamento de Biblioteca Distribuída
+# E-Library — Sistema de Gerenciamento de Biblioteca Distribuída
 
-Sistema distribuído de gerenciamento de biblioteca desenvolvido para o campus, com arquitetura cliente-servidor baseada em **EJB (Jakarta EE)**. A lógica de negócio, regras e persistência estão centralizadas em um **Servidor de Aplicação**, enquanto clientes Web (JSF) e Desktop (Java SE) consomem os serviços remotamente.
+## 🔹 Visão Geral
+Sistema distribuído para gerenciamento de biblioteca, com backend centralizado em EJB (Jakarta EE) e clientes Web (JSF) e Desktop (Java SE). Suporta usuários (alunos/professores), livros, exemplares, empréstimos e categorias.
 
-## 🧱 Fase 1 — Backend (Lógica de Negócio e Persistência)
+## 🔹 Tecnologias
+- **Backend (EAR):** Jakarta EE 9+, Java 17, EJB (Stateless, Stateful, Singleton), JPA 3.0 (Hibernate)
+- **Banco de Dados:** PostgreSQL
+- **Frontend Web:** JSF 3.0 + PrimeFaces
+- **Cliente Desktop:** Java SE (Swing/JavaFX) com EJB remoto
+- **Build/Deploy:** Maven, WildFly/GlassFish
 
-### ✅ Estrutura do Projeto
-- Projeto **EAR** contendo:
-  - Módulo **EJB**: entidades, session beans (`@Stateless`, `@Stateful`, `@Singleton`)
-  - Módulo **Web**: aplicação JSF (Managed Beans + páginas `.xhtml`)
-- Banco de dados: **ostgreSQL** com script de seed incluso.
-- Código-fonte versionado no GitHub com commits semânticos.
+## 🔹 Estrutura do Projeto (EAR — Enterprise Application)
 
----
+O projeto segue a arquitetura clássica Jakarta EE com um **EAR (Enterprise Archive)** que empacota dois módulos:
 
-### 📦 Modelo de Dados (JPA Entities)
+| Módulo | Tipo | Responsabilidade |
+|--------|------|------------------|
+| **`E-Library`** | `EJB Module` (.jar) | Contém toda a lógica de negócio: entidades JPA (`br.elibrary.model`), Session Beans (`br.elibrary.stateless`, `br.elibrary.stateful`, `br.elibrary.singleton`) e serviços (`br.elibrary.service`). É o núcleo do sistema e roda no servidor de aplicação (ex: WildFly). |
+| **`E-LibraryClient`** | `WAR Module` (.war) | Aplicação web JSF + PrimeFaces. Acessa os EJBs localmente (via injeção `@EJB` ou CDI `@Inject`) para fornecer interface ao usuário (login, busca, empréstimo, administração). |
+| **`E-LibraryEAR`** | `EAR` (.ear) | Arquivo de empacotamento que agrupa `E-Library.jar` e `E-LibraryClient.war`, garantindo que ambos sejam implantados juntos no servidor de aplicação. Permite compartilhamento de contexto (ex: `@EJB` sem lookup remoto). |
 
-| Entidade      | Atributos                                                                                     | Relacionamentos                                                                                                 |
-|---------------|-----------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------|
-| `User`        | `id`, `name`, `registration`, `email`, `passwordHash`, `type` (`UserType`), `rules` (`Rules`) | `@OneToMany` → `Loan` (cascade = `REMOVE`)                                                                     |
-| `Book`        | `id`, `isbn`, `title`, `author`, `publisher`, `year`                                          | `@OneToMany` → `Copy` (cascade = `ALL` + `orphanRemoval`)<br>`@ManyToMany` ↔ `Category`                         |
-| `Category`    | `id`, `name`                                                                                  | `@ManyToMany` ↔ `Book`                                                                                          |
-| `Copy`        | `id`, `internalCode`, `status` (`CopyStatus`)                                                 | `@ManyToOne` → `Book`<br>`@OneToMany` → `Loan` (cascade = `REMOVE`)                                            |
-| `Loan`        | `id`, `issueDate`, `dueDate`, `returnDate`, `status` (`LoanStatus`)                           | `@ManyToOne` → `User`<br>`@ManyToOne` → `Copy`                                                                 |
+✅ **Vantagens dessa estrutura:**
+- Reutilização direta dos EJBs no cliente web (sem chamadas remotas, mais rápido).
+- Separação clara de responsabilidades: persistência/negócio (EJB) vs. apresentação (Web).
+- Escalabilidade: futuramente, o `E-Library.jar` pode ser exposto via EJB remoto para o cliente desktop (`E-LibraryDesktop.jar` — desenvolvido separadamente).
 
----
+## 🔹 Estrutura do Projeto (Backend)
 
-### 🏷️ Enumerações (`br.elibrary.model.enuns`)
+### 📁 Pacotes Principais
+- `br.elibrary.model`
 
-| Enumeração       | Valores (`name()` → `label`)                                        | Uso em Entidade(s)             |
-|------------------|----------------------------------------------------------------------|--------------------------------|
-| `UserType`       | `STUDENT` → `"Estudante"`<br>`TEACHER` → `"Professor"`              | `User.type`                    |
-| `Rules`          | `COMMON_USER` → `"Usuário Comum"`<br>`ADMIN` → `"Administrador"`    | `User.rules`                   |
-| `CopyStatus`     | `AVAILABLE` → `"DISPONIVEL"`<br>`BORROWED` → `"EMPRESTADO"`<br>`RESERVED` → `"RESERVADO"` | `Copy.status`                  |
-| `LoanStatus`     | `ACTIVE` → `"Ativo"`<br>`RETURNED` → `"Devolvido"`<br>`OVERDUE` → `"Atrasado"` | `Loan.status`                  |
+  Contém as entidades JPA e enums do domínio.
 
-> 🔹 Todos os enums usam `@Enumerated(EnumType.STRING)` para armazenamento legível.
-> 🔹 Sobrescrita de `toString()` para exibição amigável em interfaces.
+### 📄 Entidades Principais
+| Entidade | Descrição | Relacionamentos |
+|--------|-----------|-----------------|
+| `User` | Representa usuários (alunos/professores), com credenciais e papel (comum/admin). | 1:N com `Loan` |
+| `Book` | Informações bibliográficas de um título. | 1:N com `Copy`, N:M com `Category` |
+| `Copy` | Exemplar físico de um livro, com status (DISPONIVEL/EMPRESTADO/RESERVADO). | N:1 com `Book`, 1:N com `Loan` |
+| `Loan` | Registro de empréstimo, associando usuário, exemplar e datas. | N:1 com `User` e `Copy` |
+| `Category` | Categorias temáticas dos livros. | N:M com `Book` |
 
----
+### 📄 Enums
 
-### ⚙️ Session Beans — Detalhamento por Classe
+- `UserType`: `STUDENT`, `TEACHER`
+- `Rules`: `COMMON_USER`, `ADMIN`
+- `CopyStatus`: `AVAILABLE`, `BORROWED`, `RESERVED`
+- `LoanStatus`: `ACTIVE`, `RETURNED`, `OVERDUE` 
 
-#### 📘 `BookSB` (`@Stateless`, `@Remote(BookService.class)`)
+### 📁 Serviços (Session Beans)
 
-Gerencia operações transacionais de livros com integração ao cache global (`CatalogStatusSB`).
+O backend utiliza três tipos de Session Beans, conforme exigido pelo enunciado:
 
-| Método | Parâmetros | Retorno | Comportamento |
-|--------|------------|---------|---------------|
-| `create` | `Book book` | `Book` | Persiste o livro e notifica `CatalogStatusSB.onBookCreated()` |
-| `update` | `Book book` | `Book` | Mescla alterações (`em.merge`) |
-| `delete` | `Book book` | `void` | Carrega o livro com suas cópias, conta total e disponíveis, remove o livro (e cópias em cascata), notifica `CatalogStatusSB.onBookDeleted(total, available)` |
-| `findById` | `Long id` | `Book` | Busca por ID (`em.find`) |
-| `findAll` | — | `List<Book>` | Lista todos os livros, ordenados por título |
-| `findByTitle` | `String title` | `List<Book>` | Busca case-insensitive com `%LIKE%`, ordenado por título |
-| `findBooksWithCopyStats` | — | `List<Object[]>` | JPQL com `GROUP BY`: retorna `(Book, totalCopies, availableCopies)` para dashboards |
-| `findFirstAvailableCopy` | `Long bookId` | `Copy` | Busca primeira cópia com `status = AVAILABLE`; retorna `null` se indisponível |
+#### 1. **Stateless Session Beans** (`@Stateless`) — Lógica de CRUD e Consulta
+- **`BookSB`**: gerencia livros. Implementa CRUD completo + buscas avançadas com estatísticas (ex: `findByTitleOrAuthorWithStats`, `findUnavailableBooksWithStats`). Integra-se com o Singleton via callbacks (ex: `onBookCreated`).
 
----
+- **`CopySB`**: gerencia exemplares. CRUD + buscas por livro/status. Atualiza o Singleton ao criar/remover exemplares.
 
-#### 📄 `CopySB` (`@Stateless`, `@Remote(CopyService.class)`)
-Controla o ciclo de vida dos exemplares com atualização em tempo real do estoque.
+- **`LoanSB`**: consultas avançadas via JPQL:
+  - `findBorrowedCopiesByUser(userId)`: exemplares atualmente emprestados para um usuário.
+  - `findBooksWithNoAvailableCopies()`: livros com zero exemplares disponíveis (fila de espera).
+  - `findActiveLoansByUser(userId)`: empréstimos ativos do usuário.
+  
+- **`UserSB`**: CRUD de usuários com hashing de senha via BCrypt.
 
-| Método | Parâmetros | Retorno | Comportamento |
-|--------|------------|---------|---------------|
-| `create` | `Copy copy` | `Copy` | Persiste e chama `CatalogStatusSB.onCopyCreated()` |
-| `update` | `Copy copy` | `Copy` | Mescla alterações |
-| `delete` | `Copy copy` | `void` | Obtém status do exemplar gerenciado, remove e notifica `CatalogStatusSB.onCopyDeleted(status)` |
-| `deleteById` | `Long id` | `void` | Busca por ID, remove e notifica com base no status real |
-| `findById` | `Long id` | `Copy` | Busca por ID |
-| `findAll` | — | `List<Copy>` | Ordenado por `internalCode` |
-| `findByBookId` | `Long bookId` | `List<Copy>` | Lista todas as cópias de um livro |
-| `findByStatus` | `CopyStatus status` | `List<Copy>` | Filtra por status (`AVAILABLE`, `BORROWED`, `RESERVED`) |
-| `findAvailableCopiesByBookId` | `Long bookId` | `List<Copy>` | Filtra cópias **disponíveis** de um livro (usado em frontend e empréstimos) |
+- **`CategorySB`**: CRUD de categorias (funcionalidade estendida).
 
----
+#### ✅ `CatalogStatusSB` — `@Singleton`, `@Startup`
+- Gerencia em memória (thread-safe):
+  - `totalBooks`, `totalCopies`, `availableCopies`
+- Contadores atualizados via:
+  - Inicialização (`@PostConstruct` → `refreshCache()`)
+  - Callbacks disparados pelos Stateless Beans (`onCopyCreated`, `onCopyStatusChanged`, etc.)
+- Métodos de leitura com `@Lock(READ)`, escrita com `@Lock(WRITE)`
+- Usa `AtomicInteger` para operações atômicas sem bloqueio explícito.
 
-#### 🏷️ `CategorySB` (`@Stateless`)
-Gerencia categorias de livros, suportando o relacionamento `N:M`.
+#### ✅ `UserSessionSB` — `@Stateful`
 
-| Método | Parâmetros | Retorno | Comportamento |
-|--------|------------|---------|---------------|
-| `create` | `Category category` | `Category` | Persiste categoria |
-| `update` | `Category category` | `Category` | Mescla alterações |
-| `delete` | `Category category` | `void` | Remove categoria (livros não são afetados — `mappedBy` sem `cascade`) |
-| `findById` | `Long id` | `Category` | Busca por ID |
-| `findAll` | — | `List<Category>` | Ordenado alfabeticamente por `name` |
+- Estado: `private User currentUser`
+- `login(registration, password)`: busca usuário, valida senha com BCrypt, armazena sessão.
 
----
+- `borrowCopy(copyId)`:
+  1. Verifica autenticação e disponibilidade do exemplar
+  2. Cria `Loan` com `issueDate = hoje`, `dueDate = +14 dias`
+  3. Atualiza `Copy.status = BORROWED`
+  4. Notifica `CatalogStatusSB`
+  
+- `returnCopy(copyId)`:
+  1. Localiza empréstimo ativo
+  2. Atualiza `returnDate`, `status = RETURNED`
+  3. Libera exemplar (`status = AVAILABLE`)
+  4. Notifica `CatalogStatusSB`
+- `logout()` com `@Remove` → finaliza bean e libera sessão.
 
-#### 📊 `LoanSB` (`@Stateless`)
-Especializado em consultas avançadas com JPQL — sem operações de escrita.
+- `getActiveLoans()` delega para `LoanSB` → reuso de lógica.
 
-| Método | Parâmetros | Retorno | Comportamento |
-|--------|------------|---------|---------------|
-| `findBorrowedCopiesByUser` | `Long userId` | `List<Copy>` | Retorna cópias com empréstimo ativo (`status = ACTIVE`) para o usuário |
-| `findBooksWithNoAvailableCopies` | — | `List<Book>` | Livros onde **nenhuma cópia está disponível** (todas emprestadas/reservadas ou sem cópias) — via subquery com `COUNT = 0` |
-| `findActiveLoansByUser` | `Long userId` | `List<Loan>` | Lista empréstimos ativos do usuário |
-| `findActiveLoanByCopyId` | `Long copyId` | `Loan` | Localiza empréstimo ativo associado a uma cópia (usado em `returnCopy`) |
+## 🔹 Fase 2 — Aplicação Web (JSF + PrimeFaces)
 
----
+### 🔐 Autenticação e Controle de Acesso
 
-#### 👤 `UserSB` (`@Stateless`, `@Remote(UserService.class)`)
-CRUD de usuários com segurança e validações.
+#### ✅ Managed Beans
+- **`UserSessionBean`** (`@SessionScoped`): mantém o estado da sessão do usuário (instância de `User` e referência ao `UserSessionService` Stateful).
+- **`LoginBean`** (`@RequestScoped`):
+  - `doLogin()`: autentica via `UserSessionService.login()`, armazena usuário na sessão e redireciona para `admin/index.xhtml` ou `user/index.xhtml` com base em `Rules`.
+  - `doLogout()`: chama `logout()` no Stateful Bean, limpa sessão e redireciona para `/login`.
 
-| Método | Parâmetros | Retorno | Comportamento |
-|--------|------------|---------|---------------|
-| `create` | `User user` | `User` | Valida matrícula única; faz hash da senha com `BCrypt`; persiste |
-| `update` | `User user` | `User` | Atualiza dados; se senha informada (não vazia), valida ≥6 chars e gera novo hash |
-| `delete` | `User user` | `void` | Remove usuário (empréstimos são excluídos em cascata) |
-| `findAll` | — | `List<User>` | Ordenado por `registration` |
-| `findByRegistration` | `String registration` | `User` | Busca por matrícula (usado em `login`) |
-| `findById` | `Long id` | `User` | Busca por ID |
+#### ✅ Filtros de Segurança (Servlet Filters)
+- **`AuthFilter`** (`@WebFilter({"/user/*", "/admin/*"})`):
+  - Bloqueia acesso não autenticado → redireciona para `login.xhtml`.
+- **`AdminFilter`** (`@WebFilter("/admin/*")`):
+  - Permite acesso apenas a usuários com `Rules.ADMIN` → caso contrário, redireciona para `access-denied.xhtml`.
 
----
+#### ✅ Integração com EJB Stateful
+- O `LoginBean` injeta `@EJB UserSessionService` (proxy para `UserSessionSB`).
+- Após login, o `UserSessionBean` mantém a referência ao Stateful Bean — permitindo que outros beans (ex: `BorrowBean`) chamem `borrowCopy()` diretamente, preservando o estado da sessão.
 
-#### 🔐 `UserSessionSB` (`@Stateful`)
-Gerencia sessão de usuário com estado (`currentUser`) e operações de empréstimo.
+> ✅ **Conformidade**: Atende integralmente o item 5 do enunciado: login, dashboard por perfil, navegação segura, injeção de EJBs.
 
-| Método | Parâmetros | Retorno | Comportamento |
-|--------|------------|---------|---------------|
-| `login` | `String registration`, `String passwordPlain` | `boolean` | Busca por matrícula; valida senha com `BCrypt.checkpw`; guarda `currentUser` |
-| `getLoggedInUser` | — | `User` | Retorna `currentUser` ou `null` |
-| `logout` | — | `void` | Anotado com `@Remove` → bean destruído pelo contêiner |
-| `borrowCopy` | `Long copyId` | `boolean` | Verifica `status == AVAILABLE`; cria `Loan`; atualiza cópia para `BORROWED`; notifica `CatalogStatusSB.onCopyStatusChanged(AVAILABLE → BORROWED)` |
-| `returnCopy` | `Long copyId` | `boolean` | Verifica `status == BORROWED`; localiza `Loan` ativo; finaliza empréstimo; atualiza cópia para `AVAILABLE`; notifica `onCopyStatusChanged(BORROWED → AVAILABLE)` |
-| `getActiveLoans` | — | `List<Loan>` | Delega para `LoanSB.findActiveLoansByUser(currentUser.id)` |
-
----
-
-#### 📈 `CatalogStatusSB` (`@Singleton`, `@Startup`, `@ConcurrencyManagement(CONTAINER)`)
-Cache global thread-safe de métricas do acervo.
-
-| Método | Parâmetros | Retorno | Comportamento |
-|--------|------------|---------|---------------|
-| `getTotalBooks` | — | `int` | Leitura atômica (`@Lock(READ)`) |
-| `getTotalCopies` | — | `int` | Leitura atômica |
-| `getAvailableCopies` | — | `int` | Leitura atômica |
-| `refreshCache` | — | `void` | Recalcula os 3 contadores via JPQL (usado em `@PostConstruct`) |
-| `onBookCreated` | — | `void` | `totalBooks++` (`@Lock(WRITE)`) |
-| `onCopyCreated` | — | `void` | `totalCopies++`, `availableCopies++` |
-| `onCopyStatusChanged` | `CopyStatus old`, `CopyStatus new` | `void` | Ajusta `availableCopies` na transição DISPONÍVEL ⇄ OUTRO |
-| `onCopyDeleted` | `CopyStatus status` | `void` | `totalCopies--`; se `status == AVAILABLE`, `availableCopies--` |
-| `onBookDeleted` | `int totalCopies`, `int availableCopies` | `void` | `totalBooks--`, `totalCopies -= n`, `availableCopies -= m` |

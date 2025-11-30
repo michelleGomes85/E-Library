@@ -4,13 +4,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import jakarta.annotation.PostConstruct;
-import jakarta.ejb.EJB;
-import jakarta.faces.application.FacesMessage;
-import jakarta.faces.context.FacesContext;
-import jakarta.faces.view.ViewScoped;
-import jakarta.inject.Named;
-
 import org.primefaces.PrimeFaces;
 
 import br.elibrary.model.Book;
@@ -18,6 +11,12 @@ import br.elibrary.model.Copy;
 import br.elibrary.model.enuns.CopyStatus;
 import br.elibrary.service.BookService;
 import br.elibrary.service.CopyService;
+import jakarta.annotation.PostConstruct;
+import jakarta.ejb.EJB;
+import jakarta.faces.application.FacesMessage;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.view.ViewScoped;
+import jakarta.inject.Named;
 
 @Named
 @ViewScoped
@@ -36,6 +35,7 @@ public class CopyBean implements Serializable {
     private Copy selectedCopy;
 
     private List<Copy> copies;
+    
     private List<Copy> filteredCopies;
 
     private List<Book> books;
@@ -72,7 +72,11 @@ public class CopyBean implements Serializable {
 
     public void save() {
         try {
-            validateCopy(copy);
+        	
+        	if (!validateCopy(copy)) {
+    			addMessage(FacesMessage.SEVERITY_WARN, "Formulário inválido", "Corrija os campos destacados.");
+    			return;
+    		}
 
             if (editMode) {
                 copy = copyService.update(copy);
@@ -93,16 +97,26 @@ public class CopyBean implements Serializable {
         }
     }
 
-    private void validateCopy(Copy copy) throws IllegalArgumentException {
+    private boolean validateCopy(Copy copy) throws IllegalArgumentException {
 
+    	boolean valid = true;
         if (copy.getInternalCode() == null || copy.getInternalCode().trim().isEmpty()) {
-            throw new IllegalArgumentException("Código interno é obrigatório.");
+            addFieldError("internalCode", "Código interno é obrigatório.");
+            valid = false;
         }
-
+        
         if (copy.getBook() == null || copy.getBook().getId() == null) {
-            throw new IllegalArgumentException("Selecione um livro.");
+            addFieldError("book", "Selecione um livro.");
+            valid = false;
         }
+        
+        return valid;
     }
+    
+	private void addFieldError(String clientId, String message) {
+		FacesContext.getCurrentInstance().addMessage("dialogs:" + clientId,
+				new FacesMessage(FacesMessage.SEVERITY_ERROR, "", message));
+	}
 
     public void delete() {
         try {
