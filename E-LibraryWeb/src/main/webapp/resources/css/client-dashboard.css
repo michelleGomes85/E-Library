@@ -393,6 +393,85 @@ body .ui-dialog .ui-dialog-titlebar, body .ui-dialog .ui-dialog-content,
 	margin-bottom: 2rem !important;
 }
 
+.filter-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.8rem 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.2rem;
+    flex-wrap: wrap;
+}
+
+.search-group span {
+    flex: 1 1 300px;
+    width: 500px;
+}
+
+.search-input {
+	background: #000 !important;
+    width: 100%;
+    padding: 0.55rem 0.75rem;
+    border: 1px solid #334155 !important;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    transition: border-color 0.2s;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: #3a86ff;
+    box-shadow: 0 0 0 2px rgba(58, 134, 255, 0.2);
+}
+
+body .ui-input-icon-left > i:first-of-type {
+	left: 1.5rem;
+}
+
+body .ui-input-icon-left > .ui-inputfield {
+	padding: 1rem 0 1rem 4rem;
+}
+
+.filter-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.filter-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    white-space: nowrap;
+}
+
+.filter-checkbox label {
+    font-size: 0.9rem;
+    color: #495057;
+    cursor: pointer;
+}
+
+.btn-clear {
+    padding: 0;
+    border-radius: 50%;
+    background-color: #e9ecef;
+    border: none;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-clear:hover {
+    background-color: #dc3545;
+    color: white;
+    transform: scale(1.05);
+}
+
 @media ( max-width : 768px) {
 	.product-card {
 		width: 100%;

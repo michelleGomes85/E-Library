@@ -1,6 +1,7 @@
 package br.elibrary.web.managed;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.List;
 
 import br.elibrary.model.Book;
@@ -23,7 +24,7 @@ public class DashboardBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-	@EJB
+    @EJB
     private BookService bookService;
 
     @EJB
@@ -33,13 +34,16 @@ public class DashboardBean implements Serializable {
     private UserSessionBean sessionBean;
 
     private List<Object[]> booksWithAvailableCount;
+    
     private List<Loan> activeLoans;
-    
+
     private Book selectedBook;
-    
     private int detailTotal;
-    
     private int detailAvailable;
+
+    private String searchQuery;
+    
+    private boolean showOnlyUnavailable;
 
     @PostConstruct
     public void init() {
@@ -51,12 +55,23 @@ public class DashboardBean implements Serializable {
     }
 
     public void refresh() {
-        booksWithAvailableCount = bookService.findBooksWithCopyStats();
+    	
         activeLoans = getUserSession().getActiveLoans();
+
+        if (showOnlyUnavailable) {
+            booksWithAvailableCount = bookService.findUnavailableBooksWithStats();
+        } else if (searchQuery != null && !searchQuery.trim().isEmpty()) {
+            booksWithAvailableCount = bookService.findByTitleOrAuthorWithStats(searchQuery.trim());
+        } else {
+            booksWithAvailableCount = bookService.findBooksWithCopyStats();
+        }
+
+        if (booksWithAvailableCount == null) {
+            booksWithAvailableCount = Collections.emptyList();
+        }
     }
 
     public void borrow(Book book) {
-
         Copy availableCopy = bookService.findFirstAvailableCopy(book.getId());
         if (availableCopy == null) {
             addMessage(FacesMessage.SEVERITY_ERROR, "Erro", "Nenhuma cópia disponível.");
@@ -66,8 +81,9 @@ public class DashboardBean implements Serializable {
         boolean success = getUserSession().borrowCopy(availableCopy.getId());
 
         if (success) {
-        	//refresh();
-            addMessage(FacesMessage.SEVERITY_INFO, "Sucesso", String.format("Aproveito o livro: %s, e explore outros titulos ", availableCopy.getBook().getTitle()));
+            refresh();
+            addMessage(FacesMessage.SEVERITY_INFO, "Sucesso",
+                String.format("Aproveite o livro: %s, e explore outros títulos!", book.getTitle()));
         } else {
             addMessage(FacesMessage.SEVERITY_ERROR, "Erro", "Falha ao emprestar.");
         }
@@ -77,35 +93,29 @@ public class DashboardBean implements Serializable {
         boolean success = getUserSession().returnCopy(loan.getCopy().getId());
 
         if (success) {
-        	refresh();
+            refresh();
             addMessage(FacesMessage.SEVERITY_INFO, "Sucesso", "Livro devolvido!");
         } else {
             addMessage(FacesMessage.SEVERITY_ERROR, "Erro", "Falha ao devolver.");
         }
     }
-    
+
     public void selectBook(Book book, int total, int available) {
-    	
         this.selectedBook = bookService.findById(book.getId());
-        
         this.detailTotal = total;
-        
         this.detailAvailable = available;
     }
-    
+
     public List<String> getBookCategories() {
-    	
         if (selectedBook == null || selectedBook.getCategories() == null) {
             return List.of();
         }
-        
         return selectedBook.getCategories()
                            .stream()
                            .map(c -> c.getName())
                            .sorted()
                            .toList();
     }
-
 
     public List<Object[]> getBooksWithAvailableCount() {
         return booksWithAvailableCount;
@@ -127,31 +137,45 @@ public class DashboardBean implements Serializable {
         return catalogStatusSB.getAvailableCopies();
     }
 
+    public Book getSelectedBook() {
+        return selectedBook;
+    }
+
+    public int getDetailTotal() {
+        return detailTotal;
+    }
+
+    public int getDetailAvailable() {
+        return detailAvailable;
+    }
+
+    public String getSearchQuery() {
+        return searchQuery;
+    }
+
+    public void setSearchQuery(String searchQuery) {
+        this.searchQuery = searchQuery;
+    }
+
+    public boolean isShowOnlyUnavailable() {
+        return showOnlyUnavailable;
+    }
+
+    public void setShowOnlyUnavailable(boolean showOnlyUnavailable) {
+        this.showOnlyUnavailable = showOnlyUnavailable;
+    }
+
+    public void onSearchChange() {}
+
+    public void onFilterChange() {}
+
+    public void clearSearch() {
+        searchQuery = "";
+        showOnlyUnavailable = false;
+        refresh();
+    }
+
     private void addMessage(FacesMessage.Severity severity, String summary, String detail) {
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, summary, detail));
     }
-
-	public Book getSelectedBook() {
-		return selectedBook;
-	}
-
-	public void setSelectedBook(Book selectedBook) {
-		this.selectedBook = selectedBook;
-	}
-
-	public int getDetailTotal() {
-		return detailTotal;
-	}
-
-	public void setDetailTotal(int detailTotal) {
-		this.detailTotal = detailTotal;
-	}
-
-	public int getDetailAvailable() {
-		return detailAvailable;
-	}
-
-	public void setDetailAvailable(int detailAvailable) {
-		this.detailAvailable = detailAvailable;
-	}
 }

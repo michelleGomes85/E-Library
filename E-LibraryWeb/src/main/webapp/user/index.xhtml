@@ -95,6 +95,41 @@
 			</div>
 		</h:panelGroup>
 
+		<h:form id="filterForm" styleClass="filter-bar">
+
+			<div class="search-group">
+
+				<span class="ui-input-icon-left"> <i class="pi pi-search" />
+					<p:inputText id="searchInput" value="#{dashboardBean.searchQuery}"
+						placeholder="Buscar por título ou autor..."
+						styleClass="search-input">
+						<p:ajax event="keyup" update=":catalogPanel"
+							listener="#{dashboardBean.onSearchChange}" delay="500" />
+					</p:inputText>
+				</span>
+
+			</div>
+
+			<div class="filter-actions">
+
+				<div class="filter-checkbox">
+					<p:selectBooleanCheckbox id="unavailableOnly"
+						value="#{dashboardBean.showOnlyUnavailable}"
+						itemLabel="Mostrar livros em espera">
+						<p:ajax update=":catalogPanel"
+							listener="#{dashboardBean.onFilterChange}" />
+					</p:selectBooleanCheckbox>
+				</div>
+
+				<p:commandButton value="Todos" outcome="/admin/index.html"
+					action="#{dashboardBean.clearSearch}" process="@this"
+					icon="pi pi-book" title="Mostrar todos os livros"
+					update=":filterForm:searchInput :catalogPanel"
+					styleClass="btn-clear" />
+			</div>
+
+
+		</h:form>
 
 		<!-- Catálogo -->
 		<h:panelGroup id="catalogPanel" layout="block"
@@ -158,6 +193,7 @@
 						        :badgeForm:badgeContainer
 						        :globalMessages
 						        :carrossel"
+						        action="#{dashboardBean.borrow(row[0])}"
 								styleClass="action-btn borrow p-button-sm">
 							</p:commandButton>
 						</div>
@@ -264,7 +300,6 @@
 		</f:facet>
 	</p:dialog>
 
-	<h:outputScript name="js/carousel-utils.js" />
 </h:body>
 
 </html>

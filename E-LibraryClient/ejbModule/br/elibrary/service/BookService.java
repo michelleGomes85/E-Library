@@ -17,9 +17,11 @@ public interface BookService {
 
 	List<Book> findAll();
 
-	List<Book> findByTitle(String title);
+	List<Object[]> findByTitleOrAuthorWithStats(String query);
 
 	List<Object[]> findBooksWithCopyStats();
 
 	Copy findFirstAvailableCopy(Long bookId);
+	
+	List<Object[]> findUnavailableBooksWithStats();
 }
