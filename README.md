@@ -281,11 +281,11 @@ O cliente **não depende do EAR**, mas sim do `e-library-client.jar` (interfaces
 ## ⚙️ Como Executar Localmente (com PostgreSQL)
 
 ### 📥 Pré-requisitos
-| Ferramenta | Versão | Download |
-|------------|--------|----------|
-| **Java** | 17+ | [Adoptium](https://adoptium.net/) |
-| **WildFly** | 31.0.1.Final | [wildfly.org](https://wildfly.org/downloads/) |
-| **PostgreSQL** | 14+ | [postgresql.org](https://www.postgresql.org/download/) |
+| Ferramenta | Versão | 
+|------------|--------|
+| **Java** | 17+ | 
+| **WildFly** | 31.0.1.Final |
+| **PostgreSQL** | 14+ | 
 
 ---
 
