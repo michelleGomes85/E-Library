@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 
+import org.primefaces.PrimeFaces;
+
 import br.elibrary.dto.BookDTO;
 import br.elibrary.dto.CopyDTO;
 import br.elibrary.dto.LoanDTO;
@@ -84,8 +86,10 @@ public class DashboardBean implements Serializable {
 		if (success) {
 			refresh();
 			addMessage(FacesMessage.SEVERITY_INFO, "Sucesso", String.format("Aproveite o livro: %s, e explore outros títulos!", book.getTitle()));
-		} else
+			PrimeFaces.current().executeScript("PF('borrowSuccessDialog').show();");
+		} else {
 			addMessage(FacesMessage.SEVERITY_ERROR, "Erro", "Falha ao emprestar.");
+		}
 	}
 
     public void returnCopy(LoanDTO loan) {

@@ -19,7 +19,7 @@
 	</ui:define>
 
 	<ui:define name="button-1">
-		<h:form id="logoutForm" styleClass="inline-form">
+		<h:form id="logoutForm" styleClass="inline-form" prependId="false">
 			<p:commandButton value="Sair" action="#{loginBean.doLogout}"
 				icon="pi pi-sign-out" styleClass="btn-logout" ajax="true"
 				update="@form" title="Encerrar sessão" />
@@ -51,26 +51,22 @@
 		<p:growl id="globalMessages" showDetail="true" autoUpdate="true"
 			life="3000" />
 
-		<!-- Ícone / Badge de Empréstimos -->
-		<h:form id="badgeForm">
+		<!-- Badge -->
+		<h:form id="badgeForm" prependId="false">
 			<div class="loans-card">
 				<p:commandLink onclick="PF('loansDialog').show(); return false;"
-					styleClass="loan-icon-link"
-					title="Clique para ver seus empréstimos ativos">
-					<i class="pi pi-bookmark"
-						style="font-size: 1.3rem; color: #3a86ff;"></i>
+					styleClass="loan-icon-link">
+					<i class="pi pi-bookmark" style="font-size: 1.3rem; color: #3a86ff"></i>
 				</p:commandLink>
 
 				<h:panelGroup id="badgeContainer" layout="block"
 					styleClass="badge-wrapper">
-					<h:panelGroup>
-						<span class="badge-circle">#{dashboardBean.activeLoans.size()}</span>
-					</h:panelGroup>
+					<span class="badge-circle">#{dashboardBean.activeLoans.size()}</span>
 				</h:panelGroup>
 			</div>
 		</h:form>
 
-		<!-- Resumo -->
+		<!-- Summary -->
 		<h:panelGroup id="summaryPanel" layout="block"
 			styleClass="summary-box">
 			<h3>Visão Geral da Biblioteca</h3>
@@ -102,194 +98,148 @@
 			</div>
 		</h:panelGroup>
 
-		<h:form id="filterForm" styleClass="filter-bar">
-
+		<!-- Filtros -->
+		<h:form id="filterForm" prependId="false" styleClass="filter-bar">
 			<div class="search-group">
-
 				<span class="ui-input-icon-left"> <i class="pi pi-search" />
 					<p:inputText id="searchInput" value="#{dashboardBean.searchQuery}"
-						placeholder="Buscar por título ou autor..."
-						styleClass="search-input">
-						<p:ajax event="keyup" update=":catalogPanel"
+						placeholder="Buscar..." styleClass="search-input">
+						<p:ajax event="keyup" update=":catalogForm:catalogPanel"
 							listener="#{dashboardBean.onSearchChange}" delay="500" />
 					</p:inputText>
 				</span>
-
 			</div>
 
 			<div class="filter-actions">
-
-				<div class="filter-checkbox">
-					<p:selectBooleanCheckbox id="unavailableOnly"
-						value="#{dashboardBean.showOnlyUnavailable}"
-						itemLabel="Mostrar livros em espera">
-						<p:ajax update=":catalogPanel"
-							listener="#{dashboardBean.onFilterChange}" />
-					</p:selectBooleanCheckbox>
-				</div>
+				<p:selectBooleanCheckbox id="unavailableOnly"
+					value="#{dashboardBean.showOnlyUnavailable}">
+					<p:ajax update=":catalogForm:catalogPanel"
+						listener="#{dashboardBean.onFilterChange}" />
+				</p:selectBooleanCheckbox>
 
 				<p:commandButton value="Todos" action="#{dashboardBean.clearSearch}"
-					process="@this" icon="pi pi-book" title="Mostrar todos os livros"
-					update=":filterForm:searchInput :catalogPanel"
-					styleClass="btn-clear" />
+					process="@this"
+					update=":filterForm:searchInput :catalogForm:catalogPanel"
+					icon="pi pi-book" styleClass="btn-clear" />
 			</div>
-
-
 		</h:form>
 
 		<!-- Catálogo -->
-		<h:panelGroup id="catalogPanel" layout="block"
-			styleClass="catalog-section">
+		<h:form id="catalogForm" prependId="false">
+			<h:panelGroup id="catalogPanel" layout="block"
+				styleClass="catalog-section">
 
-			<p:carousel id="carrossel"
-				value="#{dashboardBean.booksWithAvailableCount}" var="row"
-				numVisible="3" circular="false" styleClass="book-carousel"
-				widgetVar="bookCarousel" binding="#{carousel}">
+				<p:carousel id="carrossel"
+					value="#{dashboardBean.booksWithAvailableCount}" var="row"
+					numVisible="3" circular="false" styleClass="book-carousel">
 
-				<h:panelGroup id="wrapper" layout="block" styleClass="product-card">
-
-					<div class="product-content">
-
-						<h3 class="product-title">#{row[0].title}</h3>
-
-						<div class="product-author">
-							<i class="pi pi-user"></i> #{row[0].author}
-						</div>
-
-						<h:panelGroup id="bookStatsID" styleClass="bookStats"
-							layout="block">
-
-							<div class="product-stats">
-								<span class="stat-badge total"> <i class="pi pi-copy"></i>
-									#{row[1]}
-								</span> <span class="stat-badge available"> <i
-									class="pi pi-check-circle"></i> #{row[2]}
-								</span>
+					<h:panelGroup id="wrapper" layout="block" styleClass="product-card">
+						<div class="product-content">
+							<h3 class="product-title">#{row[0].title}</h3>
+							<div class="product-author">
+								<i class="pi pi-user"></i> #{row[0].author}
 							</div>
 
-							<h:panelGroup>
-								<h:panelGroup rendered="#{row[2] gt 0}">
-									<span class="status-badge available"> <i
-										class="pi pi-check"></i> Disponível
-									</span>
-								</h:panelGroup>
+							<h:panelGroup id="bookStatsID" styleClass="bookStats"
+								layout="block">
+								<div class="product-stats">
+									<span class="stat-badge total"><i class="pi pi-copy"></i>
+										#{row[1]}</span> <span class="stat-badge available"><i
+										class="pi pi-check-circle"></i> #{row[2]}</span>
+								</div>
 
+								<h:panelGroup rendered="#{row[2] gt 0}">
+									<span class="status-badge available"><i
+										class="pi pi-check"></i> Disponível</span>
+								</h:panelGroup>
 								<h:panelGroup rendered="#{row[2] eq 0}">
-									<span class="status-badge unavailable"> <i
-										class="pi pi-times"></i> Indisponível
-									</span>
+									<span class="status-badge unavailable"><i
+										class="pi pi-times"></i> Indisponível</span>
 								</h:panelGroup>
 							</h:panelGroup>
 
-						</h:panelGroup>
+							<div class="product-actions">
+								<p:commandButton icon="pi pi-info-circle" title="Detalhes"
+									styleClass="action-btn details p-button-sm" process="@this"
+									update=":detailPanel"
+									action="#{dashboardBean.selectBook(row[0], row[1], row[2])}"
+									oncomplete="PF('bookDetailDialog').show();" />
 
-						<div class="product-actions">
-
-							<p:commandButton icon="pi pi-info-circle" title="Detalhes"
-								styleClass="action-btn details p-button-sm" process="@this"
-								update=":detailPanel"
-								action="#{dashboardBean.selectBook(row[0], row[1], row[2])}"
-								oncomplete="PF('bookDetailDialog').show();" />
-
-							<p:commandButton icon="pi pi-book" title="Emprestar"
-								process="@this :catalogPanel"
-								update="
-						        :summaryPanel
-						        :loansDialogContent
-						        :badgeForm:badgeContainer
-						        :globalMessages
-						        :carrossel"
-								action="#{dashboardBean.borrow(row[0])}"
-								styleClass="action-btn borrow p-button-sm">
-
-							</p:commandButton>
+								<p:commandButton icon="pi pi-book" title="Emprestar"
+									styleClass="action-btn borrow p-button-sm" process="@this"
+									update=":summaryPanel :loansDialogContent :badgeForm:badgeContainer :globalMessages :catalogForm:catalogPanel"
+									oncomplete="PF('borrowSuccessDialog').show()"
+									action="#{dashboardBean.borrow(row[0])}" />
+							</div>
 						</div>
-					</div>
-				</h:panelGroup>
+					</h:panelGroup>
 
-			</p:carousel>
-		</h:panelGroup>
+				</p:carousel>
+			</h:panelGroup>
+		</h:form>
 
-
-		<!-- Dialog: Detalhes do Livro -->
-		<p:dialog styleClass="details-modal" widgetVar="bookDetailDialog"
-			header="Detalhes do Livro" modal="true" width="500" resizable="false"
-			closeOnEscape="true" appendTo="@(body)">
-
+		<!-- Dialog Detalhes -->
+		<p:dialog widgetVar="bookDetailDialog" header="Detalhes do Livro"
+			modal="true" width="500" resizable="false" appendTo="@(body)">
 			<h:panelGroup id="detailPanel">
-
 				<div class="book-detail-container">
 					<div class="detail-row">
-						<span class="detail-label">Título:</span> <span
-							class="detail-value">#{dashboardBean.selectedBook.title}</span>
+						<span class="detail-label">Título:</span>
+						#{dashboardBean.selectedBook.title}
 					</div>
 					<div class="detail-row">
-						<span class="detail-label">ISBN:</span> <span
-							class="detail-value mono">#{dashboardBean.selectedBook.isbn}</span>
+						<span class="detail-label">ISBN:</span>
+						#{dashboardBean.selectedBook.isbn}
 					</div>
 					<div class="detail-row">
-						<span class="detail-label">Autor:</span> <span
-							class="detail-value">#{dashboardBean.selectedBook.author}</span>
+						<span class="detail-label">Autor:</span>
+						#{dashboardBean.selectedBook.author}
 					</div>
 					<div class="detail-row">
-						<span class="detail-label">Editora:</span> <span
-							class="detail-value">#{dashboardBean.selectedBook.publisher}</span>
+						<span class="detail-label">Editora:</span>
+						#{dashboardBean.selectedBook.publisher}
 					</div>
 					<div class="detail-row">
-						<span class="detail-label">Ano:</span> <span class="detail-value">#{dashboardBean.selectedBook.year}</span>
+						<span class="detail-label">Ano:</span>
+						#{dashboardBean.selectedBook.year}
 					</div>
 					<div class="detail-row">
-						<span class="detail-label">Total de Cópias:</span> <span
-							class="detail-value copies total">#{dashboardBean.detailTotal}</span>
+						<span class="detail-label">Total:</span>
+						#{dashboardBean.detailTotal}
 					</div>
 					<div class="detail-row">
-						<span class="detail-label">Disponíveis:</span> <span
-							class="detail-value copies available">#{dashboardBean.detailAvailable}</span>
-					</div>
-					<div class="detail-row categories-row">
-						<span class="detail-label">Categorias:</span>
-						<div class="categories-list">
-							<ui:repeat value="#{dashboardBean.bookCategories}" var="c">
-								<span class="category-badge">#{c}</span>
-							</ui:repeat>
-							<h:panelGroup rendered="#{empty dashboardBean.bookCategories}">
-								<span class="category-placeholder">—</span>
-							</h:panelGroup>
-						</div>
+						<span class="detail-label">Disponíveis:</span>
+						#{dashboardBean.detailAvailable}
 					</div>
 				</div>
 			</h:panelGroup>
-
 			<f:facet name="footer">
 				<p:commandButton value="Fechar" type="button"
 					onclick="PF('bookDetailDialog').hide();" />
 			</f:facet>
 		</p:dialog>
 
-		<!-- Dialog: Meus Empréstimos -->
-		<p:dialog styleClass="loans" widgetVar="loansDialog"
-			header="Meus Empréstimos" modal="true" width="600" resizable="false"
-			closeOnEscape="true" appendTo="@(body)">
+		<!-- Dialog Empréstimos -->
+		<p:dialog widgetVar="loansDialog" header="Meus Empréstimos"
+			modal="true" width="800" appendTo="@(body)">
 
 			<h:panelGroup id="loansDialogContent">
-
+			
 				<p:dataTable value="#{dashboardBean.activeLoans}" var="loan"
 					emptyMessage="Nenhum empréstimo ativo.">
-
-					<p:column headerText="Livro" width="40%">
+					
+					<p:column headerText="Livro">
 						<h:outputText value="#{loan.bookTitle}" />
 					</p:column>
-
-					<p:column headerText="Data do Empréstimo" width="25%">
-						<h:outputText value="#{loan.borrowDate}">
-						</h:outputText>
+					
+					<p:column headerText="Data">
+						<h:outputText value="#{loan.borrowDate}" />
 					</p:column>
-
-					<p:column headerText="Prazo (dias)" width="20%">
-						<h:outputText value="#{loan.daysRemaining} dias restantes"
-							style="color: #{loan.daysRemaining lt 3 ? 'red' : 'inherit'}" />
+					
+					<p:column headerText="Prazo">
+						<h:outputText value="#{loan.daysRemaining} dias" />
 					</p:column>
-
+					
 					<p:column headerText="Ações" width="15%"
 						style="text-align: center;">
 						<p:commandButton icon="pi pi-undo" title="Devolver"
@@ -298,14 +248,32 @@
 							process="@this"
 							styleClass="p-button-sm p-button-warning return-book" />
 					</p:column>
-
 				</p:dataTable>
 			</h:panelGroup>
 			<f:facet name="footer">
 				<p:commandButton value="Fechar" type="button"
-					styleClass="p-button-secondary" onclick="PF('loansDialog').hide();" />
+					onclick="PF('loansDialog').hide();" />
 			</f:facet>
 		</p:dialog>
+
+		<!-- Dialog Sucesso -->
+		<h:form id="dialogsForm" prependId="false">
+			<p:dialog widgetVar="borrowSuccessDialog"
+				header="Empréstimo Confirmado!" modal="true" width="600"
+				appendTo="@(body)">
+				<div class="borrow-success-content">
+					<i class="pi pi-check-circle success-icon"></i>
+					<p>
+			            Aproveite sua leitura.<br />
+			            Para ver seus empréstimos ativos, clique no <strong>ícone <i class="pi pi-bookmark"></i> ao lado do título</strong>.
+			        </p>
+				</div>
+				<f:facet name="footer">
+					<p:commandButton value="Ok" type="button"
+						onclick="PF('borrowSuccessDialog').hide();" />
+				</f:facet>
+			</p:dialog>
+		</h:form>
 
 	</ui:define>
 
