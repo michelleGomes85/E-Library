@@ -1,29 +1,4 @@
-@charset "UTF-8";
 
-* {
-	margin: 0;
-	padding: 0;
-	box-sizing: border-box;
-}
-
-body {
-	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-	background: #000;
-	color: #e2e8f0;
-	min-height: 100vh;
-	padding: 1.5rem;
-	padding-top: 0;
-}
-
-body .ui-button {
-	background: #00335b;
-	border: 1px solid #00335b;
-}
-
-body .ui-button:hover {
-	background: #2563eb;
-	border: 1px solid #2563eb;
-}
 
 body .ui-toolbar, body .ui-datatable .ui-datatable-header, body .ui-paginator,
 	body .ui-datatable .ui-datatable-data>tr, body .ui-datatable thead th {
@@ -59,7 +34,9 @@ body .ui-paginator {
 	flex-direction: column;
 }
 
-body .ui-inputfield {
+body .ui-inputfield,
+body .ui-selectonemenu,
+body .ui-selectcheckboxmenu {
 	background: #e0e7ff
 }
 
@@ -76,49 +53,12 @@ body .btn-danger {
 	border-color: #620c0c;
 }
 
-.header {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	padding-top: 4rem;
-	padding-bottom: 2.5rem;
-	flex-wrap: wrap;
-	gap: 1rem;
-	flex-direction: column;
-	text-align: center;
-	border-bottom: 1px solid #3d444db3;
-	background: linear-gradient(to bottom, #0f172a, #000);
-}
-
-.header-content {
-	flex: 1;
-	min-width: 0;
-}
-
-.page-title {
-	font-size: 2.2rem;
-	font-weight: 700;
-	color: #f1f5f9;
-	margin-bottom: 0.3rem;
-}
-
-.page-description {
-	font-size: 1.2rem;
-	color: #94a3b8; 
-	margin-bottom: 0.8rem;
-	line-height: 1.8;
-}
-
-.user-info {
-	font-size: 1rem;
-	color: #64748b; 
-}
 
 .header-actions {
 	flex-shrink: 0;
 	display: flex;
 	align-items: center;
-	margin-top: 10px;
+	margin-top: 1rem;
 }
 
 .inline-form {
@@ -195,22 +135,26 @@ body .ui-dialog .ui-dialog-content {
 	padding: .3rem 2.5rem 1rem 2rem;
 }
 
-.ui-datatable .ui-sortable-column {
-	width: 300px;
+th[aria-label="Ações"] {
+    width: 200px !important;
 }
 
 @media ( max-width : 768px) {
+	
 	.header {
 		flex-direction: column;
 		text-align: center;
 	}
+	
 	.header-content {
 		text-align: center;
 	}
+	
 	.header-actions {
 		width: 100%;
 		justify-content: center;
 	}
+	
 	.inline-form {
 		flex-wrap: wrap;
 		justify-content: center;

@@ -166,10 +166,6 @@ body {
     to { transform: rotate(360deg); }
 }
 
-.field-group {
-	margin: 0;
-}
-
 body .ui-button {
 	background: #00335b;
 	border: 1px solid #00335b;

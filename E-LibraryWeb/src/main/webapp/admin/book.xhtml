@@ -3,26 +3,17 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
 	xmlns:h="http://xmlns.jcp.org/jsf/html"
 	xmlns:f="http://xmlns.jcp.org/jsf/core"
-	xmlns:p="http://primefaces.org/ui">
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
 
-<h:head>
-	<title>Livros — E-Library</title>
-	<h:outputStylesheet name="css/crud-table.css" />
-</h:head>
+<ui:composition template="/template/_template.xhtml">
 
-<h:body>
+	<ui:define name="head">
+		<h:outputStylesheet name="css/admin-dashboard.css" />
+		<h:outputStylesheet name="css/crud-table.css" />
+	</ui:define>
 
-	<div class="header">
-	
-		<div class="header-content">
-			<h1 class="page-title">Gerenciamento de Livros</h1>
-			<p class="page-description">Crie, edite, consulte e exclua livros
-				do catálogo.</p>
-			<p class="user-info">
-				Usuário: <strong>#{sessionBean.loggedUser.name}</strong>
-			</p>
-		</div>
-
+	<ui:define name="button-1">
 		<div class="header-actions">
 			<h:form id="navForm" styleClass="inline-form">
 				<p:button value="← Voltar" outcome="/admin/index.html"
@@ -34,10 +25,24 @@
 					update="@form" title="Encerrar sessão" />
 			</h:form>
 		</div>
-	</div>
+	</ui:define>
 
-	<div class="page-container">
+	<ui:define name="title">
+		<h1 class="page-title">Gerenciamento de Livros</h1>
+	</ui:define>
 
+	<ui:define name="description">
+		<div class="user-info">
+			<p class="page-description">Crie, edite, consulte e exclua livros
+				do catálogo.</p>
+				
+			<p class="user-info">
+				Usuário: <strong>#{sessionBean.loggedUser.name}</strong>
+			</p>
+		</div>
+	</ui:define>
+
+	<ui:define name="corpo">
 		<h:form id="bookForm">
 
 			<p:growl id="messages" showDetail="true" autoUpdate="true" />
@@ -227,7 +232,7 @@
 					onclick="PF('deleteBookDialog').hide()" styleClass="btn-secondary" />
 			</p:confirmDialog>
 		</h:form>
+	</ui:define>
 
-	</div>
-</h:body>
+</ui:composition>
 </html>

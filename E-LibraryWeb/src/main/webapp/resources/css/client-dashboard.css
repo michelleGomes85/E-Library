@@ -58,6 +58,10 @@
 	margin-bottom: 2rem;
 }
 
+.summary-box div.description p{
+	margin-top: 1rem;
+}
+
 .summary-box div.description span {
 	color: #2196f3;
 }
