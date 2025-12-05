@@ -3,6 +3,9 @@
 > **Projeto acadêmico para a disciplina de Serviços de Suporte a Aplicações Distribuídas (SSAD)**  
 > Arquitetura Jakarta EE 9+ com **EJB 4.0**, **JPA 3.1**, **JSF 3.0** e **WildFly 31+**
 
+![assets/login.png](assets/login.png)
+![assets/admin.png](assets/admin.png)
+![assets/client.png](assets/client.png)
 ---
 
 ## 📑 Índice
@@ -266,8 +269,6 @@ Todos os beans seguem o mesmo padrão:
 O `E-LibraryClient` (projeto separado, não parte do EAR) é uma aplicação **Java SE 17+** desenvolvida para operar como **cliente remoto**, consumindo os EJBs expostos pelo WildFly via **EJB Remoto (RMI/HTTP-remoting)**.
 
 É voltado para **atendentes de balcão**, com interface console simples, mas funcional — demonstrando a capacidade do sistema de atender múltiplos clientes com diferentes tecnologias, mantendo a lógica centralizada.
-
-
 ---
 
 ### 🔌 Comunicação com o Servidor — JNDI Remoto
@@ -312,7 +313,7 @@ O cliente **não depende do EAR**, mas sim do `e-library-client.jar` (interfaces
   CREATE USER aluno WITH PASSWORD 'aluno';
   CREATE DATABASE elibrary OWNER elibrary ENCODING 'UTF8';
   \c elibrary
-  \i elibrary_dump.sql 
+  \i elibrary_dump.sql # para popular com dados
   ```
   - Ou pela interface no `pgadmin`
 
@@ -352,3 +353,11 @@ O cliente **não depende do EAR**, mas sim do `e-library-client.jar` (interfaces
 |------------|----------|
 | **Web** | Já está no WildFly — acesse a URL acima |
 | **Java EE** | java -jar e-library-client-se.jar<br>Use admin / 123456 |
+
+## 📁 Recursos do Projeto
+
+| Recurso | Arquivo/Localização | Descrição |
+|---------|---------------------|-----------|
+| 📄 **Relatório técnico** | [`relatorio-tecnico.pdf`](relatorio-tecnico.pdf) | Justificativa do uso de `@Singleton`, `@Stateful` e `@Stateless`. |
+| 💾 **Backup do banco** | [`elibrary_dump.sql`](elibrary_dump.sql) | Script de criação e *seed* do banco PostgreSQL (com usuários, livros, exemplares e empréstimos de exemplo). |
+
