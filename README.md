@@ -108,7 +108,7 @@ As classes `*Mapper` (ex: `BookMapper`, `LoanMapper`) são **responsáveis pela 
 - ✅ Nenhuma entidade JPA escape para o cliente 
 - ✅ Dados derivados (ex: `availableCopies`, `daysRemaining`) sejam calculados **uma vez**, no servidor;
 
-## 🗃️ Modelagem de Persistência (`br.elibrary.model`) — Conforme Edital (4,0 pts)
+## 🗃️ Modelagem de Persistência (`br.elibrary.model`)
 
 As entidades estão implementadas em `br.elibrary.model`, com **anotações JPA completas** e **relacionamentos exigidos**:
 
