@@ -296,7 +296,7 @@ O cliente **não depende do EAR**, mas sim do `e-library-client.jar` (interfaces
    ```bash
    cd wildfly-31.0.1.Final/bin
    ./add-user.sh 
-  ```
+   ```
 
 2. Crie usuário Management:
   - Username: ssad
