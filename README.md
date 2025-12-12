@@ -358,6 +358,6 @@ O cliente **não depende do EAR**, mas sim do `e-library-client.jar` (interfaces
 
 | Recurso | Arquivo/Localização | Descrição |
 |---------|---------------------|-----------|
-| 📄 **Relatório técnico** | [`relatorio-tecnico.pdf`](relatorio-tecnico.pdf) | Justificativa do uso de `@Singleton`, `@Stateful` e `@Stateless`. |
+| 📄 **Relatório técnico** | [`relatorio-tecnico.pdf`](relatorio_tecnico.pdf) | Justificativa do uso de `@Singleton`, `@Stateful` e `@Stateless`. |
 | 💾 **Backup do banco** | [`elibrary_dump.sql`](elibrary_dump.sql) | Script de criação e *seed* do banco PostgreSQL (com usuários, livros, exemplares e empréstimos de exemplo). |
 
