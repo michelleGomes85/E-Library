@@ -66,38 +66,6 @@
 			</div>
 		</h:form>
 
-		<!-- Summary -->
-		<h:panelGroup id="summaryPanel" layout="block"
-			styleClass="summary-box">
-			<h3>Visão Geral da Biblioteca</h3>
-			<div class="description">
-				<p>
-					Explore os <span>livros disponíveis</span> e clique no ícone
-					correspondente para <span>solicitar um empréstimo</span>.
-				</p>
-				<p>
-					Para <span>visualizar seus empréstimos ativos</span>, utilize o
-					ícone <span>ao lado</span>.
-				</p>
-			</div>
-			<div class="summary-stats">
-				<div class="stat-item">
-					<span class="stat-label">Livros cadastrados</span> <span
-						class="stat-value">#{dashboardBean.totalBooks}</span>
-				</div>
-				<div class="stat-item">
-					<span class="stat-label">Cópias totais</span> <span
-						class="stat-value">#{dashboardBean.totalCopies}</span>
-				</div>
-				<div class="stat-item">
-					<span class="stat-label">Cópias disponíveis</span> <span
-						class="stat-value"
-						style="color: #{dashboardBean.availableCopies gt 0 ? '#28a745' : '#dc3545'}">
-						#{dashboardBean.availableCopies} </span>
-				</div>
-			</div>
-		</h:panelGroup>
-
 		<!-- Filtros -->
 		<h:form id="filterForm" prependId="false" styleClass="filter-bar">
 			<div class="search-group">
@@ -167,7 +135,7 @@
 
 								<p:commandButton icon="pi pi-book" title="Emprestar"
 									styleClass="action-btn borrow p-button-sm" process="@this"
-									update=":summaryPanel :loansDialogContent :badgeForm:badgeContainer :globalMessages :catalogForm:catalogPanel"
+									update=":loansDialogContent :badgeForm:badgeContainer :globalMessages :catalogForm:catalogPanel"
 									oncomplete="PF('borrowSuccessDialog').show()"
 									action="#{dashboardBean.borrow(row[0])}" />
 							</div>
@@ -224,27 +192,27 @@
 			modal="true" width="800" appendTo="@(body)">
 
 			<h:panelGroup id="loansDialogContent">
-			
+
 				<p:dataTable value="#{dashboardBean.activeLoans}" var="loan"
 					emptyMessage="Nenhum empréstimo ativo.">
-					
+
 					<p:column headerText="Livro">
 						<h:outputText value="#{loan.bookTitle}" />
 					</p:column>
-					
+
 					<p:column headerText="Data">
 						<h:outputText value="#{loan.borrowDate}" />
 					</p:column>
-					
+
 					<p:column headerText="Prazo">
 						<h:outputText value="#{loan.daysRemaining} dias" />
 					</p:column>
-					
+
 					<p:column headerText="Ações" width="15%"
 						style="text-align: center;">
 						<p:commandButton icon="pi pi-undo" title="Devolver"
 							action="#{dashboardBean.returnCopy(loan)}"
-							update=":summaryPanel :catalogPanel :loansDialogContent :badgeForm:badgeContainer :globalMessages"
+							update=":catalogPanel :loansDialogContent :badgeForm:badgeContainer :globalMessages"
 							process="@this"
 							styleClass="p-button-sm p-button-warning return-book" />
 					</p:column>
@@ -264,9 +232,11 @@
 				<div class="borrow-success-content">
 					<i class="pi pi-check-circle success-icon"></i>
 					<p>
-			            Aproveite sua leitura.<br />
-			            Para ver seus empréstimos ativos, clique no <strong>ícone <i class="pi pi-bookmark"></i> ao lado do título</strong>.
-			        </p>
+						Aproveite sua leitura.<br /> Para ver seus empréstimos ativos,
+						clique no <strong>ícone <i class="pi pi-bookmark"></i> ao
+							lado do título
+						</strong>.
+					</p>
 				</div>
 				<f:facet name="footer">
 					<p:commandButton value="Ok" type="button"

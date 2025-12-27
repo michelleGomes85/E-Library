@@ -42,7 +42,45 @@
 	</ui:define>
 
 	<ui:define name="corpo">
-	
+
+		<!-- Summary -->
+		<h:panelGroup id="summaryPanel" layout="block"
+			styleClass="summary-box">
+			
+			<h3>Visão Geral da Biblioteca</h3>
+			
+			<div class="description">
+				<p>
+					Este painel permite o gerenciamento completo da
+						biblioteca. 
+				</p>
+				
+				<p>Aqui você pode administrar o acervo,
+					controlar usuários, organizar categorias
+					e acompanhar a disponibilidade de exemplares.</p>
+					
+				<p>Utilize as opções abaixo para acessar rapidamente cada
+					módulo e manter o funcionamento correto do sistema.</p>
+			</div>
+			
+			<div class="summary-stats">
+				<div class="stat-item">
+					<span class="stat-label">Livros cadastrados</span> <span
+						class="stat-value">#{dashboardBean.totalBooks}</span>
+				</div>
+				<div class="stat-item">
+					<span class="stat-label">Cópias totais</span> <span
+						class="stat-value">#{dashboardBean.totalCopies}</span>
+				</div>
+				<div class="stat-item">
+					<span class="stat-label">Cópias disponíveis</span> <span
+						class="stat-value"
+						style="color: #{dashboardBean.availableCopies gt 0 ? '#28a745' : '#dc3545'}">
+						#{dashboardBean.availableCopies} </span>
+				</div>
+			</div>
+		</h:panelGroup>
+
 		<div class="card-grid">
 
 			<!-- Card: Gerenciar Usuários -->
