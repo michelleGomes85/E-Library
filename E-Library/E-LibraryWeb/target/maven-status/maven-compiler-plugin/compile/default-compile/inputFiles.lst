@@ -1,0 +1,10 @@
+/home/michelle/eclipse-workspace/ProjectELibrary/ProjetoWebMaven/E-Library/E-LibraryWeb/src/main/java/br/elibrary/web/managed/LoginBean.java
+/home/michelle/eclipse-workspace/ProjectELibrary/ProjetoWebMaven/E-Library/E-LibraryWeb/src/main/java/br/elibrary/web/managed/DashboardBean.java
+/home/michelle/eclipse-workspace/ProjectELibrary/ProjetoWebMaven/E-Library/E-LibraryWeb/src/main/java/br/elibrary/web/filter/AuthFilter.java
+/home/michelle/eclipse-workspace/ProjectELibrary/ProjetoWebMaven/E-Library/E-LibraryWeb/src/main/java/br/elibrary/web/managed/BookBean.java
+/home/michelle/eclipse-workspace/ProjectELibrary/ProjetoWebMaven/E-Library/E-LibraryWeb/src/main/java/br/elibrary/web/managed/CategoryBean.java
+/home/michelle/eclipse-workspace/ProjectELibrary/ProjetoWebMaven/E-Library/E-LibraryWeb/src/main/java/br/elibrary/web/managed/UserSessionBean.java
+/home/michelle/eclipse-workspace/ProjectELibrary/ProjetoWebMaven/E-Library/E-LibraryWeb/src/main/java/br/elibrary/web/filter/AdminFilter.java
+/home/michelle/eclipse-workspace/ProjectELibrary/ProjetoWebMaven/E-Library/E-LibraryWeb/src/main/java/br/elibrary/web/converter/BookConverter.java
+/home/michelle/eclipse-workspace/ProjectELibrary/ProjetoWebMaven/E-Library/E-LibraryWeb/src/main/java/br/elibrary/web/managed/CopyBean.java
+/home/michelle/eclipse-workspace/ProjectELibrary/ProjetoWebMaven/E-Library/E-LibraryWeb/src/main/java/br/elibrary/web/managed/UserBean.java
