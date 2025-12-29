@@ -52,7 +52,7 @@ public class BookResource {
         try {
             BookDTO saved = bookRestService.create(dto);
             URI location = URI.create("/api/livros/" + saved.getId());
-            return Response.created(location).build();
+            return Response.created(location).entity(saved).build();
         } catch (Exception e) {
         	return Response.status(409).entity(e.getMessage()).build();
 		} 

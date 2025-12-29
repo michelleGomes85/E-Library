@@ -49,6 +49,10 @@ public class BookSB implements BookService {
 		
 		return false;
 	}
+	
+	private boolean isEmpty(String val) {
+	    return val == null || val.trim().isEmpty();
+	}
 
 	/**
      * Cria um novo livro no sistema após validar a unicidade do ISBN.
@@ -63,6 +67,10 @@ public class BookSB implements BookService {
 
 		if (dto == null) 
 	        return null;
+		
+		if (isEmpty(dto.getTitle()) || isEmpty(dto.getAuthor()) || isEmpty(dto.getIsbn())) {
+	        throw new BusinessException("Campos obrigatórios ausentes: Titulo, Autor e ISBN são necessários.");
+	    }
 
 	    if (dto.getIsbn() != null) {
 	    	
