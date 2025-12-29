@@ -1,0 +1,99 @@
+@charset "UTF-8";
+
+.page-container {
+	margin: 0 auto;
+}
+
+.card-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+	gap: 30px;
+	justify-items: center;
+	margin: 2.5rem auto 3rem;
+}
+
+.card {
+	width: 100%;
+	max-width: 340px;
+	background: #000;
+	border-radius: 16px;
+	border: 1px solid #1f2937;
+	box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6);
+	display: flex;
+	flex-direction: column;
+	transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+	transform: translateY(-4px);
+	box-shadow: 0 10px 26px rgba(0, 0, 0, 0.8);
+	border-color: #334155;
+}
+
+.card::before {
+	display: none;
+	content: none;
+}
+
+.card-content {
+	padding: 2rem 1.75rem 1.25rem;
+}
+
+.card-title {
+	font-size: 1.35rem;
+	font-weight: 600;
+	color: #f8fafc;
+	margin-bottom: 0.5rem;
+}
+
+.card-description {
+	font-size: 0.95rem;
+	color: #cbd5e1;
+	line-height: 1.5;
+}
+
+.card-actions {
+	padding: 0 1.75rem 1.75rem;
+}
+
+.card-actions .ui-button, .card-actions button, .card-actions a {
+	background: #00335b;
+	border: 1px solid #1f2937;
+	color: #e5e7eb;
+	border-radius: 10px;
+	font-size: 0.85rem;
+	font-weight: 500;
+	cursor: pointer;
+	transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.card-actions .ui-button:hover, .card-actions button:hover,
+	.card-actions a:hover {
+	background: #2664ec;
+	border-color: #334155;
+}
+
+.card-actions .ui-button:focus {
+	box-shadow: none;
+}
+
+body .ui-button {
+	background: #0f172a;
+	border: 1px solid #1f2937;
+	color: #e5e7eb;
+}
+
+body .ui-button:hover {
+	background: #2664ec;
+	border-color: #334155;
+}
+
+body .ui-selectcheckboxmenu .ui-selectcheckboxmenu-label-container .ui-selectcheckboxmenu-label {
+	color: #495057 !important;
+}
+
+@media ( max-width : 700px) {
+	.card-grid {
+		grid-template-columns: 1fr;
+	}
+}

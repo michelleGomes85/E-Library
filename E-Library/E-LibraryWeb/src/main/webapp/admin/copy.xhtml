@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+<ui:composition template="/template/_template.xhtml">
+
+	<ui:define name="head">
+		<h:outputStylesheet name="css/header.css" />
+		<h:outputStylesheet name="css/admin-dashboard.css" />
+		<h:outputStylesheet name="css/crud-table.css" />
+	</ui:define>
+
+	<ui:define name="button-1">
+		<div class="header-actions">
+			<h:form id="navForm" styleClass="inline-form">
+				<p:button value="← Voltar" outcome="/admin/index.html"
+					title="Retornar ao Painel do Administrador"
+					styleClass="btn-outline" />
+
+				<p:commandButton value="Sair" action="#{loginBean.doLogout}"
+					icon="pi pi-sign-out" styleClass="btn-logout" ajax="true"
+					update="@form" title="Encerrar sessão" />
+			</h:form>
+		</div>
+	</ui:define>
+
+	<ui:define name="username">
+		<strong>#{sessionBean.loggedUser.name}</strong>
+	</ui:define>
+
+	<ui:define name="title">
+		<h1 class="page-title">Gerenciamento de Exemplares</h1>
+	</ui:define>
+
+	<ui:define name="description">
+		<p class="page-description">Crie, edite, consulte e exclua livros
+			do catálogo.</p>
+	</ui:define>
+
+	<ui:define name="corpo">
+		<h:form id="copyForm">
+
+			<p:growl id="messages" showDetail="true" autoUpdate="true" />
+
+			<!-- Toolbar -->
+			<p:toolbar>
+				<p:toolbarGroup>
+					<p:commandButton value="Novo Exemplar" icon="pi pi-plus"
+						actionListener="#{copyBean.openNew}"
+						oncomplete="PF('manageCopyDialog').show()"
+						update=":dialogs:copyDialog" styleClass="btn-primary">
+						<p:resetInput target=":dialogs:copyDialog" />
+					</p:commandButton>
+				</p:toolbarGroup>
+			</p:toolbar>
+
+			<!-- TABELA -->
+			<p:dataTable id="dt-copies" widgetVar="dtCopies" var="copy"
+				value="#{copyBean.copies}" paginator="true" rows="10"
+				paginatorPosition="bottom" rowsPerPageTemplate="5,10,20"
+				emptyMessage="Nenhum exemplar encontrado." styleClass="copy-table"
+				rowKey="#{copy.id}" filteredValue="#{copyBean.filteredCopies}">
+
+				<f:facet name="header">
+					<span class="table-title">Exemplares Cadastrados</span>
+				</f:facet>
+
+				<p:column headerText="Código Interno" sortBy="#{copy.internalCode}"
+					filterBy="#{copy.internalCode}" filterMatchMode="contains">
+					<h:outputText value="#{copy.internalCode}" />
+				</p:column>
+
+				<p:column headerText="Livro" sortBy="#{copy.bookTitle}"
+					filterBy="#{copy.bookTitle}" filterMatchMode="contains">
+					<h:outputText value="#{copy.bookTitle} (#{copy.bookIsbn})" />
+				</p:column>
+
+				<p:column headerText="Status" sortBy="#{copy.status}"
+					filterBy="#{copy.status}" filterMatchMode="contains">
+					<h:outputText value="#{copy.status.label}" />
+				</p:column>
+
+				<p:column headerText="Ações" exportable="false" style="width:120px;">
+
+					<p:commandButton icon="pi pi-pencil" title="Editar"
+						styleClass="btn-secondary btn-sm" action="#{copyBean.edit(copy)}"
+						oncomplete="PF('manageCopyDialog').show()"
+						update=":dialogs:copyDialog" />
+
+					<p:commandButton icon="pi pi-trash" title="Excluir"
+						styleClass="btn-danger btn-sm"
+						action="#{copyBean.confirmDelete(copy)}"
+						oncomplete="PF('deleteCopyDialog').show()" process="@this"
+						update="@none" />
+				</p:column>
+			</p:dataTable>
+		</h:form>
+
+
+		<!-- FORMULÁRIO PARA CRIAÇÃO/EDIÇÃO -->
+		<h:form id="dialogs">
+			<p:dialog id="copyDialog"
+				header="#{copyBean.editMode ? 'Editar Exemplar' : 'Novo Exemplar'}"
+				widgetVar="manageCopyDialog" modal="true" resizable="false"
+				showEffect="fade" width="500">
+
+				<div class="form-card">
+					<div class="field-group">
+						<div class="field">
+							<label class="field-label">Código interno *</label>
+							<div class="field-input">
+								<p:inputText id="internalCode"
+									value="#{copyBean.copy.internalCode}" required="true"
+									placeholder="Ex: EX-001" />
+								<p:message for="internalCode" display="icon" />
+							</div>
+						</div>
+					</div>
+
+					<div class="field-group">
+						<div class="field">
+							<label class="field-label">Livro *</label>
+							<div class="field-input">
+								<p:selectOneMenu id="book" value="#{copyBean.copy.bookId}"
+									required="true" filter="true" filterMatchMode="contains">
+
+									<f:selectItem itemLabel="-- Selecione um livro --"
+										noSelectionOption="true" />
+
+									<f:selectItems value="#{copyBean.books}" var="book"
+										itemLabel="#{book.title} (ISBN: #{book.isbn})"
+										itemValue="#{book.id}" />
+
+								</p:selectOneMenu>
+								<p:message for="book" display="icon" />
+							</div>
+						</div>
+					</div>
+
+					<div class="field-group">
+						<div class="field">
+							<label class="field-label">Status</label>
+							<div class="field-input">
+								<p:selectOneMenu id="status" value="#{copyBean.copy.status}">
+									<f:selectItems value="#{copyBean.statusValues}" var="status"
+										itemLabel="#{status}" itemValue="#{status}" />
+								</p:selectOneMenu>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<f:facet name="footer">
+					<p:commandButton value="Salvar" icon="pi pi-check"
+						action="#{copyBean.save}"
+						update=":copyForm:messages :copyForm:dt-copies"
+						styleClass="btn-primary" />
+
+					<p:commandButton value="Cancelar" type="button" icon="pi pi-times"
+						onclick="PF('manageCopyDialog').hide()" styleClass="btn-secondary" />
+				</f:facet>
+			</p:dialog>
+		</h:form>
+
+
+		<!-- FORMULÁRIO ISOLADO PARA EXCLUSÃO -->
+		<h:form id="deleteForm">
+			<p:confirmDialog widgetVar="deleteCopyDialog"
+				message="Tem certeza que deseja excluir o exemplar '#{copyBean.selectedCopy.internalCode}'?"
+				header="Confirmar exclusão" severity="warn">
+
+				<p:commandButton value="Sim" icon="pi pi-check"
+					action="#{copyBean.delete}"
+					update=":copyForm:dt-copies :copyForm:messages"
+					styleClass="btn-danger" process="@this" />
+
+				<p:commandButton value="Não" type="button" icon="pi pi-times"
+					onclick="PF('deleteCopyDialog').hide()" styleClass="btn-secondary" />
+			</p:confirmDialog>
+		</h:form>
+
+	</ui:define>
+
+</ui:composition>
+</html>

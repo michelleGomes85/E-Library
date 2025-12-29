@@ -1,0 +1,13 @@
+@charset "UTF-8";
+
+html, body {
+    width: 100%;
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    font-family: Poppins, sans-serif;
+    background: url("../images/background.png") center center / cover no-repeat fixed;
+    position: relative;
+}

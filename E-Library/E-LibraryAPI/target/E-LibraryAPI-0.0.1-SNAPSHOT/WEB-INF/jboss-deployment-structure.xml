@@ -1,0 +1,8 @@
+<jboss-deployment-structure>
+    <deployment>
+        <dependencies>
+            <module name="org.eclipse.microprofile.graphql" export="true"/>
+            <module name="io.smallrye.graphql" export="true"/>
+        </dependencies>
+    </deployment>
+</jboss-deployment-structure>

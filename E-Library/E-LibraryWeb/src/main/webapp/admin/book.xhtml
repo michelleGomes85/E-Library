@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+<ui:composition template="/template/_template.xhtml">
+
+	<ui:define name="head">
+		<h:outputStylesheet name="css/header.css" />
+		<h:outputStylesheet name="css/admin-dashboard.css" />
+		<h:outputStylesheet name="css/crud-table.css" />
+	</ui:define>
+
+	<ui:define name="button-1">
+		<div class="header-actions">
+			<h:form id="navForm" styleClass="inline-form">
+				<p:button value="← Voltar" outcome="/admin/index.html"
+					title="Retornar ao Painel do Administrador"
+					styleClass="btn-outline" />
+
+				<p:commandButton value="Sair" action="#{loginBean.doLogout}"
+					icon="pi pi-sign-out" styleClass="btn-logout" ajax="true"
+					update="@form" title="Encerrar sessão" />
+			</h:form>
+		</div>
+	</ui:define>
+	
+	<ui:define name="username">
+		<strong>#{sessionBean.loggedUser.name}</strong>
+	</ui:define>
+
+	<ui:define name="title">
+		<h1 class="page-title">Gerenciamento de Livros</h1>
+	</ui:define>
+
+	<ui:define name="description">
+		<p class="page-description">Crie, edite, consulte e exclua livros
+			do catálogo.</p>
+	</ui:define>
+
+	<ui:define name="corpo">
+		<h:form id="bookForm">
+
+			<p:growl id="messages" showDetail="true" autoUpdate="true" />
+
+			<p:toolbar>
+				<p:toolbarGroup>
+					<p:commandButton value="Novo Livro" icon="pi pi-plus"
+						actionListener="#{bookBean.openNew}"
+						oncomplete="PF('manageBookDialog').show()"
+						update=":dialogs:bookDialog" styleClass="btn-primary">
+						<p:resetInput target=":dialogs:bookDialog" />
+					</p:commandButton>
+				</p:toolbarGroup>
+			</p:toolbar>
+
+			<!-- TABELA -->
+			<p:dataTable id="dt-books" widgetVar="dtBooks" var="book"
+				value="#{bookBean.books}" paginator="true" rows="10"
+				paginatorPosition="bottom" rowsPerPageTemplate="5,10,20"
+				emptyMessage="Nenhum livro encontrado." styleClass="book-table"
+				rowKey="#{book.id}" filteredValue="#{bookBean.filteredBooks}">
+
+				<f:facet name="header">
+					<span class="table-title">Livros Cadastrados</span>
+				</f:facet>
+
+				<p:column headerText="ISBN" sortBy="#{book.isbn}"
+					filterBy="#{book.isbn}" filterMatchMode="contains">
+					<h:outputText value="#{book.isbn}" />
+				</p:column>
+
+				<p:column headerText="Título" sortBy="#{book.title}"
+					filterBy="#{book.title}" filterMatchMode="contains">
+					<h:outputText value="#{book.title}" />
+				</p:column>
+
+				<p:column headerText="Autor" sortBy="#{book.author}"
+					filterBy="#{book.author}" filterMatchMode="contains">
+					<h:outputText value="#{book.author}" />
+				</p:column>
+
+				<p:column headerText="Editora" sortBy="#{book.publisher}"
+					filterBy="#{book.publisher}" filterMatchMode="contains">
+					<h:outputText value="#{book.publisher}" />
+				</p:column>
+
+				<p:column headerText="Ano" sortBy="#{book.year}"
+					filterBy="#{book.year}">
+					<h:outputText value="#{book.year}" />
+				</p:column>
+
+				<p:column headerText="Ações" exportable="false" style="width:120px;">
+
+					<p:commandButton icon="pi pi-pencil" title="Editar"
+						styleClass="btn-secondary btn-sm"
+						actionListener="#{bookBean.edit(book)}" process="@this"
+						update=":dialogs:bookDialog"
+						oncomplete="if (args &amp;&amp; !args.validationFailed) PF('manageBookDialog').show();" />
+
+					<p:commandButton icon="pi pi-trash" title="Excluir"
+						styleClass="btn-danger btn-sm"
+						action="#{bookBean.confirmDelete(book)}"
+						oncomplete="PF('deleteBookDialog').show()" process="@this"
+						update="@none" />
+
+				</p:column>
+			</p:dataTable>
+		</h:form>
+
+		<!-- FORMULÁRIO PARA CRIAÇÃO/EDIÇÃO -->
+
+		<h:form id="dialogs">
+
+			<p:dialog id="bookDialog"
+				header="#{bookBean.editMode ? 'Editar Livro' : 'Novo Livro'}"
+				widgetVar="manageBookDialog" modal="true" resizable="false"
+				showEffect="fade" width="500">
+
+				<div class="form-card">
+					<div class="field-group">
+						<div class="field">
+							<label class="field-label">ISBN</label>
+							<div class="field-input">
+								<p:inputText id="isbn" value="#{bookBean.book.isbn}" />
+							</div>
+						</div>
+					</div>
+
+					<div class="field-group">
+						<div class="field">
+							<label class="field-label">Título *</label>
+							<div class="field-input">
+								<p:inputText id="title" value="#{bookBean.book.title}"
+									required="true" />
+								<p:message for="title" display="icon" />
+							</div>
+						</div>
+					</div>
+
+					<div class="field-group">
+						<div class="field">
+							<label class="field-label">Autor *</label>
+							<div class="field-input">
+								<p:inputText id="author" value="#{bookBean.book.author}"
+									required="true" />
+								<p:message for="author" display="icon" />
+							</div>
+						</div>
+					</div>
+
+					<div class="field-group">
+						<div class="field">
+							<label class="field-label">Editora *</label>
+							<div class="field-input">
+								<p:inputText id="publisher" value="#{bookBean.book.publisher}"
+									required="true" />
+								<p:message for="publisher" display="icon" />
+							</div>
+						</div>
+					</div>
+
+					<div class="field-group">
+						<div class="field">
+							<label class="field-label">Ano *</label>
+							<div class="field-input">
+								<p:inputText id="year" value="#{bookBean.book.year}"
+									required="true">
+									<f:validateLongRange minimum="1000" maximum="2030" />
+								</p:inputText>
+								<p:message for="year" display="icon" />
+							</div>
+						</div>
+					</div>
+
+					<div class="field-group">
+						<div class="field">
+
+							<label class="field-label">Categorias *</label>
+
+							<div class="field-input">
+								<p:selectCheckboxMenu id="categories"
+									value="#{bookBean.book.categoryIds}" label="Categorias"
+									filter="true" filterMatchMode="contains" required="true"
+									requiredMessage="Selecione pelo menos uma categoria">
+
+									<f:selectItems value="#{bookBean.availableCategories}" var="c"
+										itemLabel="#{c.name}" itemValue="#{c.id}" />
+								</p:selectCheckboxMenu>
+
+								<p:message for="categories" display="icon" />
+
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<f:facet name="footer">
+					<p:commandButton value="Salvar" icon="pi pi-check"
+						action="#{bookBean.save}"
+						update=":bookForm:messages :bookForm:dt-books"
+						styleClass="btn-primary" />
+
+					<p:commandButton value="Cancelar" type="button" icon="pi pi-times"
+						onclick="PF('manageBookDialog').hide()" styleClass="btn-secondary" />
+				</f:facet>
+			</p:dialog>
+		</h:form>
+
+		<h:form id="deleteForm">
+			<p:confirmDialog widgetVar="deleteBookDialog"
+				message="Tem certeza que deseja excluir o livro '#{bookBean.selectedBook.title}'?"
+				header="Confirmar exclusão" severity="warn">
+
+				<p:commandButton value="Sim" icon="pi pi-check"
+					action="#{bookBean.delete}"
+					update=":bookForm:dt-books :bookForm:messages"
+					styleClass="btn-danger" process="@this" />
+
+				<p:commandButton value="Não" type="button" icon="pi pi-times"
+					onclick="PF('deleteBookDialog').hide()" styleClass="btn-secondary" />
+			</p:confirmDialog>
+		</h:form>
+	</ui:define>
+
+</ui:composition>
+</html>

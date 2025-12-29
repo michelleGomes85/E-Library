@@ -1,0 +1,6 @@
+br/elibrary/rest/LibraryResource.class
+br/elibrary/rest/resource/CopyResource.class
+br/elibrary/rest/resource/BookResource.class
+br/elibrary/rest/service/BookRestService.class
+br/elibrary/rest/service/CopyRestService.class
+br/elibrary/rest/RestConfig.class

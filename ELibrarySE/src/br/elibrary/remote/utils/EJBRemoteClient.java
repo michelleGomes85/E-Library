@@ -8,8 +8,8 @@ import javax.naming.NamingException;
 
 public class EJBRemoteClient {
 
-	private static final String APP_NAME = "E-LibraryEAR";
-	private static final String MODULE_NAME = "E-Library";
+	private static final String APP_NAME = "E-LibraryEAR-0.0.1-SNAPSHOT";
+	private static final String MODULE_NAME = "br.elibrary-E-LibraryCore-0.0.1-SNAPSHOT";
 	private static final String DISTINCT_NAME = "";
 
 	private static InitialContext context;
@@ -31,15 +31,16 @@ public class EJBRemoteClient {
 	 */
 	public static <T> T lookup(Class<T> remoteInterface, String beanName) {
 		
-		String jndiName = String.format("ejb:%s/%s/%s/%s!%s", APP_NAME, MODULE_NAME, DISTINCT_NAME, beanName, remoteInterface.getName());
-		
-		try {
-			
-			Object lookedUp = context.lookup(jndiName);
-			
-			return remoteInterface.cast(lookedUp);
-		} catch (NamingException e) {
-			throw new RuntimeException("EJB '" + beanName + "' não encontrado via JNDI: " + jndiName, e);
-		}
+	    String distinctPart = (DISTINCT_NAME == null || DISTINCT_NAME.isEmpty()) ? "" : DISTINCT_NAME + "/";
+	    
+
+	    String jndiName = String.format("ejb:%s/%s/%s%s!%s", 
+	                                    APP_NAME, MODULE_NAME, distinctPart, beanName, remoteInterface.getName());
+	    
+	    try {
+	        return remoteInterface.cast(context.lookup(jndiName));
+	    } catch (NamingException e) {
+	        throw new RuntimeException("Erro JNDI: " + jndiName, e);
+	    }
 	}
 }
