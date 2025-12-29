@@ -37,6 +37,9 @@ body {
 	position: relative;
 	
 	background: #000;
+	
+	position: fixed;
+	z-index: 1;
 }
 
 .header-content {
@@ -183,6 +186,10 @@ body {
 	font-size: 1.6rem;
 	font-weight: 700;
 	color: #f1f5f9;
+}
+
+.description-div {
+	margin-top: 100px;
 }
 
 @media (max-width: 768px) {

@@ -12,7 +12,14 @@
 	<h:outputStylesheet name="css/custom.css" />
 </h:head>
 
-<h:body>
+<h:body style="
+    background:
+      linear-gradient(
+        rgba(5, 5, 16, 0.92),
+        rgba(5, 5, 16, 0.92)
+      ),
+      url('#{resource['images/background.png']}') center / cover no-repeat fixed;
+">
 	<div class="page-container">
 	
 		<div class="form-card">
