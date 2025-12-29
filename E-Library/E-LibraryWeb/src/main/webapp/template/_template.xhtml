@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+
+	<title>E-Library</title>
+
+	<link rel="icon" type="image/png" href="../resources/images/fav.png" />
+
+	<link rel="stylesheet"
+		href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+	<h:outputStylesheet name="css/footer.css" />
+
+	<ui:insert name="head" />
+</h:head>
+
+<h:body style="
+    background:
+      linear-gradient(
+        rgba(5, 5, 16, 0.92),
+        rgba(5, 5, 16, 0.92)
+      ),
+      url('#{resource['images/background.png']}') center / cover no-repeat fixed;
+">
+
+
+	<div class="header">
+
+		<div></div>
+
+		<div class="header-content">
+			<h1>
+				<ui:insert name="title">
+                Painel
+            </ui:insert>
+			</h1>
+		</div>
+
+		<div class="header-actions">
+
+			<span class="user-info"> 
+				<ui:insert name="username">
+	                Usuário
+	            </ui:insert>
+			</span>
+
+			<!-- BOTÕES -->
+			<ui:insert name="button-1" />
+			<ui:insert name="button-2" />
+
+		</div>
+	</div>
+	
+	<div class="description-div">
+		<h:panelGroup id="summaryPanel" layout="block" styleClass="summary-box">
+			<ui:insert name="description" />
+		</h:panelGroup>
+	</div>
+
+	<div class="page-container">
+		<ui:insert name="corpo"></ui:insert>
+	</div>
+
+	<h:panelGroup layout="block" styleClass="footer">
+		<div>
+			<div class="container">
+				<p>
+					Feito por <strong>Michelle Cristina Gomes</strong>
+				</p>
+				<p>Email: gmichele498@gmail.com</p>
+				<p class="icons-contact">
+					<a href="https://www.linkedin.com/in/michelleGomes85/"
+						target="_blank"> <i class="fab fa-linkedin"></i>
+					</a> | <a href="https://github.com/michelleGomes85" target="_blank">
+						<i class="fab fa-github"></i>
+					</a>
+				</p>
+				<p class="footer-text">Feito para a disciplina de Serviços de
+					Suporte a Aplicações Distribuídas, graduação em Tecnologia em
+					Sistemas para Internet.</p>
+			</div>
+		</div>
+	</h:panelGroup>
+
+</h:body>
+</html>

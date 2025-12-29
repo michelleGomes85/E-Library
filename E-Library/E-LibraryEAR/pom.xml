@@ -1,0 +1,67 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  
+  <modelVersion>4.0.0</modelVersion>
+  
+  <parent>
+    <groupId>br.elibrary</groupId>
+    <artifactId>E-Library</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+  </parent>
+  
+  <artifactId>E-LibraryEAR</artifactId>
+  <packaging>ear</packaging>
+  
+  <dependencies>
+  
+        <dependency>
+            <groupId>br.elibrary</groupId>
+            <artifactId>E-LibraryCore</artifactId>
+            <version>${project.version}</version>
+            <type>ejb</type>
+        </dependency>
+        
+        <dependency>
+            <groupId>br.elibrary</groupId>
+            <artifactId>E-LibraryWeb</artifactId>
+            <version>${project.version}</version>
+            <type>war</type>
+        </dependency>
+        
+        <dependency>
+            <groupId>br.elibrary</groupId>
+            <artifactId>E-LibraryAPI</artifactId>
+            <version>${project.version}</version>
+            <type>war</type>
+        </dependency>
+        
+    </dependencies>
+    
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-ear-plugin</artifactId>
+                <configuration>
+                    <version>8</version> <defaultLibBundleDir>lib</defaultLibBundleDir>
+                    <modules>
+                        <ejbModule>
+                            <groupId>br.elibrary</groupId>
+                            <artifactId>E-LibraryCore</artifactId>
+                        </ejbModule>
+                        <webModule>
+                            <groupId>br.elibrary</groupId>
+                            <artifactId>E-LibraryWeb</artifactId>
+                            <contextRoot>/E-LibraryWeb</contextRoot>
+                        </webModule>
+                        <webModule>
+                            <groupId>br.elibrary</groupId>
+                            <artifactId>E-LibraryAPI</artifactId>
+                            <contextRoot>/E-LibraryAPI</contextRoot>
+                        </webModule>
+                    </modules>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+    
+</project>

@@ -1,0 +1,17 @@
+/home/michelle/eclipse-workspace/ProjectELibrary/ProjetoWebMaven/E-Library/E-LibraryClient/ejbModule/br/elibrary/model/enuns/LoanStatus.java
+/home/michelle/eclipse-workspace/ProjectELibrary/ProjetoWebMaven/E-Library/E-LibraryClient/ejbModule/br/elibrary/model/enuns/UserType.java
+/home/michelle/eclipse-workspace/ProjectELibrary/ProjetoWebMaven/E-Library/E-LibraryClient/ejbModule/br/elibrary/model/enuns/CopyStatus.java
+/home/michelle/eclipse-workspace/ProjectELibrary/ProjetoWebMaven/E-Library/E-LibraryClient/ejbModule/br/elibrary/service/UserSessionService.java
+/home/michelle/eclipse-workspace/ProjectELibrary/ProjetoWebMaven/E-Library/E-LibraryClient/ejbModule/br/elibrary/dto/BookDTO.java
+/home/michelle/eclipse-workspace/ProjectELibrary/ProjetoWebMaven/E-Library/E-LibraryClient/ejbModule/br/elibrary/service/UserSessionServiceLocal.java
+/home/michelle/eclipse-workspace/ProjectELibrary/ProjetoWebMaven/E-Library/E-LibraryClient/ejbModule/br/elibrary/dto/CategoryDTO.java
+/home/michelle/eclipse-workspace/ProjectELibrary/ProjetoWebMaven/E-Library/E-LibraryClient/ejbModule/br/elibrary/service/LibraryServiceTest.java
+/home/michelle/eclipse-workspace/ProjectELibrary/ProjetoWebMaven/E-Library/E-LibraryClient/ejbModule/br/elibrary/model/enuns/Rules.java
+/home/michelle/eclipse-workspace/ProjectELibrary/ProjetoWebMaven/E-Library/E-LibraryClient/ejbModule/br/elibrary/service/CategoryService.java
+/home/michelle/eclipse-workspace/ProjectELibrary/ProjetoWebMaven/E-Library/E-LibraryClient/ejbModule/br/elibrary/service/CopyService.java
+/home/michelle/eclipse-workspace/ProjectELibrary/ProjetoWebMaven/E-Library/E-LibraryClient/ejbModule/br/elibrary/service/CatalogStatusService.java
+/home/michelle/eclipse-workspace/ProjectELibrary/ProjetoWebMaven/E-Library/E-LibraryClient/ejbModule/br/elibrary/dto/CopyDTO.java
+/home/michelle/eclipse-workspace/ProjectELibrary/ProjetoWebMaven/E-Library/E-LibraryClient/ejbModule/br/elibrary/service/UserService.java
+/home/michelle/eclipse-workspace/ProjectELibrary/ProjetoWebMaven/E-Library/E-LibraryClient/ejbModule/br/elibrary/dto/LoanDTO.java
+/home/michelle/eclipse-workspace/ProjectELibrary/ProjetoWebMaven/E-Library/E-LibraryClient/ejbModule/br/elibrary/dto/UserDTO.java
+/home/michelle/eclipse-workspace/ProjectELibrary/ProjetoWebMaven/E-Library/E-LibraryClient/ejbModule/br/elibrary/service/BookService.java

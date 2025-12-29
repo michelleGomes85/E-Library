@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html 	xmlns="http://www.w3.org/1999/xhtml"
+	  	xmlns:h="http://xmlns.jcp.org/jsf/html"
+		xmlns:f="http://xmlns.jcp.org/jsf/core"
+		xmlns:p="http://primefaces.org/ui"
+		xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+<ui:composition template="/template/_template.xhtml">
+
+	<ui:define name="head">
+		<h:outputStylesheet name="css/header.css" />
+		<h:outputStylesheet name="css/admin-dashboard.css" />
+		<h:outputStylesheet name="css/crud-table.css" />
+	</ui:define>
+
+	<ui:define name="button-1">
+		<div class="header-actions">
+			<h:form id="navForm" styleClass="inline-form">
+				<p:button value="← Voltar" outcome="/admin/index.html"
+					title="Retornar ao Painel do Administrador"
+					styleClass="btn-outline" />
+
+				<p:commandButton value="Sair" action="#{loginBean.doLogout}"
+					icon="pi pi-sign-out" styleClass="btn-logout" ajax="true"
+					update="@form" title="Encerrar sessão" />
+			</h:form>
+		</div>
+	</ui:define>
+
+	<ui:define name="title">
+		<h1 class="page-title">Gerenciamento de Categorias</h1>
+	</ui:define>
+
+	<ui:define name="description">
+		<p class="page-description">Crie, edite e exclua categorias do
+			catálogo.</p>
+	</ui:define>
+
+	<ui:define name="corpo">
+		<h:form id="categoryForm">
+			<p:growl id="messages" showDetail="true" autoUpdate="true" />
+
+			<p:toolbar>
+				<p:toolbarGroup>
+					<p:commandButton value="Nova Categoria" icon="pi pi-plus"
+						actionListener="#{categoryBean.openNew}"
+						oncomplete="PF('manageCategoryDialog').show()"
+						update=":dialogs:categoryDialog" styleClass="btn-primary">
+						<p:resetInput target=":dialogs:categoryDialog" />
+					</p:commandButton>
+				</p:toolbarGroup>
+			</p:toolbar>
+
+			<p:dataTable id="dt-categories" var="cat"
+				value="#{categoryBean.categories}" paginator="true" rows="10"
+				paginatorPosition="bottom" rowsPerPageTemplate="5,10,20"
+				emptyMessage="Nenhuma categoria encontrada." styleClass="book-table"
+				rowKey="#{cat.id}">
+
+				<f:facet name="header">
+					<span class="table-title">Categorias Cadastradas</span>
+				</f:facet>
+
+				<p:column headerText="Nome" sortBy="#{cat.name}"
+					filterBy="#{cat.name}" filterMatchMode="contains">
+					<h:outputText value="#{cat.name}" />
+				</p:column>
+
+				<p:column headerText="Ações" style="width:100px;">
+					<p:commandButton icon="pi pi-pencil" title="Editar"
+						styleClass="btn-secondary btn-sm"
+						action="#{categoryBean.edit(cat)}"
+						oncomplete="PF('manageCategoryDialog').show()"
+						update=":dialogs:categoryDialog" />
+
+					<p:commandButton icon="pi pi-trash" title="Excluir"
+						styleClass="btn-danger btn-sm"
+						action="#{categoryBean.confirmDelete(cat)}"
+						oncomplete="PF('deleteCategoryDialog').show()" />
+				</p:column>
+			</p:dataTable>
+		</h:form>
+
+		<h:form id="dialogs">
+			<p:dialog id="categoryDialog"
+				header="#{categoryBean.editMode ? 'Editar Categoria' : 'Nova Categoria'}"
+				widgetVar="manageCategoryDialog" modal="true" resizable="false"
+				showEffect="fade" width="400">
+				<div class="form-card">
+					<div class="field-group">
+						<div class="field">
+							<label class="field-label">Nome *</label>
+							<div class="field-input">
+								<p:inputText id="name" value="#{categoryBean.category.name}"
+									required="true" />
+								<p:message for="name" display="icon" />
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<f:facet name="footer">
+					<p:commandButton value="Salvar" icon="pi pi-check"
+						action="#{categoryBean.save}"
+						update=":categoryForm:messages :categoryForm:dt-categories"
+						styleClass="btn-primary" />
+
+					<p:commandButton value="Cancelar" type="button" icon="pi pi-times"
+						onclick="PF('manageCategoryDialog').hide()"
+						styleClass="btn-secondary" />
+				</f:facet>
+			</p:dialog>
+		</h:form>
+
+		<h:form id="deleteForm">
+			<p:confirmDialog widgetVar="deleteCategoryDialog"
+				message="Tem certeza que deseja excluir a categoria '#{categoryBean.selectedCategory.name}'?"
+				header="Confirmar exclusão" severity="warn">
+
+				<p:commandButton value="Sim" icon="pi pi-check"
+					action="#{categoryBean.delete}"
+					update=":categoryForm:messages :categoryForm:dt-categories"
+					styleClass="btn-danger" />
+
+				<p:commandButton value="Não" type="button" icon="pi pi-times"
+					onclick="PF('deleteCategoryDialog').hide()"
+					styleClass="btn-secondary" />
+			</p:confirmDialog>
+		</h:form>
+	</ui:define>
+
+</ui:composition>
+</html>
