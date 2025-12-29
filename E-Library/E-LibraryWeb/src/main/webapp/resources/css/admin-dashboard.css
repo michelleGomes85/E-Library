@@ -56,9 +56,7 @@
 	padding: 0 1.75rem 1.75rem;
 }
 
-.card-actions .ui-button,
-.card-actions button,
-.card-actions a {
+.card-actions .ui-button, .card-actions button, .card-actions a {
 	background: #00335b;
 	border: 1px solid #1f2937;
 	color: #e5e7eb;
@@ -69,9 +67,8 @@
 	transition: background-color 0.15s ease, border-color 0.15s ease;
 }
 
-.card-actions .ui-button:hover,
-.card-actions button:hover,
-.card-actions a:hover {
+.card-actions .ui-button:hover, .card-actions button:hover,
+	.card-actions a:hover {
 	background: #2664ec;
 	border-color: #334155;
 }
@@ -91,7 +88,11 @@ body .ui-button:hover {
 	border-color: #334155;
 }
 
-@media (max-width: 700px) {
+body .ui-selectcheckboxmenu .ui-selectcheckboxmenu-label-container .ui-selectcheckboxmenu-label {
+	color: #495057 !important;
+}
+
+@media ( max-width : 700px) {
 	.card-grid {
 		grid-template-columns: 1fr;
 	}

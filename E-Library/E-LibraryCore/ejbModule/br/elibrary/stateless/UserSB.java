@@ -71,6 +71,9 @@ public class UserSB implements UserService {
 			String hashed = BCrypt.hashpw(dto.getPassword(), BCrypt.gensalt());
 			existing.setPasswordHash(hashed);
 		}
+		
+		em.flush();          
+	    em.refresh(existing);
 
 		return UserMapper.toDTO(existing);
 	}
@@ -79,6 +82,7 @@ public class UserSB implements UserService {
 	public void delete(UserDTO dto) {
 		if (dto != null && dto.getId() != null) {
 			deleteById(dto.getId());
+			em.flush();
 		}
 	}
 

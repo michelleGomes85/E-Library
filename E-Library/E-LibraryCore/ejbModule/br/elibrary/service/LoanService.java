@@ -15,4 +15,6 @@ public interface LoanService {
     List<Loan> findActiveLoansByUser(Long userId);
     
     Loan findActiveLoanByCopyId(Long copyId);
+    
+    boolean hasActiveLoan(Long copyId);
 }

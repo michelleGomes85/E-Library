@@ -18,7 +18,6 @@ import br.elibrary.model.enuns.LoanStatus;
 import br.elibrary.service.CatalogStatusService;
 import br.elibrary.service.LoanService;
 import br.elibrary.service.UserSessionService;
-import br.elibrary.service.UserSessionServiceLocal;
 import jakarta.ejb.EJB;
 import jakarta.ejb.Remove;
 import jakarta.ejb.Stateful;
@@ -26,7 +25,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 
 @Stateful
-public class UserSessionSB implements UserSessionService, UserSessionServiceLocal {
+public class UserSessionSB implements UserSessionService {
 
 	@PersistenceContext(unitName = "E-Library")
 	private EntityManager em;
@@ -77,7 +76,7 @@ public class UserSessionSB implements UserSessionService, UserSessionServiceLoca
 
 		Copy copy = em.find(Copy.class, copyId);
 
-		if (copy == null || copy.getStatus() != CopyStatus.AVAILABLE)
+		if (copy == null || copy.getStatus() != CopyStatus.RESERVED)
 			return false;
 
 		Loan loan = new Loan();

@@ -28,12 +28,17 @@
 		</div>
 	</ui:define>
 
+	<ui:define name="username">
+		<strong>#{sessionBean.loggedUser.name}</strong>
+	</ui:define>
+
 	<ui:define name="title">
 		<h1 class="page-title">Gerenciamento de Usuários</h1>
 	</ui:define>
 
 	<ui:define name="description">
-		<p class="page-description">Crie, edite, consulte e exclua usuários do sistema.</p>
+		<p class="page-description">Crie, edite, consulte e exclua
+			usuários do sistema.</p>
 	</ui:define>
 
 	<ui:define name="corpo">

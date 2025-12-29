@@ -83,8 +83,7 @@ public class CopyBean implements Serializable {
                 addMessage(FacesMessage.SEVERITY_INFO, "Sucesso", "Exemplar atualizado com sucesso!");
             } else {
                 copy = copyService.create(copy);
-                addMessage(FacesMessage.SEVERITY_INFO, "Sucesso", 
-                    "Exemplar '" + copy.getInternalCode() + "' cadastrado com sucesso!");
+                addMessage(FacesMessage.SEVERITY_INFO, "Sucesso", "Exemplar '" + copy.getInternalCode() + "' cadastrado com sucesso!");
             }
 
             loadCopies();
@@ -92,7 +91,6 @@ public class CopyBean implements Serializable {
             PrimeFaces.current().executeScript("PF('manageCopyDialog').hide();");
 
         } catch (Exception e) {
-            e.printStackTrace();
             addMessage(FacesMessage.SEVERITY_ERROR, "Erro", "Erro ao salvar exemplar: " + e.getMessage());
         }
     }
@@ -134,7 +132,6 @@ public class CopyBean implements Serializable {
             PrimeFaces.current().executeScript("PF('deleteCopyDialog').hide();");
 
         } catch (Exception e) {
-            e.printStackTrace();
             addMessage(FacesMessage.SEVERITY_ERROR, "Erro", "Erro ao excluir exemplar: " + e.getMessage());
         }
     }

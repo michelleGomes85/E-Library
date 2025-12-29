@@ -28,17 +28,21 @@
 		</div>
 	</ui:define>
 
+	<ui:define name="username">
+		<strong>#{sessionBean.loggedUser.name}</strong>
+	</ui:define>
+
 	<ui:define name="title">
 		<h1 class="page-title">Gerenciamento de Exemplares</h1>
 	</ui:define>
-	
+
 	<ui:define name="description">
 		<p class="page-description">Crie, edite, consulte e exclua livros
-				do catálogo.</p>
+			do catálogo.</p>
 	</ui:define>
 
 	<ui:define name="corpo">
-		 <h:form id="copyForm">
+		<h:form id="copyForm">
 
 			<p:growl id="messages" showDetail="true" autoUpdate="true" />
 
@@ -77,11 +81,11 @@
 
 				<p:column headerText="Status" sortBy="#{copy.status}"
 					filterBy="#{copy.status}" filterMatchMode="contains">
-					<h:outputText value="#{copy.status}" />
+					<h:outputText value="#{copy.status.label}" />
 				</p:column>
 
 				<p:column headerText="Ações" exportable="false" style="width:120px;">
-				
+
 					<p:commandButton icon="pi pi-pencil" title="Editar"
 						styleClass="btn-secondary btn-sm" action="#{copyBean.edit(copy)}"
 						oncomplete="PF('manageCopyDialog').show()"

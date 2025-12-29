@@ -85,8 +85,7 @@ public class BookBean implements Serializable {
 			PrimeFaces.current().executeScript("PF('manageBookDialog').hide();");
 
 		} catch (Exception e) {
-			e.printStackTrace();
-			addMessage(FacesMessage.SEVERITY_ERROR, "Erro", "Erro ao salvar livro. Verifique os dados e tente novamente.");
+			addMessage(FacesMessage.SEVERITY_ERROR, "Erro", e.getMessage());
 		}
 	}
 
@@ -103,7 +102,6 @@ public class BookBean implements Serializable {
 			PrimeFaces.current().executeScript("PF('deleteBookDialog').hide();");
 
 		} catch (Exception e) {
-			e.printStackTrace();
 			addMessage(FacesMessage.SEVERITY_ERROR, "Erro", "Erro ao excluir livro: " + e.getMessage());
 		}
 	}

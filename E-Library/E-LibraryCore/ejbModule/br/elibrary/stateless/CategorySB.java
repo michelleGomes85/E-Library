@@ -41,6 +41,9 @@ public class CategorySB implements CategoryService {
 			throw new IllegalArgumentException("Categoria não encontrada.");
 
 		existing.setName(dto.getName());
+		
+		em.flush();          
+	    em.refresh(existing);
 
 		return CategoryMapper.toDTO(existing);
 	}
@@ -55,8 +58,11 @@ public class CategorySB implements CategoryService {
 	@Override
 	public void deleteById(Long id) {
 		Category category = em.find(Category.class, id);
-		if (category != null)
+		if (category != null) {
 			em.remove(category);
+			em.flush();
+		}
+			
 	}
 
 	@Override

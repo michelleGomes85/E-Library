@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 import br.elibrary.dto.UserDTO;
 import br.elibrary.model.enuns.Rules;
-import br.elibrary.service.UserSessionServiceLocal;
+import br.elibrary.service.UserSessionService;
 import jakarta.ejb.EJB;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.faces.application.FacesMessage;
@@ -19,7 +19,7 @@ public class LoginBean implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @EJB
-    private UserSessionServiceLocal userSession;
+    private UserSessionService userSession;
 
     @Inject
     private UserSessionBean sessionBean;
@@ -28,6 +28,7 @@ public class LoginBean implements Serializable {
     private String password;
 
     public void doLogin() {
+    	
         try {
             boolean ok = userSession.login(registration, password);
 
@@ -65,9 +66,8 @@ public class LoginBean implements Serializable {
     public String doLogout() {
 
         try {
-            if (sessionBean.getUserStateful() != null) {
+            if (sessionBean.getUserStateful() != null)
                 sessionBean.getUserStateful().logout();
-            }
         } catch (Exception ignore) {}
 
         sessionBean.setLoggedUser(null);

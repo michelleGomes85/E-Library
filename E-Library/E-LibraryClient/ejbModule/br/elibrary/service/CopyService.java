@@ -13,6 +13,8 @@ public interface CopyService {
     
     CopyDTO update(CopyDTO copy);
     
+    CopyDTO updateStatus(Long id, CopyStatus newStatus);
+    
     void delete(CopyDTO copy);
     
     void deleteById(Long id);

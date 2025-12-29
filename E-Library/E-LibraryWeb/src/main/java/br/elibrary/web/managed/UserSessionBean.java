@@ -4,7 +4,6 @@ import java.io.Serializable;
 
 import br.elibrary.dto.UserDTO;
 import br.elibrary.service.UserSessionService;
-import br.elibrary.service.UserSessionServiceLocal;
 import jakarta.enterprise.context.SessionScoped;
 import jakarta.inject.Named;
 
@@ -16,7 +15,7 @@ public class UserSessionBean implements Serializable {
 
     private UserDTO loggedUser;
     
-    private UserSessionServiceLocal userStateful;
+    private UserSessionService userStateful;
 
     public UserDTO getLoggedUser() {
         return loggedUser;
@@ -34,7 +33,7 @@ public class UserSessionBean implements Serializable {
         return userStateful;
     }
 
-    public void setUserStateful(UserSessionServiceLocal userStateful) {
+    public void setUserStateful(UserSessionService userStateful) {
         this.userStateful = userStateful;
     }
 }

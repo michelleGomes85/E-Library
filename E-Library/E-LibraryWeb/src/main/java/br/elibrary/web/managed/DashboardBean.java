@@ -9,8 +9,11 @@ import org.primefaces.PrimeFaces;
 import br.elibrary.dto.BookDTO;
 import br.elibrary.dto.CopyDTO;
 import br.elibrary.dto.LoanDTO;
+import br.elibrary.exception.BusinessException;
+import br.elibrary.model.enuns.CopyStatus;
 import br.elibrary.service.BookService;
 import br.elibrary.service.CatalogStatusService;
+import br.elibrary.service.CopyService;
 import br.elibrary.service.UserSessionService;
 import jakarta.annotation.PostConstruct;
 import jakarta.ejb.EJB;
@@ -31,6 +34,9 @@ public class DashboardBean implements Serializable {
 
 	@EJB
 	private CatalogStatusService catalogStatusSB;
+
+	@EJB
+	private CopyService copyService;
 
 	@Inject
 	private UserSessionBean sessionBean;
@@ -74,39 +80,50 @@ public class DashboardBean implements Serializable {
 
 	public void borrow(BookDTO book) {
 		
-		CopyDTO availableCopy = bookService.findFirstAvailableCopy(book.getId());
-		
-		if (availableCopy == null) {
-			addMessage(FacesMessage.SEVERITY_ERROR, "Erro", "Nenhuma cópia disponível.");
+		try {
+			CopyDTO availableCopy = bookService.findFirstAvailableCopy(book.getId());
+
+			if (availableCopy == null) {
+				addMessage(FacesMessage.SEVERITY_ERROR, "Erro", "Nenhuma cópia disponível.");
+				return;
+			}
+
+			copyService.updateStatus(availableCopy.getId(), CopyStatus.RESERVED);
+
+			boolean success = getUserSession().borrowCopy(availableCopy.getId());
+
+			if (success) {
+				refresh();
+				addMessage(FacesMessage.SEVERITY_INFO, "Sucesso",
+						String.format("Aproveite o livro: %s, e explore outros títulos!", book.getTitle()));
+				PrimeFaces.current().executeScript("PF('borrowSuccessDialog').show();");
+			} else {
+				addMessage(FacesMessage.SEVERITY_ERROR, "Erro", "Falha ao emprestar.");
+			}
+		} catch (BusinessException e) {
+			refresh();
+			addMessage(FacesMessage.SEVERITY_ERROR, "Inconsistência Detectada", 
+		            "O status deste livro foi alterado recentemente. A lista foi atualizada.");
+		} catch (Exception e) {
+	        addMessage(FacesMessage.SEVERITY_ERROR, "Erro Crítico", "Erro ao processar: " + e.getMessage());
+	    }
+	}
+
+	public void returnCopy(LoanDTO loan) {
+
+		if (loan == null || loan.getCopyId() == null) {
+			addMessage(FacesMessage.SEVERITY_ERROR, "Erro", "Cópia inválida.");
 			return;
 		}
 
-		boolean success = getUserSession().borrowCopy(availableCopy.getId());
+		boolean success = getUserSession().returnCopy(loan.getCopyId());
 
 		if (success) {
 			refresh();
-			addMessage(FacesMessage.SEVERITY_INFO, "Sucesso", String.format("Aproveite o livro: %s, e explore outros títulos!", book.getTitle()));
-			PrimeFaces.current().executeScript("PF('borrowSuccessDialog').show();");
-		} else {
-			addMessage(FacesMessage.SEVERITY_ERROR, "Erro", "Falha ao emprestar.");
-		}
+			addMessage(FacesMessage.SEVERITY_INFO, "Sucesso", "Livro devolvido!");
+		} else
+			addMessage(FacesMessage.SEVERITY_ERROR, "Erro", "Falha ao devolver.");
 	}
-
-    public void returnCopy(LoanDTO loan) {
-    	
-        if (loan == null || loan.getCopyId() == null) {
-            addMessage(FacesMessage.SEVERITY_ERROR, "Erro", "Cópia inválida.");
-            return;
-        }
-        
-        boolean success = getUserSession().returnCopy(loan.getCopyId());
-        
-        if (success) {
-            refresh();
-            addMessage(FacesMessage.SEVERITY_INFO, "Sucesso", "Livro devolvido!");
-        } else
-            addMessage(FacesMessage.SEVERITY_ERROR, "Erro", "Falha ao devolver.");
-    }
 
 	public void selectBook(BookDTO book, int total, int available) {
 		this.selectedBook = bookService.findById(book.getId());
@@ -115,13 +132,13 @@ public class DashboardBean implements Serializable {
 	}
 
 	public List<String> getBookCategories() {
-        
+
 		if (selectedBook == null || selectedBook.getCategoryIds() == null) {
-            return List.of();
-        }
-        
-        return selectedBook.getCategoryNameList();
-    }
+			return List.of();
+		}
+
+		return selectedBook.getCategoryNameList();
+	}
 
 	public List<Object[]> getBooksWithAvailableCount() {
 		return booksWithAvailableCount;
