@@ -18,6 +18,8 @@ public class BookDTO implements Serializable {
 	private List<Long> categoryIds = new ArrayList<>();
 	
 	private List<String> categoryNameList = new ArrayList<>();
+	
+	private List<CopyDTO> copies = new ArrayList<>();
 
 	private Integer totalCopies;
 	private Integer availableCopies;
@@ -100,5 +102,13 @@ public class BookDTO implements Serializable {
 
 	public void setAvailableCopies(Integer availableCopies) {
 		this.availableCopies = availableCopies;
+	}
+	
+	public List<CopyDTO> getCopies() {
+	    return copies;
+	}
+
+	public void setCopies(List<CopyDTO> copies) {
+	    this.copies = copies;
 	}
 }

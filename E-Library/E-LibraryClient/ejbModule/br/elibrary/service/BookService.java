@@ -16,6 +16,8 @@ public interface BookService {
 	void delete(BookDTO book);
 
 	BookDTO findById(Long id);
+	
+	BookDTO findByIsbn(String isbn);
 
 	List<BookDTO> findAll();
 
@@ -28,4 +30,6 @@ public interface BookService {
 	List<Object[]> findUnavailableBooksWithStats();
 	
 	List<BookDTO> findByAuthorOrCategory(String author, String categoryName);
+	
+	List<BookDTO> findAvailableBooks(String author, String status);
 }

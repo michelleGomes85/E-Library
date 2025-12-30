@@ -1,13 +1,21 @@
 package br.elibrary.stateless;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
+import br.elibrary.dto.BookDTO;
+import br.elibrary.dto.CopyDTO;
+import br.elibrary.dto.LoanDTO;
+import br.elibrary.mapper.BookMapper;
+import br.elibrary.mapper.CopyMapper;
+import br.elibrary.mapper.LoanMapper;
 import br.elibrary.model.Book;
 import br.elibrary.model.Copy;
 import br.elibrary.model.Loan;
 import br.elibrary.model.enuns.CopyStatus;
 import br.elibrary.model.enuns.LoanStatus;
 import br.elibrary.service.LoanService;
+import br.elibrary.service.internal.LoanInternalService;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -17,107 +25,146 @@ import jakarta.persistence.PersistenceContext;
  * Empréstimos.
  */
 @Stateless
-public class LoanSB implements LoanService {
+public class LoanSB implements LoanService, LoanInternalService {
 
-	@PersistenceContext(unitName = "E-Library")
-	private EntityManager em;
+    @PersistenceContext(unitName = "E-Library")
+    private EntityManager em;
 
-	/**
-	 * Busca todos os exemplares (objetos Copy) que estão atualmente com o usuário.
-	 * 
-	 * @param userId ID do usuário logado.
-	 * @return Lista de exemplares cujo empréstimo associado está ATIVO.
-	 */
-	@Override
-	public List<Copy> findBorrowedCopiesByUser(Long userId) {
+    /**
+     * Busca todos os exemplares (Copy) atualmente emprestados a um usuário.
+     */
+    @Override
+    public List<CopyDTO> findBorrowedCopiesByUser(Long userId) {
 
-		if (userId == null) {
-			return List.of();
-		}
-		String jpql = """
-				SELECT l.copy
-				FROM Loan l
-				WHERE l.user.id = :userId
-				  AND l.status = :activeStatus
-				""";
-		return em.createQuery(jpql, Copy.class).setParameter("userId", userId)
-				.setParameter("activeStatus", LoanStatus.ACTIVE).getResultList();
-	}
+        if (userId == null) {
+            return List.of();
+        }
 
-	/**
-	 * Retorna uma lista de livros que não possuem nenhuma cópia disponível no
-	 * momento.
-	 * 
-	 * Utilizado para alimentar a lista de "Indisponíveis" ou para listas de espera.
-	 */
-	@Override
-	public List<Book> findBooksWithNoAvailableCopies() {
-		String jpql = """
-				SELECT b
-				FROM Book b
-				WHERE (
-				    SELECT COUNT(c)
-				    FROM Copy c
-				    WHERE c.book = b AND c.status = :available
-				) = 0
-				ORDER BY b.title
-				""";
+        String jpql = """
+            SELECT l.copy
+            FROM Loan l
+            JOIN FETCH l.copy
+            JOIN FETCH l.copy.book
+            WHERE l.user.id = :userId
+              AND l.status = :activeStatus
+        """;
 
-		return em.createQuery(jpql, Book.class).setParameter("available", CopyStatus.AVAILABLE).getResultList();
-	}
+        List<Copy> copies = em.createQuery(jpql, Copy.class)
+                .setParameter("userId", userId)
+                .setParameter("activeStatus", LoanStatus.ACTIVE)
+                .getResultList();
 
-	/**
-	 * Recupera os registros completos de Empréstimo (Loan) de um usuário.
-	 * 
-	 * Diferente do findBorrowedCopies, este retorna as datas e prazos (objeto
-	 * Loan).
-	 */
-	@Override
-	public List<Loan> findActiveLoansByUser(Long userId) {
+        return copies.stream()
+                .map(CopyMapper::toDTO)
+                .collect(Collectors.toList());
+    }
 
-		if (userId == null) {
-			return List.of();
-		}
+    /**
+     * Retorna uma lista de livros que não possuem nenhuma cópia disponível.
+     */
+    @Override
+    public List<BookDTO> findBooksWithNoAvailableCopies() {
 
-		return em.createQuery("SELECT l FROM Loan l WHERE l.user.id = :userId AND l.status = :status", Loan.class)
-				.setParameter("userId", userId).setParameter("status", LoanStatus.ACTIVE).getResultList();
-	}
+        String jpql = """
+            SELECT DISTINCT b
+            FROM Book b
+            LEFT JOIN FETCH b.copies
+            WHERE (
+                SELECT COUNT(c)
+                FROM Copy c
+                WHERE c.book = b
+                  AND c.status = :available
+            ) = 0
+            ORDER BY b.title
+        """;
 
-	/**
-	 * Localiza o registro de empréstimo ativo associado a uma cópia específica.
-	 * 
-	 * Essencial para o processo de devolução:
-	 * 
-	 * a partir da cópia, encontra-se o contrato de empréstimo.
-	 */
-	@Override
-	public Loan findActiveLoanByCopyId(Long copyId) {
+        List<Book> books = em.createQuery(jpql, Book.class)
+                .setParameter("available", CopyStatus.AVAILABLE)
+                .getResultList();
 
-		if (copyId == null)
-			return null;
+        return books.stream()
+                .map(BookMapper::toDTO)
+                .collect(Collectors.toList());
+    }
 
-		return em.createQuery("SELECT l FROM Loan l WHERE l.copy.id = :copyId AND l.status = :status", Loan.class)
-				.setParameter("copyId", copyId).setParameter("status", LoanStatus.ACTIVE).getResultStream().findFirst()
-				.orElse(null);
-	}
+    /**
+     * Recupera os empréstimos ativos de um usuário.
+     */
+    @Override
+    public List<LoanDTO> findActiveLoansByUser(Long userId) {
 
-	/**
-	 * Verifica se uma cópia específica possui um empréstimo com status ACTIVE. Este
-	 * método é vital para impedir que o administrador altere exemplares que estão
-	 * em posse de usuários. * @param copyId ID da cópia a ser verificada.
-	 * 
-	 * @return true se houver empréstimo ativo, false caso contrário.
-	 */
-	@Override
-	public boolean hasActiveLoan(Long copyId) {
+        if (userId == null) {
+            return List.of();
+        }
 
-		if (copyId == null)
-			return false;
+        String jpql = """
+            SELECT l
+            FROM Loan l
+            JOIN FETCH l.copy
+            JOIN FETCH l.copy.book
+            WHERE l.user.id = :userId
+              AND l.status = :status
+        """;
 
-		Long count = em
-				.createQuery("SELECT COUNT(l) FROM Loan l WHERE l.copy.id = :copyId AND l.status = :status", Long.class)
-				.setParameter("copyId", copyId).setParameter("status", LoanStatus.ACTIVE).getSingleResult();
+        List<Loan> loans = em.createQuery(jpql, Loan.class)
+                .setParameter("userId", userId)
+                .setParameter("status", LoanStatus.ACTIVE)
+                .getResultList();
 
-		return count > 0;
-	}
+        return loans.stream()
+                .map(LoanMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Localiza o empréstimo ativo associado a uma cópia específica.
+     */
+    @Override
+    public LoanDTO findActiveLoanByCopyId(Long copyId) {
+    	return LoanMapper.toDTO(findActiveLoanByCopyIdEntity(copyId));
+    }
+    
+    @Override
+    public Loan findActiveLoanByCopyIdEntity(Long copyId) {
+
+        if (copyId == null) {
+            return null;
+        }
+
+        String jpql = """
+            SELECT l
+            FROM Loan l
+            JOIN FETCH l.copy
+            JOIN FETCH l.copy.book
+            WHERE l.copy.id = :copyId
+              AND l.status = :status
+        """;
+
+        return em.createQuery(jpql, Loan.class)
+                .setParameter("copyId", copyId)
+                .setParameter("status", LoanStatus.ACTIVE)
+                .getResultStream()
+                .findFirst()
+                .orElse(null);
+    }
+
+    /**
+     * Verifica se uma cópia possui empréstimo ativo.
+     */
+    @Override
+    public boolean hasActiveLoan(Long copyId) {
+
+        if (copyId == null) {
+            return false;
+        }
+
+        Long count = em.createQuery(
+                "SELECT COUNT(l) FROM Loan l WHERE l.copy.id = :copyId AND l.status = :status",
+                Long.class)
+            .setParameter("copyId", copyId)
+            .setParameter("status", LoanStatus.ACTIVE)
+            .getSingleResult();
+
+        return count > 0;
+    }
 }

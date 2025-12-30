@@ -2,8 +2,11 @@ package br.elibrary.graphql.dto;
 
 public record LoanDTO(
     Long id,
-    String loanDate,
-    String expectedReturnDate,
+    String issueDate,
+    String dueDate,
     String returnDate,
-    CopyDTO copy
+    String status,
+    String bookTitle,
+    Long copyId,
+    String copyInternalCode
 ) {}

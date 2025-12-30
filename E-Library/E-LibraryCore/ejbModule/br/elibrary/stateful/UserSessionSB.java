@@ -2,13 +2,11 @@ package br.elibrary.stateful;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.mindrot.jbcrypt.BCrypt;
 
 import br.elibrary.dto.LoanDTO;
 import br.elibrary.dto.UserDTO;
-import br.elibrary.mapper.LoanMapper;
 import br.elibrary.mapper.UserMapper;
 import br.elibrary.model.Copy;
 import br.elibrary.model.Loan;
@@ -18,6 +16,7 @@ import br.elibrary.model.enuns.LoanStatus;
 import br.elibrary.service.CatalogStatusService;
 import br.elibrary.service.LoanService;
 import br.elibrary.service.UserSessionService;
+import br.elibrary.service.internal.LoanInternalService;
 import jakarta.ejb.EJB;
 import jakarta.ejb.Remove;
 import jakarta.ejb.Stateful;
@@ -37,7 +36,10 @@ public class UserSessionSB implements UserSessionService {
 
 	@EJB
 	private LoanService loanSB;
-
+	
+	@EJB
+	private LoanInternalService loanSBInternal;
+	
 	@Override
 	public boolean login(String registration, String passwordPlain) {
 
@@ -91,7 +93,7 @@ public class UserSessionSB implements UserSessionService {
 
 		copy.setStatus(CopyStatus.BORROWED);
 
-		catalogStatusSB.onCopyStatusChanged(CopyStatus.AVAILABLE, CopyStatus.BORROWED);
+		catalogStatusSB.onCopyStatusChanged(CopyStatus.RESERVED, CopyStatus.BORROWED);
 
 		return true;
 	}
@@ -108,7 +110,8 @@ public class UserSessionSB implements UserSessionService {
 			return false;
 		}
 
-		Loan activeLoan = loanSB.findActiveLoanByCopyId(copyId);
+		Loan activeLoan = loanSBInternal.findActiveLoanByCopyIdEntity(copyId);
+		
 		if (activeLoan == null) {
 			copy.setStatus(CopyStatus.AVAILABLE);
 			return false;
@@ -117,6 +120,9 @@ public class UserSessionSB implements UserSessionService {
 		activeLoan.setReturnDate(LocalDate.now());
 		activeLoan.setStatus(LoanStatus.RETURNED);
 		copy.setStatus(CopyStatus.AVAILABLE);
+		
+		em.flush();
+		em.refresh(copy);
 
 		catalogStatusSB.onCopyStatusChanged(CopyStatus.BORROWED, CopyStatus.AVAILABLE);
 
@@ -129,7 +135,8 @@ public class UserSessionSB implements UserSessionService {
 		if (currentUser == null)
 			return List.of();
 
-		List<Loan> loans = loanSB.findActiveLoansByUser(currentUser.getId());
-		return loans.stream().map(LoanMapper::toDTO).collect(Collectors.toList());
+		List<LoanDTO> loans = loanSB.findActiveLoansByUser(currentUser.getId());
+		
+		return loans;
 	}
 }

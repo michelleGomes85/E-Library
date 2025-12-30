@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.List;
 
 import br.elibrary.dto.BookDTO;
+import br.elibrary.exception.BusinessException;
 import br.elibrary.rest.service.BookRestService;
 import br.elibrary.rest.service.CopyRestService;
 import jakarta.inject.Inject;
@@ -31,7 +32,7 @@ public class BookResource {
     private CopyRestService copyRestService;
 
     @POST
-    public Response create(
+    public Response create (
             @FormParam("titulo") String titulo,
             @FormParam("autor") String autor,
             @FormParam("isbn") String isbn,
@@ -135,5 +136,26 @@ public class BookResource {
         var dtos = copyRestService.findByBookIdAndStatus(bookId, status);
         
         return Response.ok(dtos).build();
+    }
+    
+    @GET
+    @Path("/isbn/{isbn}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getByIsbn(@PathParam("isbn") String isbn) {
+    	try {
+    		BookDTO dto = bookRestService.findByIsbn(isbn);
+            return Response.ok(dto).build();
+		} catch (BusinessException e) {
+			return Response.status(404).entity(e.getMessage()).build();
+		}
+    }
+    
+    @GET
+    @Path("/available")
+    public Response getAvailable(
+            @QueryParam("author") String author,
+            @QueryParam("status") String status) {
+        List<BookDTO> books = bookRestService.findAvailableBooks(author, status);
+        return Response.ok(books).build();
     }
 }

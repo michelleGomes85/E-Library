@@ -1,5 +1,6 @@
 package br.elibrary.service;
 
+import br.elibrary.dto.DashboardDTO;
 import br.elibrary.model.enuns.CopyStatus;
 
 public interface CatalogStatusService {
@@ -23,4 +24,6 @@ public interface CatalogStatusService {
     void onCopyDeleted(CopyStatus status);  
     
     void onBookDeleted(int totalCopies, int availableCopies);
+    
+	DashboardDTO getFullDashboard();
 }

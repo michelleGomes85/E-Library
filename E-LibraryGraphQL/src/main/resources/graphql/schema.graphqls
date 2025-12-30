@@ -25,12 +25,15 @@ type Copy {
 }
 
 type Loan {
-    id: ID!
-    loanDate: String!
-    expectedReturnDate: String!
-    returnDate: String
-    copy: Copy
+  id: ID
+  issueDate: String
+  dueDate: String
+  returnDate: String
+  status: String
+  bookTitle: String
+  copyInternalCode: String
 }
+
 
 type Dashboard {
     totalBooks: Int
