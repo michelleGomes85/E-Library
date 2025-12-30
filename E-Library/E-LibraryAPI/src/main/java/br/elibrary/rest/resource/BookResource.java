@@ -109,17 +109,20 @@ public class BookResource {
 
     @POST
     @Path("/{bookId}/exemplares")
+    @Consumes(MediaType.WILDCARD)
     public Response createCopy(@PathParam("bookId") Long bookId) {
     	
-        if (bookId == null) {
-            return Response.status(400).entity("bookId obrigatório").build();
+    	System.out.println("Recebendo requisição de exemplar para livro ID: " + bookId);
+
+        if (bookId == null || bookId <= 0) {
+            return Response.status(400).entity("bookId inválido ou ausente").build();
         }
         
         try {
             copyRestService.create(bookId);
             return Response.status(201).build();
         } catch (Exception e) {
-            return Response.status(400).entity("Erro ao criar exemplar").build();
+        	return Response.status(400).entity("Erro interno: " + e.getMessage()).build();
         }
     }
 

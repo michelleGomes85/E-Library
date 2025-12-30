@@ -1,0 +1,89 @@
+@charset "UTF-8";
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.content {
+	margin-top: 120px;
+	display: flex;
+	align-items: center;
+}
+
+.ui-card, .ui-datatable, body .ui-toolbar {
+	background: #000;
+	backdrop-filter: blur(6px);
+	border: 1px solid #334155;
+	border-radius: 12px;
+	box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+	text-align: center;
+	padding: 1rem;
+	margin-bottom: 2rem;
+	margin-top: 30px;
+	max-width: 1500px;
+	width: 90vw;
+}
+
+.ui-card-content p {
+	font-family: Poppins, sans-serif !important;
+	margin-bottom: 10px;
+	font-size: 1.1rem;
+}
+
+body .ui-widget {
+	font-family: Poppins, sans-serif !important;
+}
+
+.ui-card-content,
+.ui-card-body,
+body .ui-card,
+body .ui-toolbar,
+body .ui-datatable .ui-datatable-header,
+body .ui-paginator,
+body .ui-datatable .ui-datatable-data>tr,
+body .ui-datatable thead th {
+	background: #000;
+	color: #fff !important;
+} 
+
+body .ui-fileupload .ui-fileupload-buttonbar,
+body .ui-fileupload .ui-fileupload-content {
+	background: #000;
+	color: #fff;
+	border: none;
+}
+
+body .ui-datatable .ui-paginator.ui-paginator-bottom,
+body .ui-datatable .ui-datatable-header {
+	border: 0 none;
+}
+
+body .ui-button {
+	background: #0f172a;
+	border: 1px solid #1f2937;
+	color: #e5e7eb;
+}
+
+body .ui-datatable .ui-datatable-data>tr>td {
+	line-height: 1.8rem;
+	text-align: left;
+}
+
+body .ui-button:hover {
+	background: #2664ec;
+	border-color: #334155;
+}
+
+body .ui-button.ui-button-text-icon-left .ui-button-text {
+	padding: .9rem 2rem .9rem 3rem;
+}
+
+body .ui-button.ui-button-text-icon-left .ui-icon {
+	left: .9rem;
+}
+
+.ui-datatable .ui-sortable-column:hover {
+	color: #000 !important;
+}
