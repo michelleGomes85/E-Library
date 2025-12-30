@@ -1,0 +1,57 @@
+type Query {
+    bookByIsbn(isbn: String!): Book
+    availableBooks(filter: BookFilter): [Book]
+    activeLoansByUser(userId: ID!): [Loan]
+    libraryDashboard: Dashboard
+}
+
+type Mutation {
+    createBook(book: BookInput): Book
+    updateCopyStatus(copyId: ID!, status: String!): Copy
+}
+
+type Book {
+    id: ID
+    isbn: String
+    title: String
+    author: String
+    copies: [Copy]
+}
+
+type Copy {
+    id: ID
+    internalCode: String
+    status: String
+}
+
+type Loan {
+  id: ID
+  issueDate: String
+  dueDate: String
+  returnDate: String
+  status: String
+  bookTitle: String
+  copyInternalCode: String
+}
+
+
+type Dashboard {
+    totalBooks: Int
+    totalCopies: Int
+    totalAvailable: Int
+    totalReserved: Int
+    totalBorrowed: Int
+}
+
+input BookFilter {
+    author: String
+    status: String
+}
+
+input BookInput {
+    isbn: String!
+    title: String!
+    author: String!
+    publisher: String
+    publicationYear: Int
+}

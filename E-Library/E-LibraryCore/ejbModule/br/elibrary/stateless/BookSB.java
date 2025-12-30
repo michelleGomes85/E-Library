@@ -18,6 +18,7 @@ import br.elibrary.service.CatalogStatusService;
 import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
 
@@ -29,180 +30,195 @@ public class BookSB implements BookService {
 
 	@EJB
 	private CatalogStatusService catalogStatusSB;
-	
+
 	/**
-     * Verifica internamente se um ISBN já existe na base de dados.
-     * 
-     * @param isbn Código identificador único do livro. 
-     * @return true se o ISBN já existir, false caso contrário.
-     */
+	 * Verifica internamente se um ISBN já existe na base de dados.
+	 * 
+	 * @param isbn Código identificador único do livro.
+	 * @return true se o ISBN já existir, false caso contrário.
+	 */
 	private boolean verifyExistingISBN(String isbn) {
-		
+
 		Book existing = em.createQuery("SELECT b FROM Book b WHERE b.isbn = :isbn", Book.class)
-                .setParameter("isbn", isbn)
-                .getResultStream()
-                .findFirst()
-                .orElse(null);
-		
+				.setParameter("isbn", isbn).getResultStream().findFirst().orElse(null);
+
 		if (existing != null)
 			return true;
-		
+
 		return false;
 	}
 
+	private boolean isEmpty(String val) {
+		return val == null || val.trim().isEmpty();
+	}
+
 	/**
-     * Cria um novo livro no sistema após validar a unicidade do ISBN.
-     * 
-     * Notifica o serviço de status do catálogo após a criação.
-     * 
-     * @param dto Objeto de transferência de dados do livro.
-     * @return BookDTO do livro persistido.
-     */
+	 * Cria um novo livro no sistema após validar a unicidade do ISBN.
+	 * 
+	 * Notifica o serviço de status do catálogo após a criação.
+	 * 
+	 * @param dto Objeto de transferência de dados do livro.
+	 * @return BookDTO do livro persistido.
+	 */
 	@Override
 	public BookDTO create(BookDTO dto) {
 
-		if (dto == null) 
-	        return null;
+		if (dto == null)
+			return null;
 
-	    if (dto.getIsbn() != null) {
-	    	
-	    	if (verifyExistingISBN(dto.getIsbn()))
-	    		throw new BusinessException("ISBN já cadastrado: " + dto.getIsbn());
-	    }
+		if (isEmpty(dto.getTitle()) || isEmpty(dto.getAuthor()) || isEmpty(dto.getIsbn())) {
+			throw new BusinessException("Campos obrigatórios ausentes: Titulo, Autor e ISBN são necessários.");
+		}
 
-	    Book entity = BookMapper.toEntity(dto, em);
-	    em.persist(entity);
-	    em.flush();
+		if (dto.getIsbn() != null) {
 
-	    catalogStatusSB.onBookCreated();
-	    return BookMapper.toDTO(entity);
+			if (verifyExistingISBN(dto.getIsbn()))
+				throw new BusinessException("ISBN já cadastrado: " + dto.getIsbn());
+		}
+
+		Book entity = BookMapper.toEntity(dto, em);
+		em.persist(entity);
+		em.flush();
+
+		catalogStatusSB.onBookCreated();
+		return BookMapper.toDTO(entity);
 	}
-	
+
 	/**
-     * Atualiza os dados de um livro existente 
-     * 
-     * (ISBN, título, autor, editora, ano e categorias).
-     * 
-     * Valida se o novo ISBN (caso alterado) já pertence a outro livro.
-     */
+	 * Atualiza os dados de um livro existente
+	 * 
+	 * (ISBN, título, autor, editora, ano e categorias).
+	 * 
+	 * Valida se o novo ISBN (caso alterado) já pertence a outro livro.
+	 */
 	@Override
 	public BookDTO update(BookDTO dto) {
-		
-	    if (dto == null || dto.getId() == null)
-	        throw new IllegalArgumentException("ID do livro é obrigatório para atualização");
 
-	    Book existing = em.find(Book.class, dto.getId());
-	    
-	    if (existing == null)
-	        throw new IllegalArgumentException("Livro não encontrado");
-	    
-	    if (!existing.getIsbn().equals(dto.getIsbn())) {
-		    if (verifyExistingISBN(dto.getIsbn()))
-	    		throw new BusinessException("ISBN já cadastrado: " + dto.getIsbn());
-	    }
+		if (dto == null || dto.getId() == null)
+			throw new IllegalArgumentException("ID do livro é obrigatório para atualização");
 
-	    existing.setIsbn(dto.getIsbn());
-	    existing.setTitle(dto.getTitle());
-	    existing.setAuthor(dto.getAuthor());
-	    existing.setPublisher(dto.getPublisher());
-	    existing.setYear(dto.getYear());
+		Book existing = em.find(Book.class, dto.getId());
 
-	    existing.getCategories().clear();
+		if (existing == null)
+			throw new BusinessException("Livro não encontrado");
 
-	    if (dto.getCategoryIds() != null && !dto.getCategoryIds().isEmpty()) {
-	    	
-	        var managedCategories = dto.getCategoryIds().stream()
-	            .filter(Objects::nonNull)
-	            .map(id -> em.getReference(Category.class, id))
-	            .collect(Collectors.toList());
-	        existing.getCategories().addAll(managedCategories);
-	    }
-	    
-	    em.flush();          
-	    em.refresh(existing);
+		if (!existing.getIsbn().equals(dto.getIsbn())) {
+			if (verifyExistingISBN(dto.getIsbn()))
+				throw new BusinessException("ISBN já cadastrado: " + dto.getIsbn());
+		}
 
-	    return BookMapper.toDTO(existing);
+		existing.setIsbn(dto.getIsbn());
+		existing.setTitle(dto.getTitle());
+		existing.setAuthor(dto.getAuthor());
+		existing.setPublisher(dto.getPublisher());
+		existing.setYear(dto.getYear());
+
+		existing.getCategories().clear();
+
+		if (dto.getCategoryIds() != null && !dto.getCategoryIds().isEmpty()) {
+
+			var managedCategories = dto.getCategoryIds().stream().filter(Objects::nonNull)
+					.map(id -> em.getReference(Category.class, id)).collect(Collectors.toList());
+			existing.getCategories().addAll(managedCategories);
+		}
+
+		em.flush();
+		em.refresh(existing);
+
+		return BookMapper.toDTO(existing);
 	}
-	
+
 	/**
-     * Remove um livro do sistema. 
-     * 
-     * Impede a remoção se houver exemplares com status EMPRESTADO ou RESERVADO.
-     */
+	 * Remove um livro do sistema.
+	 * 
+	 * Impede a remoção se houver exemplares com status EMPRESTADO ou RESERVADO.
+	 */
 	@Override
 	public void delete(BookDTO book) {
-		
-	    Book managed = em.find(Book.class, book.getId());
-	    
-	    if (managed == null)
-	        throw new BusinessException("Livro não encontrado para exclusão. ID: " + book.getId());
 
-	    boolean possessesBlockedCopies = managed.getCopies().stream().anyMatch(c -> c.getStatus() == CopyStatus.BORROWED || c.getStatus() == CopyStatus.RESERVED);
+		Book managed = em.find(Book.class, book.getId());
 
-	    if (possessesBlockedCopies) {
-	        throw new BusinessException("Não é possível excluir o livro '" + managed.getTitle() + 
-	                "'. Existem exemplares emprestados ou reservados.");
-	    }
+		if (managed == null)
+			throw new BusinessException("Livro não encontrado para exclusão. ID: " + book.getId());
 
-	    long totalCopies = managed.getCopies().size();
-	    long availableCopies = managed.getCopies().stream()
-	            .filter(c -> c.getStatus() == CopyStatus.AVAILABLE)
-	            .count();
+		boolean possessesBlockedCopies = managed.getCopies().stream()
+				.anyMatch(c -> c.getStatus() == CopyStatus.BORROWED || c.getStatus() == CopyStatus.RESERVED);
 
-	    em.remove(managed);
-	    
-	    em.flush();
-	    
-	    catalogStatusSB.onBookDeleted((int) totalCopies, (int) availableCopies);
+		if (possessesBlockedCopies) {
+			throw new BusinessException("Não é possível excluir o livro '" + managed.getTitle()
+					+ "'. Existem exemplares emprestados ou reservados.");
+		}
+
+		long totalCopies = managed.getCopies().size();
+		long availableCopies = managed.getCopies().stream().filter(c -> c.getStatus() == CopyStatus.AVAILABLE).count();
+
+		em.remove(managed);
+
+		em.flush();
+
+		catalogStatusSB.onBookDeleted((int) totalCopies, (int) availableCopies);
 	}
 
 	/**
-     * Busca um livro pelo ID, carregando suas categorias de forma ansiosa (fetch join).
-     */
+	 * Busca um livro pelo ID, carregando suas categorias de forma ansiosa (fetch
+	 * join).
+	 */
 	@Override
 	public BookDTO findById(Long id) {
-		
+
 		try {
 			Book book = em.createQuery("""
 					SELECT b FROM Book b
 					LEFT JOIN FETCH b.categories
 					WHERE b.id = :id
 					""", Book.class).setParameter("id", id).getSingleResult();
-			
+
 			return BookMapper.toDTO(book);
 		} catch (Exception e) {
 			throw new BusinessException("ID Inexistente: " + id);
 		}
-		
+
 	}
-	
+
 	/**
-     * Lista todos os livros ordenados por título, incluindo categorias.
-     */
+	 * Lista todos os livros ordenados por título, incluindo categorias.
+	 */
 	@Override
 	public List<BookDTO> findAll() {
 		List<Book> books = em.createQuery("""
 				SELECT DISTINCT b FROM Book b
 				LEFT JOIN FETCH b.categories
 				ORDER BY b.title
-				""", Book.class)
-				.getResultList();
-		
-		return books.stream()
-				.map(BookMapper::toDTO)
-				.collect(Collectors.toList());
+				""", Book.class).getResultList();
+
+		return books.stream().map(BookMapper::toDTO).collect(Collectors.toList());
 	}
-	
+
 	/**
-     * Pesquisa livros por título ou autor e retorna estatísticas de cópias 
-     * (Total e Disponíveis).
-     */
+	 * Busca livro pelo seu isbn
+	 */
+	@Override
+	public BookDTO findByIsbn(String isbn) {
+		try {
+			Book entity = em.createQuery("SELECT b FROM Book b WHERE b.isbn = :isbn", Book.class)
+					.setParameter("isbn", isbn).getSingleResult();
+
+			return BookMapper.toDTO(entity);
+		} catch (NoResultException e) {
+			throw new BusinessException("Nenhum livro encontrado");
+		}
+	}
+
+	/**
+	 * Pesquisa livros por título ou autor e retorna estatísticas de cópias (Total e
+	 * Disponíveis).
+	 */
 	@Override
 	public List<Object[]> findByTitleOrAuthorWithStats(String query) {
 
 		String q = "%" + query.toLowerCase() + "%";
 
-		List<Object[]> results =  em.createQuery("""
+		List<Object[]> results = em.createQuery("""
 				SELECT b,
 				       COUNT(c) AS totalCopies,
 				       SUM(CASE WHEN c.status = :available THEN 1 ELSE 0 END) AS availableCopies
@@ -213,25 +229,20 @@ public class BookSB implements BookService {
 				ORDER BY b.title ASC
 				""", Object[].class).setParameter("q", q).setParameter("available", CopyStatus.AVAILABLE)
 				.getResultList();
-		
-	    return results.stream()
-	            .map(row -> new Object[]{
-	                BookMapper.toDTO((Book) row[0]),
-	                row[1], 
-	                row[2]  
-	            })
-	            
-	            .collect(Collectors.toList());
+
+		return results.stream().map(row -> new Object[] { BookMapper.toDTO((Book) row[0]), row[1], row[2] })
+
+				.collect(Collectors.toList());
 	}
-	
+
 	/**
-     * Retorna livros que não possuem exemplares disponíveis 
-     * 
-     * (usado para lista de espera).
-     */
+	 * Retorna livros que não possuem exemplares disponíveis
+	 * 
+	 * (usado para lista de espera).
+	 */
 	@Override
 	public List<Object[]> findUnavailableBooksWithStats() {
-		
+
 		List<Object[]> results = em.createQuery("""
 				SELECT b,
 				       COUNT(c) AS totalCopies,
@@ -242,19 +253,14 @@ public class BookSB implements BookService {
 				HAVING SUM(CASE WHEN c.status = :available THEN 1 ELSE 0 END) = 0
 				ORDER BY b.title
 				""", Object[].class).setParameter("available", CopyStatus.AVAILABLE).getResultList();
-		
-	    return results.stream()
-	            .map(row -> new Object[]{
-	                BookMapper.toDTO((Book) row[0]),
-	                row[1],
-	                row[2]
-	            })
-	            .collect(Collectors.toList());
+
+		return results.stream().map(row -> new Object[] { BookMapper.toDTO((Book) row[0]), row[1], row[2] })
+				.collect(Collectors.toList());
 	}
-	
+
 	/**
-     * Busca livros que possuem alguma copia disponível
-     */
+	 * Busca livros que possuem alguma copia disponível
+	 */
 	@Override
 	public List<Object[]> findBooksWithCopyStats() {
 		List<Object[]> results = em.createQuery("""
@@ -266,70 +272,106 @@ public class BookSB implements BookService {
 				GROUP BY b.id, b.title
 				ORDER BY b.title ASC
 				""", Object[].class).setParameter("available", CopyStatus.AVAILABLE).getResultList();
-		
-	    return results.stream()
-	            .map(row -> new Object[]{
-	                BookMapper.toDTO((Book) row[0]),
-	                row[1],
-	                row[2]
-	            })
-	            .collect(Collectors.toList());
+
+		return results.stream().map(row -> new Object[] { BookMapper.toDTO((Book) row[0]), row[1], row[2] })
+				.collect(Collectors.toList());
 	}
-	
+
 	/**
-     * Busca um exemplar disponível (status AVAILABLE) para um determinado livro.
-     */
+	 * Busca um exemplar disponível (status AVAILABLE) para um determinado livro.
+	 */
 	@Override
 	public CopyDTO findFirstAvailableCopy(Long bookId) {
-		
+
 		Copy copy = em.createQuery("""
 				SELECT c FROM Copy c
 				WHERE c.book.id = :bookId AND c.status = :status
 				""", Copy.class).setParameter("bookId", bookId).setParameter("status", CopyStatus.AVAILABLE)
 				.setMaxResults(1).getResultStream().findFirst().orElse(null);
-		
+
 		return CopyMapper.toDTO(copy);
+	}
+
+	/**
+	 * Filtra livros por autor e/ou nome da categoria.
+	 */
+	@Override
+	public List<BookDTO> findByAuthorOrCategory(String author, String categoryName) {
+
+		StringBuilder jpql = new StringBuilder("SELECT DISTINCT b FROM Book b ");
+
+		boolean hasCategoryFilter = categoryName != null && !categoryName.trim().isEmpty();
+
+		if (hasCategoryFilter) {
+			jpql.append("JOIN b.categories cat ");
+		} else {
+			jpql.append("LEFT JOIN b.categories cat ");
+		}
+
+		jpql.append("WHERE 1 = 1");
+
+		if (author != null && !author.trim().isEmpty()) {
+			jpql.append(" AND LOWER(b.author) LIKE LOWER(:author)");
+		}
+
+		if (hasCategoryFilter) {
+			jpql.append(" AND LOWER(cat.name) LIKE LOWER(:categoryName)");
+		}
+
+		TypedQuery<Book> query = em.createQuery(jpql.toString(), Book.class);
+
+		if (author != null && !author.trim().isEmpty()) {
+			query.setParameter("author", "%" + author.trim() + "%");
+		}
+
+		if (hasCategoryFilter) {
+			query.setParameter("categoryName", "%" + categoryName.trim() + "%");
+		}
+
+		List<Book> books = query.getResultList();
+		
+		return books.stream().map(BookMapper::toDTO).collect(Collectors.toList());
 	}
 	
 	/**
-     * Filtra livros por autor e/ou nome da categoria.
-     */
+	 * Filtra livros por autor e status.
+	 */
 	@Override
-	public List<BookDTO> findByAuthorOrCategory(String author, String categoryName) {
-		
-	    StringBuilder jpql = new StringBuilder("SELECT DISTINCT b FROM Book b ");
-	    
-	    boolean hasCategoryFilter = categoryName != null && !categoryName.trim().isEmpty();
+	public List<BookDTO> findAvailableBooks(String author, String statusStr) {
 
-	    if (hasCategoryFilter) {
-	        jpql.append("JOIN b.categories cat ");
-	    } else {
-	        jpql.append("LEFT JOIN b.categories cat ");
+	    CopyStatus status = CopyStatus.AVAILABLE;
+
+	    if (statusStr != null && !statusStr.isBlank()) {
+	        try {
+	            status = CopyStatus.valueOf(statusStr);
+	        } catch (IllegalArgumentException ignored) {}
 	    }
 
-	    jpql.append("WHERE 1 = 1");
+	    StringBuilder jpql = new StringBuilder("""
+	        SELECT b
+	        FROM Book b
+	        WHERE EXISTS (
+	            SELECT 1
+	            FROM Copy c
+	            WHERE c.book = b
+	              AND c.status = :status
+	        )
+	    """);
 
-	    if (author != null && !author.trim().isEmpty()) {
+	    if (author != null && !author.isBlank()) {
 	        jpql.append(" AND LOWER(b.author) LIKE LOWER(:author)");
 	    }
 
-	    if (hasCategoryFilter) {
-	        jpql.append(" AND LOWER(cat.name) LIKE LOWER(:categoryName)");
-	    }
-
 	    TypedQuery<Book> query = em.createQuery(jpql.toString(), Book.class);
+	    query.setParameter("status", status);
 
-	    if (author != null && !author.trim().isEmpty()) {
-	        query.setParameter("author", "%" + author.trim() + "%");
+	    if (author != null && !author.isBlank()) {
+	        query.setParameter("author", "%" + author + "%");
 	    }
 
-	    if (hasCategoryFilter) {
-	        query.setParameter("categoryName", "%" + categoryName.trim() + "%");
-	    }
-
-	    List<Book> books = query.getResultList();
-	    return books.stream()
-	                .map(BookMapper::toDTO)
-	                .collect(Collectors.toList());
+	    return query.getResultList()
+	            .stream()
+	            .map(BookMapper::toDTO)
+	            .toList();
 	}
 }

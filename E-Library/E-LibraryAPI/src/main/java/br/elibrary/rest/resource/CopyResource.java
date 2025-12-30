@@ -17,37 +17,35 @@ import jakarta.ws.rs.core.Response;
 @Produces(MediaType.APPLICATION_JSON)
 public class CopyResource {
 
-    @Inject
-    private CopyRestService copyRestService;
+	@Inject
+	private CopyRestService copyRestService;
 
-    @GET
-    @Path("/{id}")
-    public Response findById(@PathParam("id") Long id) {
-    	
-        CopyDTO dto = copyRestService.findById(id);
-        
-        if (dto == null)
-            return Response.status(404).build();
-        
-        return Response.ok(dto).build();
-    }
+	@GET
+	@Path("/{id}")
+	public Response findById(@PathParam("id") Long id) {
 
-    @PUT
-    @Path("/{id}/status")
-    public Response updateStatus(
-            @PathParam("id") Long id,
-            @FormParam("status") String status) {
+		CopyDTO dto = copyRestService.findById(id);
 
-        if (status == null)
-            return Response.status(400).entity("Status é obrigatório").build();
+		if (dto == null)
+			return Response.status(404).build();
 
-        try {
-            CopyDTO updated = copyRestService.updateStatus(id, status);
-            return Response.ok(updated).build();
-        } catch (BusinessException e) {
-            return Response.status(409).entity(e.getMessage()).build();
-        } catch (Exception e) {
-            return Response.status(400).entity("Erro ao atualizar status").build();
-        }
-    }
+		return Response.ok(dto).build();
+	}
+
+	@PUT
+	@Path("/{id}/status")
+	public Response updateStatus(@PathParam("id") Long id, @FormParam("status") String status) {
+
+		if (status == null)
+			return Response.status(400).entity("Status é obrigatório").build();
+
+		try {
+			CopyDTO updated = copyRestService.updateStatus(id, status);
+			return Response.ok(updated).build();
+		} catch (BusinessException e) {
+			return Response.status(409).entity(e.getMessage()).build();
+		} catch (Exception e) {
+			return Response.status(400).entity("Erro ao atualizar status").build();
+		}
+	}
 }

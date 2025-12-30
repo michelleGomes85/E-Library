@@ -29,4 +29,12 @@ public class BookRestService {
         dto.setId(id);
         return bookSB.update(dto);
     }
+    
+    public BookDTO findByIsbn(String isbn) {
+    	return bookSB.findByIsbn(isbn);
+    }
+    
+    public List<BookDTO> findAvailableBooks(String author, String status) {
+    	return bookSB.findAvailableBooks(author, status);
+    }
 }

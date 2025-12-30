@@ -26,6 +26,7 @@ public class BookMapper {
 		dto.setYear(book.getYear());
 
 		if (book.getCategories() != null) {
+			
 			dto.setCategoryIds(
 					book.getCategories().stream()
 					.filter(Objects::nonNull).map(Category::getId)
@@ -38,10 +39,17 @@ public class BookMapper {
 		}
 
         if (book.getCopies() != null) {
+        	
+        	dto.setCopies(book.getCopies().stream()
+                    .filter(Objects::nonNull)
+                    .map(CopyMapper::toDTO)
+                    .collect(Collectors.toList()));
+        	
             dto.setTotalCopies(book.getCopies().size());
             long available = book.getCopies().stream()
                 .filter(copy -> copy.getStatus() != null && copy.getStatus().isAvailable())
                 .count();
+            
             dto.setAvailableCopies((int) available);
         }
 
