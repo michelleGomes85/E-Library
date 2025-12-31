@@ -2,6 +2,8 @@
 
 > **Projeto Académico para a disciplina de Serviços de Suporte a Aplicações Distribuídas (SSAD)** > Arquitetura Híbrida: **Jakarta EE 10 (WildFly 31)** + **Spring Boot 3 (GraphQL)**
 
+![Diagrama do projeto](assets/diagrama_ee.svg)
+
 ---
 
 ## 📑 Índice de Documentação Detalhada
