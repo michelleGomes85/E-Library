@@ -21,12 +21,17 @@ public class BookAvailabilityEvent extends LibraryEvent {
     private String isbn;
     private String title;
     private LocalDateTime createdAt;
+    
+    private String email;
+    private boolean send;
 
     public BookAvailabilityEvent(Long bookId, String isbn, String title) {
         super(EventType.BOOK_AVAILABLE);
         this.bookId = bookId;
         this.isbn = isbn;
         this.title = title;
+        
+        this.send = false;
     }
 
     public Long getBookId() {
@@ -67,5 +72,21 @@ public class BookAvailabilityEvent extends LibraryEvent {
 
 	public void setUserId(Long userId) {
 		this.userId = userId;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public boolean isSend() {
+		return send;
+	}
+
+	public void setSend(boolean send) {
+		this.send = send;
 	}
 }

@@ -26,6 +26,7 @@ Para facilitar a compreensão técnica de cada camada, a documentação foi divi
 
 - [📬 **Mensageria Assíncrona (JMS)**](docs/MESSAGE_NOTIFICATION.md) - Notificações de disponibilidade e atrasos, consumidor assíncrono e histórico.
 
+- [📧 **Envio de E-mails**](docs/EMAIL.md) - Integração com Jakarta Mail para notificações.
 ---
 
 ## 📌 Visão Geral

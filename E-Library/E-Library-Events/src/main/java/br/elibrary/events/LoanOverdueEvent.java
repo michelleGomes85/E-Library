@@ -22,7 +22,10 @@ public class LoanOverdueEvent extends LibraryEvent {
     private LocalDate expectedReturnDate;
     private long overdueDays;
     private LocalDateTime createdAt;
-
+    
+    private String email;
+    private boolean send;
+    
     public LoanOverdueEvent(Long userId,
                             Long copyId,
                             LocalDate expectedReturnDate,
@@ -33,6 +36,8 @@ public class LoanOverdueEvent extends LibraryEvent {
         this.copyId = copyId;
         this.expectedReturnDate = expectedReturnDate;
         this.overdueDays = overdueDays;
+        
+        this.send = false;
     }
 
     public Long getUserId() {
@@ -73,5 +78,21 @@ public class LoanOverdueEvent extends LibraryEvent {
 
 	public void setOverdueDays(long overdueDays) {
 		this.overdueDays = overdueDays;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public boolean isSend() {
+		return send;
+	}
+
+	public void setSend(boolean send) {
+		this.send = send;
 	}
 }
