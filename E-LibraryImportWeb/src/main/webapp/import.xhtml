@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<title>E-Library | Sistema de Importação</title>
+
+	<link rel="icon" type="image/png" href="resources/images/fav.png" />
+
+	<link rel="stylesheet"
+		href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+	<h:outputStylesheet name="css/custom.css" />
+	<h:outputStylesheet name="css/header.css" />
+	<h:outputStylesheet name="css/footer.css" />
+</h:head>
+
+<h:body
+	style="
+    background:
+      linear-gradient(
+        rgba(5, 5, 16, 0.92),
+        rgba(5, 5, 16, 0.92)
+      ),
+      url('#{resource['images/background.png']}') center / cover no-repeat fixed;
+">
+	<div class="header">
+
+		<div></div>
+
+		<div class="header-content">
+			<h1>Importador de Coleção de Livros - Doações</h1>
+		</div>
+
+		<div class="header-actions">
+			<div class="header-actions">
+				<p:link value="Administração da Biblioteca" href="http://localhost:8080/E-LibraryWeb"
+					title="Página de administração da biblioteca"
+					styleClass="btn-outline" target="_blank"/>
+			</div>
+		</div>
+	</div>
+
+	<div class="content">
+
+		<h:form id="importForm" enctype="multipart/form-data"
+			styleClass="import-form">
+
+			<!-- Mensagens -->
+			<p:growl id="messages" showDetail="true" keepAlive="true"
+				styleClass="messages" />
+
+			<!-- Card de Upload -->
+			<p:card styleClass="card">
+				<p>
+					Selecione um arquivo <strong>JSON</strong> ou <strong>XML</strong>
+					para cadastrar livros e cópias.
+				</p>
+
+				<p:fileUpload listener="#{importBean.handleFileUpload}"
+					mode="advanced" dragDropSupport="true"
+					update="messages reportTable exportButton" sizeLimit="10000000"
+					allowTypes="/(\.|\/)(json|xml)$/" accept=".json,.xml"
+					label="Escolher Arquivo" uploadLabel="Importar Agora"
+					cancelLabel="Cancelar"
+					invalidFileMessage="Tipo de arquivo inválido"
+					invalidSizeMessage="Arquivo muito grande" styleClass="file-upload"
+					oncomplete="PF('reportTableVar').filter()" />
+			</p:card>
+
+			<!-- Botão de Exportação -->
+			<p:toolbar id="exportButton">
+				<p:toolbarGroup align="right">
+					<p:commandButton value="Baixar Relatório Excel"
+						icon="pi pi-file-excel" styleClass="button-success"
+						rendered="#{not empty importBean.reports}" ajax="false">
+						<p:dataExporter type="xls" target="reportTable"
+							fileName="relatorio_importacao" />
+					</p:commandButton>
+				</p:toolbarGroup>
+			</p:toolbar>
+
+			<!-- Tabela de Resultados -->
+			<p:dataTable id="reportTable" value="#{importBean.reports}"
+				var="report" widgetVar="reportTableVar" styleClass="data-table"
+				rows="10" paginator="true" paginatorPosition="bottom"
+				emptyMessage="Nenhum dado processado ainda.">
+
+				<f:facet name="header">
+                Resultados da Importação
+            </f:facet>
+
+				<p:column headerText="Título" sortBy="#{report.title}">
+					<h:outputText value="#{report.title}" />
+				</p:column>
+
+				<p:column headerText="Autor">
+					<h:outputText value="#{report.author}" />
+				</p:column>
+
+				<p:column headerText="ISBN" width="120">
+					<h:outputText value="#{report.isbn}" />
+				</p:column>
+
+				<p:column headerText="Editora">
+					<h:outputText value="#{report.publisher}" />
+				</p:column>
+
+				<p:column headerText="Ano" width="80">
+					<h:outputText value="#{report.year}" />
+				</p:column>
+
+				<p:column headerText="Cópias" width="70">
+					<h:outputText value="#{report.quantity}" />
+				</p:column>
+
+				<p:column headerText="Status" width="100" sortBy="#{report.status}">
+					<h:outputText value="#{report.status}"
+						styleClass="customer-badge status-#{report.status.toLowerCase()}"
+						style="color: #{report.status == 'SUCESSO' ? 'green' : 'red'}; font-weight: bold" />
+				</p:column>
+
+				<p:column headerText="Mensagem">
+					<h:outputText value="#{report.message}" />
+				</p:column>
+
+			</p:dataTable>
+
+		</h:form>
+
+	</div>
+
+	<h:panelGroup layout="block" styleClass="footer">
+		<div>
+			<div class="container">
+				<p>
+					Feito por <strong>Michelle Cristina Gomes</strong>
+				</p>
+				<p>Email: gmichele498@gmail.com</p>
+				<p class="icons-contact">
+					<a href="https://www.linkedin.com/in/michelleGomes85/"
+						target="_blank"> <i class="fab fa-linkedin"></i>
+					</a> | <a href="https://github.com/michelleGomes85" target="_blank">
+						<i class="fab fa-github"></i>
+					</a>
+				</p>
+				<p class="footer-text">Feito para a disciplina de Serviços de
+					Suporte a Aplicações Distribuídas, graduação em Tecnologia em
+					Sistemas para Internet.</p>
+			</div>
+		</div>
+	</h:panelGroup>
+
+</h:body>
+</html>
