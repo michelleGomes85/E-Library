@@ -2,12 +2,32 @@
 
 # 📡 API RESTful (JAX-RS)
 
-O módulo `E-LibraryAPI` é a camada de interoperabilidade do ecossistema. Ele expõe as regras de negócio processadas pelos EJBs no **WildFly** através de uma interface **RESTful**, permitindo que sistemas modernos como o **Spring Boot** consumam os dados via JSON.
+O módulo `e-library-api` é a **camada de integração síncrona** do sistema. Sua única responsabilidade é **orquestrar** os EJBs já existentes no `E-LibraryCore`, expondo-os como serviços HTTP/JSON — **sem acesso direto ao `EntityManager`**, sem regras de negócio duplicadas e sem violar os contratos de domínio.
+
+É o ponto de entrada oficial para todos os clientes modernos:  
+→ `E-LibraryGraph` (GraphQL/BFF),  
+→ `E-LibraryImportWeb` (importação de doações),  
+→ e futuros frontends (mobile, React, etc.).
 
 ## 🚀 Integração com o Ecossistema
+
 Enquanto o cliente Java SE utiliza o protocolo nativo RMI (mais pesado), esta API utiliza **HTTP/JSON**, o que garante:
 - **Leveza:** Ideal para o tráfego entre servidores (WildFly ↔ Spring).
 - **Padronização:** Facilita a expansão para futuros clientes mobile ou front-ends em React/Angular.
+
+---
+
+## 🧭 Princípios Arquiteturais
+
+- **Orquestração, não reimplementação**:  
+  Cada método de `Resource` delega 100% da lógica para os EJBs (`BookSB`, `CopySB`, `LoanSB`, `CatalogStatusSB`).  
+  Exemplo: `PUT /exemplares/{id}/status` chama `copySB.updateStatus(id, newStatus)` — **quem valida a transição é o EJB**, não o REST.
+
+- **DTOs como contrato imutável**:  
+  Todos os dados de entrada/saída usam os mesmos DTOs do `e-library-client` (`BookDTO`, `CopyDTO`, `LoanDTO`). Isso garante consistência entre REST, GraphQL e cliente remoto.
+
+- **Códigos HTTP semanticamente corretos**:  
+  A API traduz exceções do contrato (`InvalidStatusTransitionException`) em respostas HTTP padronizadas.
 
 ---
 
@@ -66,3 +86,5 @@ A API utiliza o **Jakarta JSON Binding** para converter automaticamente os **DTO
 ### 3. Tratamento de Erros
 
 A camada API captura exceções de negócio vindas do Core (ex: Livro não encontrado ou Exemplar já emprestado) e as traduz em códigos de status HTTP apropriados (`404 Not Found`, `400 Bad Request`, `500 Internal Server Error`).
+
+[← Voltar ao README principal](../README.md)

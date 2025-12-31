@@ -2,37 +2,55 @@
 
 # 🌐 Módulo Web — JSF + PrimeFaces
 
-O módulo `e-library-web` é a interface principal do sistema, desenvolvida com **JSF 3.0** e **PrimeFaces 12+**. Ela foi projetada para ser o painel administrativo e de autoatendimento do usuário via navegador.
+O módulo `e-library-web` é a interface principal do sistema: uma aplicação web responsiva e interativa, construída com **Jakarta Faces 3.0 (JSF)** e **PrimeFaces 12+**, voltada tanto para operadores administrativos quanto para usuários finais (autoatendimento de empréstimos, lista de espera).
 
-## 🧩 Camada de Managed Beans
-A lógica de apresentação é isolada em beans gerenciados que se comunicam com o back-end via injeção de dependência (`@EJB`).
+É implantado como parte do EAR e consome os EJBs do Core **exclusivamente via injeção local (`@EJB`)** — garantindo máxima performance e acesso transacional direto, sem passar pela camada REST.
 
-- **DashboardBean (`@RequestScoped`):** Consome o Singleton `CatalogStatusSB` para exibir as métricas em tempo real no topo da página.
+## 🧠 Camada de Managed Beans
 
-- **BookBean (`@ViewScoped`):** Gerencia o ciclo de vida do CRUD de livros, garantindo que o estado da edição seja mantido durante as interações com modais do PrimeFaces.
+Os *Managed Beans* seguem rigorosamente os escopos do Jakarta Faces, alinhados ao ciclo de vida das interações do usuário:
 
-- **LoginBean (`@SessionScoped`):** Interage com o `UserSessionSB` (Stateful) para manter a identidade do usuário durante toda a navegação.
+- **`LoginBean` (`@SessionScoped`)**  
+  Responsável pela autenticação e gerenciamento da sessão do usuário. Delega credenciais ao `UserSessionSB` (`@Stateful`), que mantém o estado do login e os dados do usuário durante toda a navegação. Após login bem-sucedido, armazena um `UserDTO` serializável na `HttpSession`, usado pelos filtros de segurança.
 
-## 🔐 Segurança e Controle de Acesso
+- **`BookBean` e `CopyBean` (`@ViewScoped`)**  
+  Controlam operações de cadastro, edição e busca de livros e exemplares. O escopo `@ViewScoped` é essencial para manter o estado de formulários modais (ex: inclusão de categoria, edição em popup) sem perda de dados durante requisições AJAX.
 
-A segurança não é baseada apenas em esconder botões, mas sim em **Filtros de Servlet** que interceptam as requisições:
+- **`LoanBean` (`@ViewScoped`)**  
+  Gerencia o fluxo de empréstimo: busca de usuário (via autocomplete), seleção de exemplares, validação de regras (ex: limite de empréstimos, atrasos pendentes) e confirmação. Utiliza o `LoanSB` (`@Stateless`) para processar a transação final.
 
-| Filtro | Responsabilidade |
-|--------|------------------|
-| **`AuthFilter`** | Verifica se existe um `UserDTO` na sessão. Caso contrário, redireciona para o login. |
-| **`AdminFilter`** | Verifica se o usuário logado possui a Role `ADMIN`. Impede que usuários comuns acessem `/admin/*`. |
+- **`DashboardBean` (`@RequestScoped`)**  
+  Obtém métricas em tempo real do `CatalogStatusSB` (`@Singleton`), como contagem de livros por status, empréstimos ativos e fila de espera. Como os dados são atualizados *in-memory* após cada operação transacional, o dashboard reflete o estado consistente do sistema sem sobrecarregar o banco.
 
-## 🔁 Converters (Otimização de UI)
-O uso do `BookConverter` é fundamental para a experiência do usuário. Ele permite que o componente `<p:selectOneMenu>` trabalhe com objetos `BookDTO` completos:
-1. **No envio:** Transforma o objeto em seu ID (String).
-2. **No retorno:** Recebe o ID e busca o DTO atualizado no serviço, garantindo a integridade referencial.
+## 🔐 Segurança por Filtros — Não por Frontend
 
----
+A segurança é implementada de forma **defensiva e centralizada**, via *Servlet Filters*, não apenas por esconder botões no frontend:
 
-## 🎨 Componentes Principais
+- **`AuthFilter`**  
+  Aplicado a todas as rotas exceto `/login.xhtml`. Verifica se existe um `UserDTO` na sessão HTTP. Caso ausente, redireciona para `/login.xhtml` com status `302`.
 
-- **Templates Faclets:** Uso de `ui:composition` para manter um cabeçalho e rodapé únicos em todo o sistema.
+- **`AdminFilter`**  
+  Aplicado a rotas sob `/admin/*`. Verifica se o `UserDTO` possui a role `"ADMIN"`. Caso contrário, responde com `403 Forbidden`.
 
-- **DataTables:** Listagens com ordenação e paginação via AJAX, consumindo métodos otimizados dos EJBs Stateless.
+Essa abordagem garante que mesmo requisições diretas (ex: via `curl` ou Postman) sejam bloqueadas — tornando a proteção independente da interface.
+
+## 🔄 Converters — Integridade Referencial na UI
+
+O `BookConverter` e o `UserConverter` são críticos para a usabilidade e consistência:
+
+- Implementam `jakarta.faces.convert.Converter`;
+- Em `getAsString()`: retornam o ID (ex: ISBN ou `userId`) como `String`;
+- Em `getAsObject()`: recebem o ID e **invocam o serviço remoto** (ex: `BookSB.findById()`) para obter o DTO atualizado — evitando objetos *stale* ou desconectados.
+
+Isso permite usar componentes como `<p:selectOneMenu>` com objetos completos, mantendo a integridade mesmo em cenários de longa duração de view.
+
+## 🎨 Experiência do Usuário — Mais que Funcionalidade
+
+- **Layout responsivo**: baseado em `primefaces.css` + `flex/grid`, com suporte a dispositivos móveis (ex: terminal de balcão em tablet).
+- **Feedback visual**: mensagens de sucesso/erro via `<p:messages autoUpdate="true"/>`, e loading em operações assíncronas (`<p:ajaxStatus>`).
+- **Reutilização**: template `main.xhtml` com `ui:insert` para conteúdo, cabeçalho com menu condicional (usuário comum vs admin), e rodapé com versão do sistema.
+- **Validação no cliente e servidor**: uso de `required`, `size`, `f:validateRegex` + validações programáticas nos beans antes de chamar os EJBs.
+
+> ✅ **Importante**: este módulo *não* acessa o `EntityManager`, DTOs não são entidades, e nenhuma lógica de negócio está duplicada — tudo é orquestrado pelos EJBs do `E-LibraryCore`.
 
 [← Voltar ao README principal](../README.md)
