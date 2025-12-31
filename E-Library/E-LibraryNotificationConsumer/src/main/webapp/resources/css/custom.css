@@ -86,3 +86,14 @@ body .ui-button.ui-button-text-icon-left .ui-icon {
 .ui-datatable .ui-sortable-column:hover {
 	color: #000 !important;
 }
+
+.send{
+	background: #280e64 !important
+}
+
+body .ui-inputfield {
+	background: #000;
+	color: #fff;
+	padding: .9rem .9rem;
+	border: 1px solid #334155;
+}

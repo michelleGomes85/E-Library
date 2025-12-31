@@ -24,7 +24,7 @@ public class NotificationRecord implements Serializable {
     private String payload;
     
     private LocalDateTime createdAt;
-    
+        
 	public Long getId() {
 		return id;
 	}

@@ -15,8 +15,9 @@
 	<h:outputStylesheet name="css/footer.css" />
 </h:head>
 
-<h:body
-	style="
+<f:view transient="true">
+	<h:body
+		style="
     background:
       linear-gradient(
         rgba(5, 5, 16, 0.92),
@@ -24,101 +25,140 @@
       ),
       url('#{resource['images/background.png']}') center / cover no-repeat fixed;
 ">
-	<div class="header">
+		<div class="header">
 
-		<div></div>
+			<div></div>
 
-		<div class="header-content">
-			<h1>Centro de Notificações E-Library</h1>
-		</div>
+			<div class="header-content">
+				<h1>Centro de Notificações E-Library</h1>
+			</div>
 
-		<div class="header-actions">
 			<div class="header-actions">
-				<p:link value="Administração da Biblioteca"
-					href="http://localhost:8080/E-LibraryWeb"
-					title="Página de administração da biblioteca"
-					styleClass="btn-outline" target="_blank" />
+				<div class="header-actions">
+					<p:link value="Administração da Biblioteca"
+						href="http://localhost:8080/E-LibraryWeb"
+						title="Página de administração da biblioteca"
+						styleClass="btn-outline" target="_blank" />
+
+					<p:link value="Doações de Livros"
+						href="http://localhost:8080/E-LibraryImportWeb"
+						title="Página para doação de livros por meio de importação"
+						styleClass="btn-outline" target="_blank" />
+				</div>
+			</div>
+		</div>
+
+		<div class="content">
+
+			<h:form id="form">
+
+				<p:growl id="messages" showDetail="true" keepAlive="true"
+					styleClass="messages" />
+
+				<p:commandButton value="Limpar Tudo"
+					action="#{notificationBean.clear}"
+					update="form:messages tableAvailability tableOverdue" icon="pi pi-trash"
+					styleClass="ui-button-danger" />
+
+				<p:poll interval="3" update="tableAvailability tableOverdue form:messages" />
+
+				<p:card style="margin-bottom: 2em">
+				
+					<f:facet name="title">Livros Disponíveis (Lista de Espera)</f:facet>
 					
-				<p:link value="Doações de Livros"
-					href="http://localhost:8080/E-LibraryImportWeb"
-					title="Página para doação de livros por meio de importação"
-					styleClass="btn-outline" target="_blank" />
-			</div>
+					<p:dataTable id="tableAvailability"
+						value="#{notificationBean.notifications}" var="notif">
+						
+						<p:column headerText="Data/Hora">
+							<h:outputText value="#{notif.dateTime}">
+								<f:convertDateTime pattern="dd/MM HH:mm" type="localDateTime" />
+							</h:outputText>
+						</p:column>
+						<p:column headerText="Livro ID">#{notif.bookId}</p:column>
+						<p:column headerText="Titulo">#{notif.title}</p:column>
+						<p:column headerText="ISBN">#{notif.isbn}</p:column>
+
+						<p:column headerText="Status">
+							<p:tag value="DISPONÍVEL" severity="success" />
+						</p:column>
+
+						<p:column headerText="E-mail (opcional)" width="230px">
+							<p:inputText value="#{notif.email}"
+								placeholder="ex: user@dominio.com" rendered="#{!notif.send}" />
+
+							<p:tag class="send" value="ENVIADO" rendered="#{notif.send}" />
+						</p:column>
+
+						<p:column>
+							<p:commandButton value="Enviar"
+								action="#{notificationBean.sendEmail(notif)}"
+								update="form:messages tableAvailability" icon="pi pi-envelope"
+								disabled="#{empty notif.email or notif.send}"
+								styleClass="ui-button-success ui-button-sm"
+								rendered="#{!notif.send}" />
+						</p:column>
+					</p:dataTable>
+				</p:card>
+
+				<p:card style="margin-bottom: 2em">
+					<f:facet name="title">Alertas de Empréstimos em Atraso</f:facet>
+					<p:dataTable id="tableOverdue"
+						value="#{notificationBean.overdueNotifications}" var="over">
+						<p:column headerText="Data Alerta">
+							<h:outputText value="#{over.dateTime}">
+								<f:convertDateTime pattern="dd/MM HH:mm" type="localDateTime" />
+							</h:outputText>
+						</p:column>
+						<p:column headerText="Id Usuário">#{over.userId}</p:column>
+						<p:column headerText="Id Cópia">#{over.copyId}</p:column>
+						<p:column headerText="Vencimento">#{over.expectedReturnDate}</p:column>
+						<p:column headerText="Dias de Atraso">
+							<h:outputText value="#{over.overdueDays} dias"
+								style="color: red; font-weight: bold" />
+						</p:column>
+						<p:column headerText="Status">
+							<p:tag value="EM ATRASO" severity="danger" />
+						</p:column>
+
+						<p:column headerText="E-mail (opcional)" width="230px">
+							<p:inputText value="#{over.email}"
+								placeholder="ex: user@dominio.com" rendered="#{!over.send}" />
+							<p:tag class="send" value="ENVIADO" rendered="#{over.send}" />
+						</p:column>
+
+						<p:column>
+							<p:commandButton value="Enviar"
+								action="#{notificationBean.sendEmail(over)}"
+								update="form:messages tableOverdue" icon="pi pi-envelope"
+								disabled="#{empty over.email or over.send}"
+								styleClass="ui-button-success ui-button-sm"
+								rendered="#{!over.send}" />
+						</p:column>
+					</p:dataTable>
+				</p:card>
+			</h:form>
 		</div>
-	</div>
 
-	<div class="content">
-
-		<h:form id="form">
-
-			<p:commandButton value="Limpar Tudo"
-				action="#{notificationBean.clear}"
-				update="tableAvailability tableOverdue" icon="pi pi-trash"
-				styleClass="ui-button-danger" />
-
-			<p:poll interval="3" update="tableAvailability tableOverdue" /> 
-			
-			<p:card style="margin-bottom: 2em">
-				<f:facet name="title">Livros Disponíveis (Lista de Espera)</f:facet>
-				<p:dataTable id="tableAvailability"
-					value="#{notificationBean.notifications}" var="notif">
-					<p:column headerText="Data/Hora">
-						<h:outputText value="#{notif.dateTime}">
-							<f:convertDateTime pattern="dd/MM HH:mm" type="localDateTime" />
-						</h:outputText>
-					</p:column>
-					<p:column headerText="Livro ID">#{notif.bookId}</p:column>
-					<p:column headerText="Titulo">#{notif.title}</p:column>
-					<p:column headerText="ISBN">#{notif.isbn}</p:column>
-					<p:column headerText="Status">
-						<p:tag value="DISPONÍVEL" severity="success" />
-					</p:column>
-				</p:dataTable>
-			</p:card>
-
-			<p:card style="margin-bottom: 2em">
-				<f:facet name="title">Alertas de Empréstimos em Atraso</f:facet>
-				<p:dataTable id="tableOverdue"
-					value="#{notificationBean.overdueNotifications}" var="over">
-					<p:column headerText="Data Alerta">
-						<h:outputText value="#{over.dateTime}">
-							<f:convertDateTime pattern="dd/MM HH:mm" type="localDateTime" />
-						</h:outputText>
-					</p:column>
-					<p:column headerText="Id Usuário">#{over.userId}</p:column>
-					<p:column headerText="Id Cópia">#{over.copyId}</p:column>
-					<p:column headerText="Vencimento">#{over.expectedReturnDate}</p:column>
-					<p:column headerText="Dias de Atraso">
-						<h:outputText value="#{over.overdueDays} dias"
-							style="color: red; font-weight: bold" />
-					</p:column>
-					<p:column headerText="Status">
-						<p:tag value="EM ATRASO" severity="danger" />
-					</p:column>
-				</p:dataTable>
-			</p:card>
-		</h:form>
-	</div>
-
-	<h:panelGroup layout="block" styleClass="footer">
-		<div>
-			<div class="container">
-				<p>
-					Feito por <strong>Michelle Cristina Gomes</strong>
-				</p>
-				<p>Email: gmichele498@gmail.com</p>
-				<p class="icons-contact">
-					<a href="https://www.linkedin.com/in/michelleGomes85/"
-						target="_blank"> <i class="fab fa-linkedin"></i>
-					</a> | <a href="https://github.com/michelleGomes85" target="_blank">
-						<i class="fab fa-github"></i>
-					</a>
-				</p>
-				<p class="footer-text">Feito para a disciplina de Serviços de
-					Suporte a Aplicações Distribuídas, graduação em Tecnologia em
-					Sistemas para Internet.</p>
+		<h:panelGroup layout="block" styleClass="footer">
+			<div>
+				<div class="container">
+					<p>
+						Feito por <strong>Michelle Cristina Gomes</strong>
+					</p>
+					<p>Email: gmichele498@gmail.com</p>
+					<p class="icons-contact">
+						<a href="https://www.linkedin.com/in/michelleGomes85/"
+							target="_blank"> <i class="fab fa-linkedin"></i>
+						</a> | <a href="https://github.com/michelleGomes85" target="_blank">
+							<i class="fab fa-github"></i>
+						</a>
+					</p>
+					<p class="footer-text">Feito para a disciplina de Serviços de
+						Suporte a Aplicações Distribuídas, graduação em Tecnologia em
+						Sistemas para Internet.</p>
+				</div>
 			</div>
-		</div>
-	</h:panelGroup>
-</h:body>
+		</h:panelGroup>
+	</h:body>
+</f:view>
 </html>
