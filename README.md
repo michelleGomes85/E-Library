@@ -29,6 +29,41 @@ Para facilitar a compreensão técnica de cada camada, a documentação foi divi
 - [📧 **Envio de E-mails**](docs/EMAIL.md) - Integração com Jakarta Mail para notificações.
 ---
 
+## 🖼️ Demonstração Visual das Interfaces
+
+> *Todas as interfaces foram desenvolvidas com JSF 3.0 e PrimeFaces 12.*
+
+### 🏢 Administração (E-LibraryWeb)
+
+#### Entrada
+
+![Login](assets/screenshots/login.png)
+![register](assets/screenshots/register.png)
+
+#### Parte Administrativa
+
+![administracao](assets/screenshots/admin.png)
+
+![crud_example](assets/screenshots/crud.png)
+
+#### Interação do usuário 
+
+![user](assets/screenshots/user.png)
+
+![filter](assets/screenshots/filter.png)
+
+![loans](assets/screenshots/loans.png)
+
+----
+
+### 📥 Importação de Doações (E-LibraryImportWeb)
+
+![import](assets/screenshots/import.png)
+
+### 📬 Centro de Notificações (E-LibraryNotificationConsumer)
+
+![import](assets/screenshots/email_notification.png)
+
 ## 📌 Visão Geral
 
 O **E-Library** é um sistema distribuído robusto que demonstra a integração entre o ecossistema corporativo clássico **(Jakarta EE)** e padrões modernos de consumo de dados **(GraphQL, mensageria)**. O sistema gere livros, exemplares, utilizadores e empréstimos, garantindo a integridade dos dados através de transações distribuídas e alta performance via cache em memória.
