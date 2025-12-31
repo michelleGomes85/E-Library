@@ -62,7 +62,7 @@
 			life="3000" />
 
 		<div class="toggle-sections">
-			
+
 			<h:form id="badgeForm" prependId="false">
 				<div class="loans-card">
 					<h:panelGroup id="badgeContainer" layout="block"
@@ -71,7 +71,7 @@
 						</h:panelGroup>
 				</div>
 			</h:form>
-			
+
 			<button type="button"
 				onclick="PF('loansDialog').show(); return false;" class="toggle-btn">
 				<i class="pi pi-bookmark"></i> Empréstimos
@@ -191,12 +191,27 @@
 										action="#{dashboardBean.selectBook(row[0], row[1], row[2])}"
 										oncomplete="PF('bookDetailDialog').show();" />
 
-									<p:commandButton icon="pi pi-book" title="Emprestar"
-										styleClass="action-btn borrow p-button-sm" process="@this"
-										action="#{dashboardBean.borrow(row[0])}"
-										oncomplete="PF('borrowSuccessDialog').show()"
-										update=":loansDialogContent :badgeForm:badgeContainer :globalMessages :catalogForm:catalogPanel"
-										disabled="#{row[2] eq 0}" />
+									<!-- BOTÃO EMPRESTAR (somente se houver disponíveis) -->
+									<h:panelGroup rendered="#{row[2] gt 0}">
+										<p:commandButton icon="pi pi-book" title="Emprestar"
+											styleClass="action-btn borrow p-button-sm" process="@this"
+											action="#{dashboardBean.borrow(row[0])}"
+											oncomplete="PF('borrowSuccessDialog').show()"
+											update=":loansDialogContent 
+									                :badgeForm:badgeContainer 
+									                :globalMessages 
+									                :catalogForm:catalogPanel" />
+									</h:panelGroup>
+
+									<!-- BOTÃO LISTA DE ESPERA (somente se NÃO houver disponíveis) -->
+									<h:panelGroup rendered="#{row[2] eq 0}">
+										<p:commandButton icon="pi pi-clock"
+											title="Entrar na lista de espera"
+											styleClass="action-btn waitlist p-button-sm btn-wait" process="@this"
+											action="#{dashboardBean.subscribeWaitingList(row[0])}"
+											oncomplete="PF('waitListDialog').show()"
+											update=":globalMessages" />
+									</h:panelGroup>
 
 								</div>
 							</div>
@@ -251,8 +266,8 @@
 		</p:dialog>
 
 		<!-- Dialog Empréstimos -->
-		<p:dialog class="dialog-loans" widgetVar="loansDialog" header="Meus Empréstimos"
-			modal="true" width="800" appendTo="@(body)">
+		<p:dialog class="dialog-loans" widgetVar="loansDialog"
+			header="Meus Empréstimos" modal="true" width="800" appendTo="@(body)">
 
 			<h:panelGroup id="loansDialogContent">
 
@@ -286,6 +301,26 @@
 					onclick="PF('loansDialog').hide();" />
 			</f:facet>
 		</p:dialog>
+
+		<!-- Dialog Lista de Espera -->
+		<p:dialog widgetVar="waitListDialog" header="Lista de Espera"
+			modal="true" width="500" resizable="false" appendTo="@(body)">
+
+			<div class="borrow-success-content">
+				<i class="pi pi-clock success-icon"></i>
+
+				<p>
+					Você foi adicionado à <strong>lista de espera</strong> deste livro.<br />
+					Assim que uma cópia ficar disponível, você será notificado.
+				</p>
+			</div>
+
+			<f:facet name="footer">
+				<p:commandButton value="Ok" type="button"
+					onclick="PF('waitListDialog').hide();" />
+			</f:facet>
+		</p:dialog>
+
 
 		<!-- Dialog Sucesso -->
 		<h:form id="dialogsForm" prependId="false">

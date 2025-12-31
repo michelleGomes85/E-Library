@@ -93,7 +93,7 @@ public class UserSessionSB implements UserSessionService {
 
 		copy.setStatus(CopyStatus.BORROWED);
 
-		catalogStatusSB.onCopyStatusChanged(CopyStatus.RESERVED, CopyStatus.BORROWED);
+		catalogStatusSB.onCopyStatusChanged(copy.getBook().getId(), CopyStatus.RESERVED, CopyStatus.BORROWED);
 
 		return true;
 	}
@@ -124,7 +124,7 @@ public class UserSessionSB implements UserSessionService {
 		em.flush();
 		em.refresh(copy);
 
-		catalogStatusSB.onCopyStatusChanged(CopyStatus.BORROWED, CopyStatus.AVAILABLE);
+		catalogStatusSB.onCopyStatusChanged(copy.getBook().getId(), CopyStatus.BORROWED, CopyStatus.AVAILABLE);
 
 		return true;
 	}

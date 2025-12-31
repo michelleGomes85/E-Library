@@ -1,0 +1,51 @@
+@charset "UTF-8";
+
+.footer {
+	width: 100%;
+	border-top: 1px solid #1f2937;
+	padding: 1.5rem 0;
+	margin-top: 50px;
+	font-size: 0.9rem;
+	border-radius: 40px;
+	background: #000;
+}
+
+.footer .container {
+	max-width: 1200px;
+	margin: 0 auto;
+	padding: 2rem 1rem 0;
+	text-align: center;
+}
+
+.footer p {
+	font-size: 0.95rem;
+	color: #cbd5e1;
+	line-height: 1.5;
+	margin: 1rem 0;
+}
+
+.footer .icons-contact {
+	margin: 1.5rem 0;
+}
+
+.footer .icons-contact a {
+	color: #6c757d;
+	text-decoration: none;
+	margin: 0 0.5rem;
+	transition: color 0.2s ease;
+}
+
+.footer .icons-contact a:hover {
+	color: #0d6efd;
+	transform: scale(1.1);
+}
+
+.footer .icons-contact i {
+	font-size: 1.4rem;
+}
+
+.footer .footer-text {
+	font-style: italic;
+	color: #6c757d;
+	margin-top: 1.5rem;
+}

@@ -1,12 +1,16 @@
 /home/michelle/eclipse-workspace/ProjectELibrary/ProjetoWebMaven/E-Library/E-LibraryCore/ejbModule/br/elibrary/stateless/LoanSB.java
+/home/michelle/eclipse-workspace/ProjectELibrary/ProjetoWebMaven/E-Library/E-LibraryCore/ejbModule/br/elibrary/service/internal/WaitingInternalListService.java
 /home/michelle/eclipse-workspace/ProjectELibrary/ProjetoWebMaven/E-Library/E-LibraryCore/ejbModule/br/elibrary/mapper/UserMapper.java
 /home/michelle/eclipse-workspace/ProjectELibrary/ProjetoWebMaven/E-Library/E-LibraryCore/ejbModule/br/elibrary/mapper/CategoryMapper.java
+/home/michelle/eclipse-workspace/ProjectELibrary/ProjetoWebMaven/E-Library/E-LibraryCore/ejbModule/br/elibrary/stateless/NotificationPublisherSB.java
 /home/michelle/eclipse-workspace/ProjectELibrary/ProjetoWebMaven/E-Library/E-LibraryCore/ejbModule/br/elibrary/stateless/BookSB.java
 /home/michelle/eclipse-workspace/ProjectELibrary/ProjetoWebMaven/E-Library/E-LibraryCore/ejbModule/br/elibrary/mapper/BookMapper.java
+/home/michelle/eclipse-workspace/ProjectELibrary/ProjetoWebMaven/E-Library/E-LibraryCore/ejbModule/br/elibrary/service/internal/LoanInternalService.java
 /home/michelle/eclipse-workspace/ProjectELibrary/ProjetoWebMaven/E-Library/E-LibraryCore/ejbModule/br/elibrary/mapper/CopyMapper.java
 /home/michelle/eclipse-workspace/ProjectELibrary/ProjetoWebMaven/E-Library/E-LibraryCore/ejbModule/br/elibrary/stateless/UserSB.java
-/home/michelle/eclipse-workspace/ProjectELibrary/ProjetoWebMaven/E-Library/E-LibraryCore/ejbModule/br/elibrary/service/LoanService.java
+/home/michelle/eclipse-workspace/ProjectELibrary/ProjetoWebMaven/E-Library/E-LibraryCore/ejbModule/br/elibrary/stateless/WaitingListSB.java
 /home/michelle/eclipse-workspace/ProjectELibrary/ProjetoWebMaven/E-Library/E-LibraryCore/ejbModule/br/elibrary/service/impl/LibraryServiceBean.java
+/home/michelle/eclipse-workspace/ProjectELibrary/ProjetoWebMaven/E-Library/E-LibraryCore/ejbModule/br/elibrary/model/WaitingList.java
 /home/michelle/eclipse-workspace/ProjectELibrary/ProjetoWebMaven/E-Library/E-LibraryCore/ejbModule/br/elibrary/model/Book.java
 /home/michelle/eclipse-workspace/ProjectELibrary/ProjetoWebMaven/E-Library/E-LibraryCore/ejbModule/br/elibrary/stateful/UserSessionSB.java
 /home/michelle/eclipse-workspace/ProjectELibrary/ProjetoWebMaven/E-Library/E-LibraryCore/ejbModule/br/elibrary/model/Category.java

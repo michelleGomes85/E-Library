@@ -191,6 +191,12 @@ body {
 	margin-top: 100px;
 }
 
+.header-actions link, .header-actions .ui-button, .header-actions a:hover {
+	text-decoration: none;
+	color: #fff;
+	background-color: #2664ec;
+}
+
 @media (max-width: 768px) {
 	.header {
 		height: auto;

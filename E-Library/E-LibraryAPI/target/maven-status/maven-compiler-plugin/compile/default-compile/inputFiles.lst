@@ -2,5 +2,7 @@
 /home/michelle/eclipse-workspace/ProjectELibrary/ProjetoWebMaven/E-Library/E-LibraryAPI/src/main/java/br/elibrary/rest/resource/CopyResource.java
 /home/michelle/eclipse-workspace/ProjectELibrary/ProjetoWebMaven/E-Library/E-LibraryAPI/src/main/java/br/elibrary/rest/resource/BookResource.java
 /home/michelle/eclipse-workspace/ProjectELibrary/ProjetoWebMaven/E-Library/E-LibraryAPI/src/main/java/br/elibrary/rest/service/BookRestService.java
+/home/michelle/eclipse-workspace/ProjectELibrary/ProjetoWebMaven/E-Library/E-LibraryAPI/src/main/java/br/elibrary/rest/resource/LibraryResource.java
 /home/michelle/eclipse-workspace/ProjectELibrary/ProjetoWebMaven/E-Library/E-LibraryAPI/src/main/java/br/elibrary/rest/service/CopyRestService.java
 /home/michelle/eclipse-workspace/ProjectELibrary/ProjetoWebMaven/E-Library/E-LibraryAPI/src/main/java/br/elibrary/rest/LibraryResource.java
+/home/michelle/eclipse-workspace/ProjectELibrary/ProjetoWebMaven/E-Library/E-LibraryAPI/src/main/java/br/elibrary/rest/service/LibraryRestService.java
