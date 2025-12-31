@@ -522,6 +522,14 @@ body .ui-input-icon-left > .ui-inputfield {
     transform: scale(1.05);
 }
 
+.btn-wait {
+	background: #004073 !important;
+}
+
+.btn-wait:hover {
+	background: #102147 !important;
+}
+
 @media ( max-width : 768px) {
 	.product-card {
 		width: 100%;

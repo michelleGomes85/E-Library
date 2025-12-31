@@ -11,18 +11,30 @@
     <packaging>ejb</packaging>
 
     <dependencies>
+    	
+    	 <!-- Interfaces EJB -->
         <dependency>
             <groupId>br.elibrary</groupId>
             <artifactId>E-LibraryClient</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
+        
+        <!-- Eventos (DTOs JMS) -->
+		<dependency>
+			<groupId>br.elibrary</groupId>
+			<artifactId>E-Library-Events</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<!-- Jakarta EE -->
         <dependency>
             <groupId>jakarta.platform</groupId>
             <artifactId>jakarta.jakartaee-api</artifactId>
             <scope>provided</scope>
         </dependency>
 
+		<!-- BCrypt -->
 		<dependency>
 			<groupId>org.mindrot</groupId>
 			<artifactId>jbcrypt</artifactId>

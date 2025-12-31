@@ -15,7 +15,7 @@ public interface CatalogStatusService {
 
     void onCopyCreated();
 
-    void onCopyStatusChanged(CopyStatus oldStatus, CopyStatus newStatus);
+    void onCopyStatusChanged(Long bookId, CopyStatus oldStatus, CopyStatus newStatus);
     
     void onBookCreated();
     

@@ -118,7 +118,7 @@ public class CopySB implements CopyService {
 		validateCopyState(existing.getId(), dto.getStatus());
 
 		if (oldStatus != existing.getStatus())
-			catalogStatusSB.onCopyStatusChanged(oldStatus, existing.getStatus());
+			catalogStatusSB.onCopyStatusChanged(dto.getBookId(), oldStatus, existing.getStatus());
 		
 		em.flush();          
 	    em.refresh(existing);
@@ -159,7 +159,7 @@ public class CopySB implements CopyService {
 		existing.setStatus(newStatus);
 
 		if (!oldStatus.equals(newStatus)) {
-			catalogStatusSB.onCopyStatusChanged(oldStatus, newStatus);
+			catalogStatusSB.onCopyStatusChanged(existing.getBook().getId(), oldStatus, newStatus);
 		}
 		
 		em.flush();          

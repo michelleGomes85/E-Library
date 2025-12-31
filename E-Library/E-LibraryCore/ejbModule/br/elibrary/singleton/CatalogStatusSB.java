@@ -3,12 +3,17 @@ package br.elibrary.singleton;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import br.elibrary.dto.BookDTO;
 import br.elibrary.dto.DashboardDTO;
 import br.elibrary.model.enuns.CopyStatus;
+import br.elibrary.service.BookService;
 import br.elibrary.service.CatalogStatusService;
+import br.elibrary.service.NotificationPublisher;
+import br.elibrary.service.internal.WaitingInternalListService;
 import jakarta.annotation.PostConstruct;
 import jakarta.ejb.ConcurrencyManagement;
 import jakarta.ejb.ConcurrencyManagementType;
+import jakarta.ejb.EJB;
 import jakarta.ejb.Lock;
 import jakarta.ejb.LockType;
 import jakarta.ejb.Remote;
@@ -36,6 +41,15 @@ public class CatalogStatusSB implements CatalogStatusService {
 	private final AtomicInteger availableCopies = new AtomicInteger(0);
 	private final AtomicInteger reservedCopies = new AtomicInteger(0);
 	private final AtomicInteger borrowedCopies = new AtomicInteger(0);
+	
+	@EJB
+	private WaitingInternalListService waitingListService;
+
+	@EJB
+	private NotificationPublisher notificationPublisher;
+	
+	@EJB
+	private BookService bookService;
 
 	/**
 	 * Inicializa o cache assim que o servidor WildFly sobe.
@@ -103,7 +117,9 @@ public class CatalogStatusSB implements CatalogStatusService {
 	 */
 	@Override
 	@Lock(LockType.WRITE)
-	public void onCopyStatusChanged(CopyStatus oldStatus, CopyStatus newStatus) {
+	public void onCopyStatusChanged(Long bookId, CopyStatus oldStatus, CopyStatus newStatus) {
+		
+		BookDTO bookDTO = bookService.findById(bookId);
 		
 		if (oldStatus != null) {
 			updateAtomicValue(oldStatus, -1, true);
@@ -112,7 +128,30 @@ public class CatalogStatusSB implements CatalogStatusService {
 		if (newStatus != null) {
 			updateAtomicValue(newStatus, 1, true); 
 		}
+		
+	    if (bookDTO.getAvailableCopies() == 1) {
+	        notifyWaitingList(bookDTO);
+	    }
 	}
+	
+	private void notifyWaitingList(BookDTO bookDTO) {
+
+	    var waitingUsers = waitingListService.findUsersWaitingForBook(bookDTO.getId());
+
+	    if (waitingUsers.isEmpty())
+	        return;
+
+
+	    notificationPublisher.publishBookAvailable(
+	        bookDTO.getId(),
+	        bookDTO.getIsbn(),
+	        bookDTO.getTitle()
+	    );
+
+	    waitingListService.removeAllFromWaitingList(bookDTO.getId());
+	}
+
+
 
 	/**
 	 * Incrementa o contador de livros únicos.

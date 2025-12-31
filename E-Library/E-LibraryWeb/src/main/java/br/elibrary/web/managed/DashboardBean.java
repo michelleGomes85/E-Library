@@ -15,6 +15,7 @@ import br.elibrary.service.BookService;
 import br.elibrary.service.CatalogStatusService;
 import br.elibrary.service.CopyService;
 import br.elibrary.service.UserSessionService;
+import br.elibrary.service.WaitingListService;
 import jakarta.annotation.PostConstruct;
 import jakarta.ejb.EJB;
 import jakarta.faces.application.FacesMessage;
@@ -40,6 +41,9 @@ public class DashboardBean implements Serializable {
 
 	@Inject
 	private UserSessionBean sessionBean;
+	
+	@EJB
+	private WaitingListService waitingListService;
 
 	private List<Object[]> booksWithAvailableCount;
 
@@ -202,5 +206,22 @@ public class DashboardBean implements Serializable {
 
 	private void addMessage(FacesMessage.Severity severity, String summary, String detail) {
 		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, summary, detail));
+	}
+	
+	public void subscribeWaitingList(BookDTO book) {
+
+	    Long userId = sessionBean.getLoggedUser().getId();
+	    Long bookId = book.getId();
+
+	    waitingListService.subscribe(userId, bookId);
+
+	    FacesContext.getCurrentInstance().addMessage(
+	        null,
+	        new FacesMessage(
+	            FacesMessage.SEVERITY_INFO,
+	            "Lista de espera",
+	            "Você foi adicionado à lista de espera do livro."
+	        )
+	    );
 	}
 }
