@@ -70,6 +70,80 @@ Abaixo estão os recursos expostos e a lógica que executam no servidor:
 
 ---
 
+## Teste `curl`
+
+## Livros
+
+#### Cadastrar Livro (POST)
+
+```code
+curl -i -X POST "http://localhost:8080/E-LibraryAPI/api/livros" -d "titulo=O Hobbit&autor=J.R.R. Tolkien&isbn=9780007525492&editora=HarperCollins&ano=1937"
+````
+
+### Buscar por ID (GET)
+
+```code
+curl -i -X GET "http://localhost:8080/E-LibraryAPI/api/livros/1"
+```
+
+### Atualizar Livro (PUT)
+
+```code
+curl -i -X PUT "http://localhost:8080/E-LibraryAPI/api/livros/1" -d "titulo=O Hobbit - Edicao Especial&autor=J.R.R. Tolkien&isbn=9780007525492&editora=HarperCollins&ano=2024"
+```
+
+#### Listar (GET)
+
+##### Listar Todos
+
+```code
+curl -i -X GET "http://localhost:8080/E-LibraryAPI/api/livros"
+```
+
+##### Listar por Autor
+
+```code
+curl -i -X GET "http://localhost:8080/E-LibraryAPI/api/livros?autor=Tolkien"
+```
+
+##### Listar por Categoria
+
+```code
+curl -i -X GET "http://localhost:8080/E-LibraryAPI/api/livros?categoria=Fantasia"
+```
+
+#### Listar por Autor e categoria
+
+```code
+curl -i -X GET "http://localhost:8080/E-LibraryAPI/api/livros?autor=Tolkien&categoria=Fantasia"
+```
+
+## Exemplares
+
+### Cadastrar exemplar para um livro (POST)
+
+```code
+curl -i -X POST "http://localhost:8080/E-LibraryAPI/api/livros/1/exemplares"
+```
+
+### Buscar Exemplar por ID (GET)
+
+```code
+curl -i -X GET "http://localhost:8080/E-LibraryAPI/api/exemplares/10"
+```
+
+### Atualizar Status de Exemplar (PUT)
+
+```code
+curl -i -X PUT "http://localhost:8080/E-LibraryAPI/api/exemplares/10/status" -d "status=BORROWED"
+```
+
+### Listar exemplares de um livro por status 
+
+```code
+curl -i -X GET "http://localhost:8080/E-LibraryAPI/api/livros/15/exemplares?status=RESERVED"
+```
+
 ## 🛠️ Detalhes Técnicos de Implementação
 
 ### 1. Injeção de Dependência (CDI & EJB)
